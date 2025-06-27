@@ -184,6 +184,7 @@ class ProductDisplay {
         alert(`查看产品详情: ${productId}\n功能开发中...`);
     }
 
+
     // 加入购物车
     addToCart(productId) {
         alert(`产品 ${productId} 已加入购物车\n功能开发中...`);
@@ -222,3 +223,6 @@ $(document).ready(function() {
     productDisplay = new ProductDisplay();
     productDisplay.init();
 });
+function viewDetail(productId) {
+    window.location.href = `product_detail.html?id=${productId}`;
+}

@@ -61,7 +61,12 @@ public class UserController {
         if (user != null) {
             response.put("status", 0);
             response.put("msg", "登录成功");
-            response.put("data", user);
+            // 将用户信息作为 data 字段返回，包含角色信息
+            Map<String, Object> userData = new HashMap<>();
+            userData.put("id", user.getId());
+            userData.put("username", user.getName());
+            userData.put("role", user.getRole());
+            response.put("data", userData);
         } else {
             response.put("status", 1);
             response.put("msg", "用户名/手机号或密码错误");
