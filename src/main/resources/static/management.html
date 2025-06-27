@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>后台管理 - 用户管理</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --border-color: #dee2e6;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--light-color);
+            font-weight: 500;
+            color: var(--dark-color);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        .btn i {
+            margin-right: 5px;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show {
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 25px;
+            border-radius: 8px;
+            width: 50%;
+            max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(-50px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: var(--dark-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-inactive {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .search-btn {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .search-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 90%;
+                margin: 10% auto;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1><i class="fas fa-users"></i> 用户管理</h1>
+        <div class="search-bar">
+            <input type="text" class="search-input" id="searchInput" placeholder="搜索用户...">
+            <button class="search-btn" onclick="searchUsers()"><i class="fas fa-search"></i> 搜索</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="table-container">
+            <table>
+                <thead>
+                <tr>
+                    <th>用户名</th>
+                    <th>姓名</th>
+                    <th>手机号</th>
+                    <th>邮箱</th>
+                    <th>性别</th>
+                    <th>年龄</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="userTable">
+                <!-- 数据将通过JavaScript动态加载 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 修改用户模态框 -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-user-edit"></i> 修改用户信息</h2>
+            <span class="close" onclick="closeModal()">&times;</span>
+        </div>
+        <form id="editForm">
+            <input type="hidden" id="editId">
+            <div class="form-group">
+                <label for="editAccount"><i class="fas fa-user"></i> 用户名</label>
+                <input type="text" id="editAccount" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="editName"><i class="fas fa-id-card"></i> 姓名</label>
+                <input type="text" id="editName" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="editPhone"><i class="fas fa-phone"></i> 手机号</label>
+                <input type="text" id="editPhone" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="editEmail"><i class="fas fa-envelope"></i> 邮箱</label>
+                <input type="email" id="editEmail" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="editSex"><i class="fas fa-venus-mars"></i> 性别</label>
+                <select id="editSex" class="form-control">
+                    <option value="1">男</option>
+                    <option value="0">女</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="editAge"><i class="fas fa-birthday-cake"></i> 年龄</label>
+                <input type="number" id="editAge" class="form-control">
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-primary" onclick="submitEdit()">
+                    <i class="fas fa-save"></i> 保存
+                </button>
+                <button type="button" class="btn" onclick="closeModal()" style="background-color: var(--light-color);">
+                    <i class="fas fa-times"></i> 取消
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="js/jquery.min.js"></script>
+<script>
+    let currentEditId = null;
+
+    $(document).ready(function() {
+        loadUsers();
+    });
+
+    function loadUsers() {
+        $.ajax({
+            url: 'http://localhost:8080/api/admin/users',
+            type: 'GET',
+            dataType: 'json',
+            beforeSend: function() {
+                $('#userTable').html('<tr><td colspan="7" style="text-align: center;"><i class="fas fa-spinner fa-spin"></i> 加载中...</td></tr>');
+            },
+            success: function(response) {
+                if (response.status === 0 && response.data && response.data.length > 0) {
+                    let html = '';
+                    $.each(response.data, function(i, user) {
+                        html += `<tr>
+                                <td>${escapeHtml(user.account) || '-'}</td>
+                                <td>${escapeHtml(user.name) || '-'}</td>
+                                <td>${escapeHtml(user.phone) || '-'}</td>
+                                <td>${escapeHtml(user.email) || '-'}</td>
+                                <td>${user.sex === 1 ? '<span class="status-badge status-active"><i class="fas fa-male"></i> 男</span>' :
+                            '<span class="status-badge status-inactive"><i class="fas fa-female"></i> 女</span>'}</td>
+                                <td>${user.age || '-'}</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" onclick="openEditModal(${user.id}, '${escapeHtml(user.account)}', '${escapeHtml(user.name)}', '${escapeHtml(user.phone)}', '${escapeHtml(user.email)}', ${user.sex}, ${user.age})">
+                                        <i class="fas fa-edit"></i> 修改
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">
+                                        <i class="fas fa-trash"></i> 删除
+                                    </button>
+                                </td>
+                            </tr>`;
+                    });
+                    $('#userTable').html(html);
+                } else if (response.status === 0) {
+                    $('#userTable').html('<tr><td colspan="7" style="text-align: center;">暂无用户数据</td></tr>');
+                } else {
+                    console.error('获取用户数据失败:', response.msg);
+                    $('#userTable').html('<tr><td colspan="7" style="text-align: center; color: var(--danger-color);">加载用户数据失败: ' + escapeHtml(response.msg) + '</td></tr>');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('请求失败:', error);
+                $('#userTable').html('<tr><td colspan="7" style="text-align: center; color: var(--danger-color);">请求失败: ' + escapeHtml(error) + '</td></tr>');
+            }
+        });
+    }
+
+    function searchUsers() {
+        const keyword = $('#searchInput').val().trim();
+        if (keyword === '') {
+            loadUsers(); // 如果搜索框为空，加载所有用户
+            return;
+        }
+
+        $.ajax({
+            url: 'http://localhost:8080/api/admin/users/search',
+            type: 'GET',
+            dataType: 'json',
+            data: { keyword: keyword },
+            beforeSend: function() {
+                $('#userTable').html('<tr><td colspan="7" style="text-align: center;"><i class="fas fa-spinner fa-spin"></i> 加载中...</td></tr>');
+            },
+            success: function(response) {
+                if (response.status === 0 && response.data && response.data.length > 0) {
+                    let html = '';
+                    $.each(response.data, function(i, user) {
+                        html += `<tr>
+                                <td>${escapeHtml(user.account) || '-'}</td>
+                                <td>${escapeHtml(user.name) || '-'}</td>
+                                <td>${escapeHtml(user.phone) || '-'}</td>
+                                <td>${escapeHtml(user.email) || '-'}</td>
+                                <td>${user.sex === 1 ? '<span class="status-badge status-active"><i class="fas fa-male"></i> 男</span>' :
+                            '<span class="status-badge status-inactive"><i class="fas fa-female"></i> 女</span>'}</td>
+                                <td>${user.age || '-'}</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" onclick="openEditModal(${user.id}, '${escapeHtml(user.account)}', '${escapeHtml(user.name)}', '${escapeHtml(user.phone)}', '${escapeHtml(user.email)}', ${user.sex}, ${user.age})">
+                                        <i class="fas fa-edit"></i> 修改
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">
+                                        <i class="fas fa-trash"></i> 删除
+                                    </button>
+                                </td>
+                            </tr>`;
+                    });
+                    $('#userTable').html(html);
+                } else if (response.status === 0) {
+                    $('#userTable').html('<tr><td colspan="7" style="text-align: center;">暂无匹配的用户数据</td></tr>');
+                } else {
+                    console.error('搜索用户失败:', response.msg);
+                    $('#userTable').html('<tr><td colspan="7" style="text-align: center; color: var(--danger-color);">搜索用户失败: ' + escapeHtml(response.msg) + '</td></tr>');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('请求失败:', error);
+                $('#userTable').html('<tr><td colspan="7" style="text-align: center; color: var(--danger-color);">请求失败: ' + escapeHtml(error) + '</td></tr>');
+            }
+        });
+    }
+
+    function openEditModal(id, account, name, phone, email, sex, age) {
+        currentEditId = id;
+        $('#editId').val(id);
+        $('#editAccount').val(account);
+        $('#editName').val(name);
+        $('#editPhone').val(phone);
+        $('#editEmail').val(email);
+        $('#editSex').val(sex);
+        $('#editAge').val(age || '');
+
+        $('#editModal').addClass('show').show();
+        $('body').css('overflow', 'hidden');
+    }
+
+    function closeModal() {
+        $('#editModal').removeClass('show');
+        setTimeout(() => {
+            $('#editModal').hide();
+            $('body').css('overflow', 'auto');
+        }, 300);
+    }
+
+    function submitEdit() {
+        const user = {
+            id: currentEditId,
+            account: $('#editAccount').val(),
+            name: $('#editName').val(),
+            phone: $('#editPhone').val(),
+            email: $('#editEmail').val(),
+            sex: parseInt($('#editSex').val()),
+            age: parseInt($('#editAge').val()) || null
+        };
+
+        if (!user.account || !user.name) {
+            alert('用户名和姓名不能为空');
+            return;
+        }
+
+        $.ajax({
+            url: 'http://localhost:8080/api/admin/user',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(user),
+            beforeSend: function() {
+                $('.modal-content').append('<div class="loading-overlay"><i class="fas fa-spinner fa-spin"></i> 保存中...</div>');
+            },
+            success: function(response) {
+                if (response.status === 0) {
+                    showToast('success', '修改成功');
+                    closeModal();
+                    loadUsers();
+                } else {
+                    showToast('error', '修改失败: ' + response.msg);
+                }
+            },
+            error: function(xhr, status, error) {
+                showToast('error', '请求失败: ' + error);
+            },
+            complete: function() {
+                $('.loading-overlay').remove();
+            }
+        });
+    }
+
+    function deleteUser(id) {
+        if (confirm('确定要删除此用户吗？此操作不可撤销！')) {
+            $.ajax({
+                url: 'http://localhost:8080/api/admin/user/' + id,
+                type: 'DELETE',
+                beforeSend: function() {
+                    // 可以在这里添加加载指示器
+                },
+                success: function(response) {
+                    if (response.status === 0) {
+                        showToast('success', '删除成功');
+                        loadUsers();
+                    } else {
+                        showToast('error', '删除失败: ' + response.msg);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showToast('error', '请求失败: ' + error);
+                }
+            });
+        }
+    }
+
+    // 辅助函数：防止XSS攻击
+    function escapeHtml(unsafe) {
+        if (!unsafe) return unsafe;
+        return unsafe.toString()
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // 显示Toast通知
+    function showToast(type, message) {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }, 100);
+    }
+</script>
+</body>
+</html>
