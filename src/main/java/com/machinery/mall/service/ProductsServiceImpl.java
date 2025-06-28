@@ -29,4 +29,23 @@ public class ProductsServiceImpl implements ProductsService {
     public Products getProductById(Integer id) {
         return productsMapper.selectById(id);
     }
+    @Override
+    public List<Products> getAllProducts() {
+        return productsMapper.getAllProducts();
+    }
+
+    @Override
+    public int updateProduct(Products product) {
+        return productsMapper.updateProduct(product);
+    }
+
+    @Override
+    public int deleteProduct(int id) {
+        return productsMapper.deleteProduct(id);
+    }
+
+    @Override
+    public List<Products> searchProductsByName(String name) {
+        return productsMapper.searchProductsByName(name);
+    }
     }

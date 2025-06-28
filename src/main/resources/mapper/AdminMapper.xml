@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.machinery.mall.mapper.AdminMapper">
+    <select id="getAllUsers" resultType="com.machinery.mall.entity.User">
+        SELECT id, account, name, phone, email, sex, age
+        FROM users
+        WHERE del = 0
+    </select>
+
+    <update id="updateUser">
+        UPDATE users
+        SET account = #{account},
+            name = #{name},
+            phone = #{phone},
+            email = #{email},
+            sex = #{sex},
+            age = #{age}
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteUser">
+        UPDATE users
+        SET del = 1
+        WHERE id = #{id}
+    </update>
+
+    <select id="searchUsers" resultType="com.machinery.mall.entity.User">
+        SELECT id, account, name, phone, email, sex, age
+        FROM users
+        WHERE del = 0
+          AND (account LIKE CONCAT('%', #{keyword}, '%')
+            OR name LIKE CONCAT('%', #{keyword}, '%')
+            OR phone LIKE CONCAT('%', #{keyword}, '%')
+            OR email LIKE CONCAT('%', #{keyword}, '%'))
+    </select>
+</mapper>

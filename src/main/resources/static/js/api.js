@@ -42,7 +42,7 @@ class ApiService {
 
     // 根据产品名称搜索产品
     static async searchProductsByName(name) {
-        return await this.get(`${API_BASE_URL}/products/search`, { name });
+        return await this.get(`${API_BASE_URL}/products/searchByCategory`, { name });
     }
 }
 

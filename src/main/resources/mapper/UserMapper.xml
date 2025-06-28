@@ -91,4 +91,19 @@
                          update_time = NOW()
         WHERE phone = #{phone} AND del = 0
     </update>
+    <select id="selectByAccount" resultMap="BaseResultMap">
+        SELECT * FROM users
+        WHERE account = #{account} AND del = 0
+    </select>
+
+    <update id="updateProfile">
+        UPDATE users SET
+                         name = #{user.name},
+                         sex = #{user.sex},
+                         phone = #{user.phone},
+                         email = #{user.email},
+                         age = #{user.age},
+                         update_time = NOW()
+        WHERE account = #{user.account} AND del = 0
+    </update>
 </mapper>

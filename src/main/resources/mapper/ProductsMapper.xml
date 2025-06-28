@@ -17,4 +17,31 @@
     <select id="selectById" resultType="com.machinery.mall.entity.Products">
         SELECT * FROM products WHERE id = #{id}
     </select>
+    <select id="getAllProducts" resultType="com.machinery.mall.entity.Products">
+        SELECT id, name, product_id as productId, parts_id as partsId,
+               icon_url as iconUrl, sub_images as subImages, detail,
+               spec_param as specParam, price, stock, status, is_hot as isHot,
+               created, updated
+        FROM products
+    </select>
+
+    <update id="updateProduct">
+        UPDATE products
+        SET name = #{name},
+            price = #{price},
+            status = #{status},
+            is_hot = #{isHot}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteProduct">
+        DELETE FROM products
+        WHERE id = #{id}
+    </delete>
+
+    <select id="searchProductsByName" resultType="com.machinery.mall.entity.Products">
+        SELECT id, name, price, status, is_hot
+        FROM products
+        WHERE name LIKE CONCAT('%', #{name}, '%')
+    </select>
 </mapper>

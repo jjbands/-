@@ -34,7 +34,7 @@ public class CategoryController {
     public List<Products> getProductsByCategory(@RequestParam Integer categoryId) {
         return productsService.getProductsByCategory(categoryId);
     }
-    @GetMapping("/products/search")
+    @GetMapping("/products/searchByCategory")
     public List<Products> searchProductsByName(@RequestParam String name) {
         return productsService.getProductsByName(name);
     }

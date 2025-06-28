@@ -13,7 +13,6 @@ import org.springframework.util.DigestUtils;
 @Service
 public class UserServiceImpl implements UserService {
 
-
     private UserMapper userMapper;
     public UserServiceImpl(UserMapper userMapper) {
         this.userMapper = userMapper;}
@@ -94,5 +93,14 @@ public class UserServiceImpl implements UserService {
         }
 
         return result > 0;
+    }
+    @Override
+    public User getUserByAccount(String account) {
+        return userMapper.selectByAccount(account);
+    }
+
+    @Override
+    public boolean updateUserProfile(User user) {
+        return userMapper.updateProfile(user) > 0;
     }
 }
