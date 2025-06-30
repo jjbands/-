@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>收货地址管理 - 机械电商平台</title>
+    <style>
+        .address-table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+        .address-table th, .address-table td { border: 1px solid #e0e0e0; padding: 10px; text-align: center; }
+        .address-table th { background: #f8f8f8; }
+        .address-table .default-badge { color: #fff; background: #67c23a; border-radius: 4px; padding: 2px 8px; font-size: 12px; }
+        .address-table button { margin: 0 2px; padding: 4px 10px; border: none; border-radius: 4px; background: #409eff; color: #fff; cursor: pointer; }
+        .address-table button.delete { background: #f56c6c; }
+        .address-table button.save { background: #67c23a; }
+        .address-table button.cancel { background: #909399; }
+        .address-table button.default { background: #e6a23c; }
+        .address-table input, .address-table select { padding: 4px 6px; border: 1px solid #dcdfe6; border-radius: 4px; }
+        .add-btn { margin: 20px 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-size: 16px; cursor: pointer; }
+        .debug-info { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; font-size: 12px; }
+    </style>
+    <script type="text/javascript">
+    window._AMapSecurityConfig = {
+        serviceHost: "http://127.0.0.1/_AMapService"
+    };
+    </script>
+    <script src="https://webapi.amap.com/maps?v=2.0&key=1cf1799df8d3e6d1ae1e68837f289d4c"></script>
+</head>
+<body>
+    <h2 style="margin-top:30px;">管理地址</h2>
+    
+    <div style="margin-bottom: 20px;">
+      <button id="activeTab" onclick="showActiveAddresses()">活跃地址</button>
+      <button id="deletedTab" onclick="showDeletedAddresses()">已删除地址</button>
+    </div>
+    <table class="address-table" id="deletedAddressTable" style="display:none;">
+      <thead>
+        <tr>
+          <th>收货人</th>
+          <th>联系方式</th>
+          <th>收货地址</th>
+          <th>详细地址</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="deletedAddressTableBody"></tbody>
+    </table>
+    
+    <table class="address-table" id="addressTable">
+        <thead>
+            <tr>
+                <th>收货人</th>
+                <th>联系方式</th>
+                <th>收货地址</th>
+                <th>详细地址</th>
+                <th>默认地址</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody id="addressTableBody"></tbody>
+    </table>
+    <button class="add-btn" onclick="addRow()">新增</button>
+
+    <div id="amap-container" style="width:0;height:0;display:none"></div>
+
+    <script src="/js/jquery.min.js"></script>
+    <script>
+    let regionData = [];
+    let addressList = [];
+    let editingIndex = null;
+
+    // 页面加载时异步加载省市区数据
+    $(document).ready(function() {
+        $.getJSON('/pcas-code.json', function(data) {
+            regionData = data;
+            loadAddressList();
+        });
+    });
+
+    // 2. 加载后端地址数据
+    function loadAddressList() {
+        // 从localStorage获取当前用户账号
+        const account = localStorage.getItem('account');
+        
+        if (!account) {
+            alert('请先登录');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        $.ajax({
+            url: '/api/address/list',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ account: account }),
+            success: function(res) {
+                if (res.status === 0) {
+                    addressList = res.data || [];
+                } else {
+                    addressList = [];
+                    alert(res.msg);
+                }
+                renderTable();
+            },
+            error: function(xhr, status, error) {
+                alert('加载地址失败');
+            }
+        });
+    }
+
+    function renderTable() {
+        let html = '';
+        addressList.forEach((addr, idx) => {
+            if (editingIndex === idx) {
+                html += renderEditRow(addr, idx);
+            } else {
+                html += renderViewRow(addr, idx);
+            }
+        });
+        $('#addressTableBody').html(html);
+        
+        // 如果是编辑状态，渲染省市区选择器
+        if (editingIndex !== null) {
+            renderRegionSelect(editingIndex, addressList[editingIndex]);
+        }
+    }
+
+    function renderViewRow(addr, idx) {
+        return `<tr>
+            <td>${addr.name||''}</td>
+            <td>${addr.mobile||addr.phone||''}</td>
+            <td>${addr.province||''} / ${addr.city||''} / ${addr.district||''}</td>
+            <td>${addr.addr||''}</td>
+            <td>${addr.dfault ? '<span class="default-badge">默认</span>' : ''}</td>
+            <td>
+                <button onclick="editRow(${idx})">编辑</button>
+                <button class="delete" onclick="deleteRow(${idx})">删除</button>
+                ${!addr.dfault ? `<button class="default" onclick="setDefault(${idx})">设为默认</button>` : ''}
+            </td>
+        </tr>`;
+    }
+
+    function renderEditRow(addr, idx) {
+        return `<tr>
+            <td><input type="text" id="name_${idx}" value="${addr.name||''}"></td>
+            <td><input type="text" id="mobile_${idx}" value="${addr.mobile||addr.phone||''}"></td>
+            <td>
+                <select id="province_${idx}" onchange="onProvinceChange(${idx})"></select>
+                <select id="city_${idx}" onchange="onCityChange(${idx})"></select>
+                <select id="district_${idx}"></select>
+            </td>
+            <td><input type="text" id="addr_${idx}" value="${addr.addr||''}"></td>
+            <td><input type="checkbox" id="dfault_${idx}" ${addr.dfault ? 'checked' : ''}></td>
+            <td>
+                <button class="save" onclick="saveRow(${idx})">保存</button>
+                <button class="cancel" onclick="cancelEdit()">取消</button>
+            </td>
+        </tr>`;
+    }
+
+    function addRow() {
+        addressList.push({name:'', mobile:'', province:'', city:'', district:'', addr:'', dfault:0});
+        editingIndex = addressList.length - 1;
+        renderTable();
+    }
+
+    function editRow(idx) {
+        editingIndex = idx;
+        renderTable();
+    }
+
+    function deleteRow(idx) {
+        if (!addressList[idx].id) {
+            addressList.splice(idx, 1);
+            editingIndex = null;
+            renderTable();
+            return;
+        }
+        if (confirm('确定删除？')) {
+            $.ajax({
+                url: '/api/address/delete',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ id: addressList[idx].id }),
+                success: function(res) {
+                    if (res.status === 0) {
+                        addressList.splice(idx, 1);
+                        editingIndex = null;
+                        renderTable();
+                    } else {
+                        alert(res.msg);
+                    }
+                }
+            });
+        }
+    }
+
+    function saveRow(idx) {
+        let addr = addressList[idx];
+        addr.name = $(`#name_${idx}`).val();
+        addr.mobile = $(`#mobile_${idx}`).val();
+        addr.province = $(`#province_${idx}`).val();
+        addr.city = $(`#city_${idx}`).val();
+        addr.district = $(`#district_${idx}`).val();
+        addr.addr = $(`#addr_${idx}`).val();
+        addr.dfault = $(`#dfault_${idx}`).is(':checked') ? 1 : 0;
+        addr.account = localStorage.getItem('account');
+
+        let url, data;
+        if (addr.id) {
+            url = '/api/address/update';
+            data = {
+                id: addr.id,
+                account: addr.account,
+                receiverName: addr.name,
+                receiverPhone: addr.mobile,
+                province: addr.province,
+                city: addr.city,
+                district: addr.district,
+                detailAddress: addr.addr,
+                isDefault: addr.dfault
+            };
+        } else {
+            url = '/api/address/add';
+            data = {
+                account: addr.account,
+                receiverName: addr.name,
+                receiverPhone: addr.mobile,
+                province: addr.province,
+                city: addr.city,
+                district: addr.district,
+                detailAddress: addr.addr,
+                isDefault: addr.dfault
+            };
+        }
+        
+        $.ajax({
+            url: url,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(res) {
+                if (res.status === 0) {
+                    loadAddressList();
+                } else {
+                    alert(res.msg);
+                }
+            }
+        });
+        editingIndex = null;
+    }
+
+    function cancelEdit() {
+        editingIndex = null;
+        renderTable();
+    }
+
+    function setDefault(idx) {
+        $.ajax({
+            url: '/api/address/setDefault',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                account: localStorage.getItem('account'),
+                addressId: addressList[idx].id
+            }),
+            success: function(res) {
+                if (res.status === 0) {
+                    loadAddressList();
+                } else {
+                    alert(res.msg);
+                }
+            }
+        });
+    }
+
+    // 省市区三级联动渲染
+    function renderRegionSelect(idx, addr = {}) {
+        let $province = $(`#province_${idx}`);
+        let $city = $(`#city_${idx}`);
+        let $district = $(`#district_${idx}`);
+
+        // 渲染省
+        $province.html('<option value="">请选择</option>');
+        regionData.forEach(p => $province.append(`<option value="${p.name}">${p.name}</option>`));
+        if (addr.province) $province.val(addr.province);
+
+        // 渲染市
+        $city.html('<option value="">请选择</option>');
+        let provinceObj = regionData.find(p => p.name === (addr.province || $province.val()));
+        if (provinceObj && provinceObj.children) {
+            provinceObj.children.forEach(c => $city.append(`<option value="${c.name}">${c.name}</option>`));
+            if (addr.city) $city.val(addr.city);
+        }
+
+        // 渲染区
+        $district.html('<option value="">请选择</option>');
+        if (provinceObj && provinceObj.children) {
+            let cityObj = provinceObj.children.find(c => c.name === (addr.city || $city.val()));
+            if (cityObj && cityObj.children) {
+                cityObj.children.forEach(d => $district.append(`<option value="${d.name}">${d.name}</option>`));
+                if (addr.district) $district.val(addr.district);
+            }
+        }
+    }
+
+    function onProvinceChange(idx) {
+        let province = $(`#province_${idx}`).val();
+        let $city = $(`#city_${idx}`);
+        $city.html('<option value="">请选择</option>');
+        let provinceObj = regionData.find(p => p.name === province);
+        if (provinceObj && provinceObj.children) {
+            provinceObj.children.forEach(c => $city.append(`<option value="${c.name}">${c.name}</option>`));
+        }
+        $(`#district_${idx}`).html('<option value="">请选择</option>');
+    }
+
+    function onCityChange(idx) {
+        let province = $(`#province_${idx}`).val();
+        let city = $(`#city_${idx}`).val();
+        let $district = $(`#district_${idx}`);
+        $district.html('<option value="">请选择</option>');
+        let provinceObj = regionData.find(p => p.name === province);
+        if (provinceObj && provinceObj.children) {
+            let cityObj = provinceObj.children.find(c => c.name === city);
+            if (cityObj && cityObj.children) {
+                cityObj.children.forEach(d => $district.append(`<option value="${d.name}">${d.name}</option>`));
+            }
+        }
+    }
+
+    function showActiveAddresses() {
+        $("#deletedAddressTable").hide();
+        $("#addressTable").show();
+        $('#activeTab').addClass('active');
+        $('#deletedTab').removeClass('active');
+        loadAddressList();
+    }
+    function showDeletedAddresses() {
+        $("#addressTable").hide();
+        $("#deletedAddressTable").show();
+        $('#activeTab').removeClass('active');
+        $('#deletedTab').addClass('active');
+        loadDeletedAddressList();
+    }
+    function loadDeletedAddressList() {
+        const account = localStorage.getItem('account');
+        $.ajax({
+            url: '/api/address/deletedList',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ account: account }),
+            success: function(res) {
+                if (res.status === 0) {
+                    renderDeletedTable(res.data || []);
+                } else {
+                    alert(res.msg);
+                }
+            }
+        });
+    }
+    function renderDeletedTable(list) {
+        let html = '';
+        list.forEach(addr => {
+            html += `<tr>
+                <td>${addr.name||''}</td>
+                <td>${addr.mobile||addr.phone||''}</td>
+                <td>${addr.province||''} / ${addr.city||''} / ${addr.district||''}</td>
+                <td>${addr.addr||''}</td>
+                <td>
+                    <button class="restore" onclick="restoreAddress(${addr.id})">恢复</button>
+                    <button class="delete" onclick="permanentlyDeleteAddress(${addr.id})">永久删除</button>
+                </td>
+            </tr>`;
+        });
+        $('#deletedAddressTableBody').html(html);
+    }
+    function restoreAddress(id) {
+        $.ajax({
+            url: '/api/address/restore',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ id: id }),
+            success: function(res) {
+                if (res.status === 0) {
+                    loadDeletedAddressList();
+                } else {
+                    alert(res.msg);
+                }
+            }
+        });
+    }
+    function permanentlyDeleteAddress(id) {
+        if (confirm('确定要永久删除该地址吗？此操作不可恢复！')) {
+            $.ajax({
+                url: '/api/address/permanentDelete',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ id: id }),
+                success: function(res) {
+                    if (res.status === 0) {
+                        loadDeletedAddressList();
+                    } else {
+                        alert(res.msg);
+                    }
+                }
+            });
+        }
+    }
+    function selectOptionByText($select, text) {
+        let found = false;
+        $select.find('option').each(function() {
+            if ($(this).text().indexOf(text) !== -1) {
+                $select.val($(this).val());
+                found = true;
+                return false;
+            }
+        });
+        return found;
+    }
+    </script>
+</body>
+</html>

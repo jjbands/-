@@ -116,6 +116,16 @@
             color: #e74c3c !important;
             border-top: 1px solid #eee;
         }
+        .category-menu { display: flex; position: relative; width: 220px; }
+        .main-category-list { width: 220px; background: #fff; border-right: 1px solid #eee; list-style: none; margin: 0; padding: 0; }
+        .main-category-list li { padding: 12px 20px; cursor: pointer; position: relative; transition: background 0.2s; }
+        .main-category-list li.active, .main-category-list li:hover { background: #f5f7fa; color: #e1251b; }
+        .sub-category-panel { position: absolute; left: 220px; top: 0; background: #fff; min-width: 600px; min-height: 100%; border: 1px solid #eee; z-index: 10; padding: 20px; display: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .sub-category-title { font-weight: bold; margin-bottom: 10px; color: #333; }
+        .sub-category-list { display: flex; flex-wrap: wrap; }
+        .sub-category-group { width: 200px; margin-right: 20px; margin-bottom: 10px; }
+        .sub-category-group a { display: inline-block; margin: 2px 8px 2px 0; color: #333; text-decoration: none; font-size: 14px; }
+        .sub-category-group a:hover { color: #e1251b; text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -142,6 +152,7 @@
                         <a href="myaccount.html">我的账户</a>
                         <a href="myorders.html">我的订单</a>
                         <a href="myfavorites.html">我的关注</a>
+                        <a href="address_management.html">地址管理</a>
                         <a href="#" class="logout-btn" id="logoutBtn">退出登录</a>
                     </div>
                 </div>
@@ -161,10 +172,11 @@
     </div>
 </div>
 <div class="main">
-    <div class="sidebar">
-        <ul id="categoryList">
-            <!-- 分类列表将通过JavaScript动态加载 -->
+    <div class="category-menu">
+        <ul class="main-category-list" id="mainCategoryList">
+            <!-- 主分类通过JS动态生成 -->
         </ul>
+        <div class="sub-category-panel" id="subCategoryPanel" style="display:none;"></div>
     </div>
     <div class="content-area">
         <div class="banner">
@@ -245,6 +257,130 @@
                 $('#searchBtn').click();
             }
         });
+    });
+</script>
+<script>
+// 平铺数组转树结构
+function listToTree(list) {
+    const map = {};
+    const roots = [];
+    list.forEach(item => {
+        map[item.id] = { ...item, children: [] };
+    });
+    list.forEach(item => {
+        if (item.parentId !== 0 && map[item.parentId]) {
+            map[item.parentId].children.push(map[item.id]);
+        } else if (item.parentId === 0) {
+            roots.push(map[item.id]);
+        }
+    });
+    return roots;
+}
+
+// 渲染主分类
+function renderMainCategories(tree) {
+    const mainList = document.getElementById('mainCategoryList');
+    mainList.innerHTML = '';
+    tree.forEach(cat => {
+        const li = document.createElement('li');
+        li.textContent = cat.name;
+        li.dataset.id = cat.id;
+        li.addEventListener('mouseenter', () => showSubCategory(cat, li));
+        li.addEventListener('mouseleave', () => hideSubCategory());
+        li.addEventListener('click', function(e) {
+            e.stopPropagation();
+            loadProductsByCategoryId(cat.id, cat.name);
+        });
+        mainList.appendChild(li);
+    });
+}
+
+// 渲染子分类面板
+function showSubCategory(cat, li) {
+    const panel = document.getElementById('subCategoryPanel');
+    panel.innerHTML = '';
+    panel.style.display = 'block';
+    li.classList.add('active');
+    if (cat.children && cat.children.length > 0) {
+        cat.children.forEach(sub => {
+            const group = document.createElement('div');
+            group.className = 'sub-category-group';
+            group.innerHTML = `<div class=\"sub-category-title\">${sub.name}</div>`;
+            if (sub.children && sub.children.length > 0) {
+                sub.children.forEach(item => {
+                    const a = document.createElement('a');
+                    a.textContent = item.name;
+                    a.href = '#';
+                    a.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        loadProductsByCategoryId(item.id, item.name);
+                    });
+                    group.appendChild(a);
+                });
+            }
+            // 支持点击二级分类直接查产品
+            group.querySelector('.sub-category-title').addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                loadProductsByCategoryId(sub.id, sub.name);
+            });
+            panel.appendChild(group);
+        });
+    }
+    // 保证panel在鼠标移入时不消失
+    panel.onmouseenter = function() { panel.style.display = 'block'; li.classList.add('active'); };
+    panel.onmouseleave = function() { panel.style.display = 'none'; li.classList.remove('active'); };
+}
+function hideSubCategory() {
+    document.getElementById('subCategoryPanel').style.display = 'none';
+    document.querySelectorAll('.main-category-list li').forEach(li => li.classList.remove('active'));
+}
+
+// 加载并渲染产品
+function loadProductsByCategoryId(categoryId, categoryName) {
+    document.getElementById('categoryTitle').textContent = categoryName;
+    const container = document.getElementById('productsContainer');
+    container.innerHTML = '<div class="loading">正在加载产品...</div>';
+    fetch(`/api/products?categoryId=${categoryId}`)
+        .then(res => res.json())
+        .then(products => {
+            if (!products || products.length === 0) {
+                container.innerHTML = '<div class="loading">该分类暂无产品</div>';
+                return;
+            }
+            let html = '<div class="products-grid">';
+            products.forEach(product => {
+                const imageUrl = product.iconUrl || 'https://via.placeholder.com/250x200?text=产品图片';
+                const price = product.price ? `¥${product.price}` : '¥0.00';
+                const stock = product.stock || 0;
+                html += `
+                <div class=\"product-card\" data-product-id=\"${product.id}\">
+                    <img src=\"${imageUrl}\" alt=\"${product.name}\" class=\"product-image\">
+                    <div class=\"product-name\">${product.name}</div>
+                    <div class=\"product-price\">${price}</div>
+                    <div class=\"product-stock\">库存: ${stock} 件</div>
+                    <div class=\"product-actions\">
+                        <button class=\"btn-view\" onclick=\"viewDetail(${product.id})\">查看详情</button>
+                        <button class=\"btn-add-cart\" onclick=\"alert('加入购物车功能开发中')\">加入购物车</button>
+                    </div>
+                </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        })
+        .catch(() => {
+            container.innerHTML = '<div class="error">加载产品失败，请稍后重试</div>';
+        });
+}
+
+// 数据加载与初始化
+fetch('/api/categories')
+    .then(res => res.json())
+    .then(list => {
+        const tree = listToTree(list);
+        renderMainCategories(tree);
     });
 </script>
 </body>

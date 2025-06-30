@@ -20,4 +20,5 @@ public interface ProductsMapper {
     int updateProduct(Products product);
     int deleteProduct(@Param("id") int id);
     List<Products> searchProductsByName(@Param("name") String name);
+    List<Products> selectByCategoryIds(List<Integer> categoryIds);
 }
