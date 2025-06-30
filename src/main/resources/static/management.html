@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>后台管理 - 用户管理</title>
     <style>
+        /* 样式部分保持不变，与您提供的相同 */
         :root {
             --primary-color: #4361ee;
             --secondary-color: #3f37c9;
             --success-color: #4cc9f0;
             --danger-color: #f72585;
+            --warning-color: #f59e0b;
             --light-color: #f8f9fa;
             --dark-color: #212529;
             --border-color: #dee2e6;
@@ -114,6 +116,16 @@
         }
 
         .btn-danger:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
             opacity: 0.9;
             transform: translateY(-2px);
         }
@@ -239,6 +251,11 @@
             color: #b91c1c;
         }
 
+        .status-deleted {
+            background-color: #e5e7eb;
+            color: #4b5563;
+        }
+
         .search-bar {
             display: flex;
             gap: 10px;
@@ -265,6 +282,93 @@
 
         .search-btn:hover {
             background-color: var(--secondary-color);
+        }
+
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .tab:hover:not(.active) {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        /* Toast通知样式 */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 4px;
+            color: white;
+            font-weight: 500;
+            box-shadow: var(--shadow);
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1100;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast-success {
+            background-color: #10b981;
+        }
+
+        .toast-error {
+            background-color: #ef4444;
+        }
+
+        .toast-warning {
+            background-color: #f59e0b;
+        }
+
+        .toast i {
+            margin-right: 8px;
+        }
+
+        /* 加载动画 */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .spinner {
+            animation: rotate 2s linear infinite;
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+        }
+
+        @keyframes rotate {
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         @media (max-width: 768px) {
@@ -296,17 +400,25 @@
         </div>
     </div>
 
+    <div class="tab-container">
+        <div class="tab active" onclick="switchTab('active')"><i class="fas fa-user-check"></i> 活跃用户</div>
+        <div class="tab" onclick="switchTab('deleted')"><i class="fas fa-user-slash"></i> 已删除用户</div>
+    </div>
+
     <div class="card">
         <div class="table-container">
             <table>
                 <thead>
                 <tr>
+                    <th>ID</th>
                     <th>用户名</th>
                     <th>姓名</th>
                     <th>手机号</th>
                     <th>邮箱</th>
                     <th>性别</th>
                     <th>年龄</th>
+                    <th>角色</th>
+                    <th>状态</th>
                     <th>操作</th>
                 </tr>
                 </thead>
@@ -354,6 +466,13 @@
                 <label for="editAge"><i class="fas fa-birthday-cake"></i> 年龄</label>
                 <input type="number" id="editAge" class="form-control">
             </div>
+            <div class="form-group">
+                <label for="editRole"><i class="fas fa-user-tag"></i> 角色</label>
+                <select id="editRole" class="form-control">
+                    <option value="1">普通用户</option>
+                    <option value="2">管理员</option>
+                </select>
+            </div>
             <div class="form-actions">
                 <button type="button" class="btn btn-primary" onclick="submitEdit()">
                     <i class="fas fa-save"></i> 保存
@@ -366,112 +485,158 @@
     </div>
 </div>
 
+<!-- 确认删除模态框 -->
+<div id="confirmDeleteModal" class="modal">
+    <div class="modal-content" style="width: 400px;">
+        <div class="modal-header">
+            <h2><i class="fas fa-exclamation-triangle"></i> 确认删除</h2>
+            <span class="close" onclick="closeConfirmDeleteModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p id="deleteMessage">确定要删除此用户吗？</p>
+        </div>
+        <div class="form-actions">
+            <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+                <i class="fas fa-trash"></i> 确认删除
+            </button>
+            <button type="button" class="btn" onclick="closeConfirmDeleteModal()" style="background-color: var(--light-color);">
+                <i class="fas fa-times"></i> 取消
+            </button>
+        </div>
+    </div>
+</div>
+
 <script src="js/jquery.min.js"></script>
 <script>
     let currentEditId = null;
+    let currentDeleteId = null;
+    let currentTab = 'active'; // 当前标签页，'active'或'deleted'
+    let currentDeleteType = 'soft'; // 'soft'或'force'
 
     $(document).ready(function() {
         loadUsers();
     });
 
+    function switchTab(tab) {
+        currentTab = tab;
+        $('.tab').removeClass('active');
+        $(`.tab:contains(${tab === 'active' ? '活跃用户' : '已删除用户'})`).addClass('active');
+        loadUsers();
+    }
+
     function loadUsers() {
+        const url = currentTab === 'active'
+            ? 'http://localhost:8080/api/admin/users'
+            : 'http://localhost:8080/api/admin/users/deleted';
+
+        showLoading();
+
         $.ajax({
-            url: 'http://localhost:8080/api/admin/users',
+            url: url,
             type: 'GET',
             dataType: 'json',
-            beforeSend: function() {
-                $('#userTable').html('<tr><td colspan="7" style="text-align: center;"><i class="fas fa-spinner fa-spin"></i> 加载中...</td></tr>');
-            },
             success: function(response) {
                 if (response.status === 0 && response.data && response.data.length > 0) {
-                    let html = '';
-                    $.each(response.data, function(i, user) {
-                        html += `<tr>
-                                <td>${escapeHtml(user.account) || '-'}</td>
-                                <td>${escapeHtml(user.name) || '-'}</td>
-                                <td>${escapeHtml(user.phone) || '-'}</td>
-                                <td>${escapeHtml(user.email) || '-'}</td>
-                                <td>${user.sex === 1 ? '<span class="status-badge status-active"><i class="fas fa-male"></i> 男</span>' :
-                            '<span class="status-badge status-inactive"><i class="fas fa-female"></i> 女</span>'}</td>
-                                <td>${user.age || '-'}</td>
-                                <td>
-                                    <button class="btn btn-primary btn-sm" onclick="openEditModal(${user.id}, '${escapeHtml(user.account)}', '${escapeHtml(user.name)}', '${escapeHtml(user.phone)}', '${escapeHtml(user.email)}', ${user.sex}, ${user.age})">
-                                        <i class="fas fa-edit"></i> 修改
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">
-                                        <i class="fas fa-trash"></i> 删除
-                                    </button>
-                                </td>
-                            </tr>`;
-                    });
-                    $('#userTable').html(html);
+                    renderUserTable(response.data);
                 } else if (response.status === 0) {
-                    $('#userTable').html('<tr><td colspan="7" style="text-align: center;">暂无用户数据</td></tr>');
+                    $('#userTable').html(`<tr><td colspan="10" style="text-align: center;">暂无${currentTab === 'active' ? '活跃' : '已删除'}用户数据</td></tr>`);
                 } else {
-                    console.error('获取用户数据失败:', response.msg);
-                    $('#userTable').html('<tr><td colspan="7" style="text-align: center; color: var(--danger-color);">加载用户数据失败: ' + escapeHtml(response.msg) + '</td></tr>');
+                    showError('加载用户数据失败: ' + response.msg);
                 }
             },
             error: function(xhr, status, error) {
-                console.error('请求失败:', error);
-                $('#userTable').html('<tr><td colspan="7" style="text-align: center; color: var(--danger-color);">请求失败: ' + escapeHtml(error) + '</td></tr>');
+                showError('请求失败: ' + error);
+            },
+            complete: function() {
+                hideLoading();
             }
         });
+    }
+
+    function renderUserTable(users) {
+        let html = '';
+        $.each(users, function(i, user) {
+            // 角色文本
+            let roleText = user.role === 1 ? '普通用户' : '<span style="color: var(--danger-color);">管理员</span>';
+
+            // 状态文本
+            let statusText = '';
+            if (currentTab === 'deleted') {
+                statusText = '<span class="status-badge status-deleted"><i class="fas fa-user-slash"></i> 已删除</span>';
+            } else {
+                statusText = '<span class="status-badge status-active"><i class="fas fa-user-check"></i> 活跃</span>';
+            }
+
+            html += `<tr>
+                    <td>${user.id}</td>
+                    <td>${escapeHtml(user.account) || '-'}</td>
+                    <td>${escapeHtml(user.name) || '-'}</td>
+                    <td>${escapeHtml(user.phone) || '-'}</td>
+                    <td>${escapeHtml(user.email) || '-'}</td>
+                    <td>${user.sex === 1 ? '<span class="status-badge status-active"><i class="fas fa-male"></i> 男</span>' :
+                '<span class="status-badge status-inactive"><i class="fas fa-female"></i> 女</span>'}</td>
+                    <td>${user.age || '-'}</td>
+                    <td>${roleText}</td>
+                    <td>${statusText}</td>
+                    <td>
+                        ${currentTab === 'active' ? `
+                        <button class="btn btn-primary btn-sm" onclick="openEditModal(${user.id}, '${escapeHtml(user.account)}', '${escapeHtml(user.name)}', '${escapeHtml(user.phone)}', '${escapeHtml(user.email)}', ${user.sex}, ${user.age || 0}, ${user.role || 1})">
+                            <i class="fas fa-edit"></i> 修改
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="confirmDeleteUser(${user.id}, ${user.role || 1}, 'soft')">
+                            <i class="fas fa-trash"></i> 删除
+                        </button>
+                        ` : `
+                        <button class="btn btn-warning btn-sm" onclick="restoreUser(${user.id})">
+                            <i class="fas fa-undo"></i> 恢复
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="confirmDeleteUser(${user.id}, ${user.role || 1}, 'force')">
+                            <i class="fas fa-trash"></i> 永久删除
+                        </button>
+                        `}
+                    </td>
+                </tr>`;
+        });
+        $('#userTable').html(html);
     }
 
     function searchUsers() {
         const keyword = $('#searchInput').val().trim();
         if (keyword === '') {
-            loadUsers(); // 如果搜索框为空，加载所有用户
+            loadUsers();
             return;
         }
 
+        const url = currentTab === 'active'
+            ? 'http://localhost:8080/api/admin/users/search'
+            : 'http://localhost:8080/api/admin/users/deleted/search';
+
+        showLoading();
+
         $.ajax({
-            url: 'http://localhost:8080/api/admin/users/search',
+            url: url,
             type: 'GET',
             dataType: 'json',
             data: { keyword: keyword },
-            beforeSend: function() {
-                $('#userTable').html('<tr><td colspan="7" style="text-align: center;"><i class="fas fa-spinner fa-spin"></i> 加载中...</td></tr>');
-            },
             success: function(response) {
                 if (response.status === 0 && response.data && response.data.length > 0) {
-                    let html = '';
-                    $.each(response.data, function(i, user) {
-                        html += `<tr>
-                                <td>${escapeHtml(user.account) || '-'}</td>
-                                <td>${escapeHtml(user.name) || '-'}</td>
-                                <td>${escapeHtml(user.phone) || '-'}</td>
-                                <td>${escapeHtml(user.email) || '-'}</td>
-                                <td>${user.sex === 1 ? '<span class="status-badge status-active"><i class="fas fa-male"></i> 男</span>' :
-                            '<span class="status-badge status-inactive"><i class="fas fa-female"></i> 女</span>'}</td>
-                                <td>${user.age || '-'}</td>
-                                <td>
-                                    <button class="btn btn-primary btn-sm" onclick="openEditModal(${user.id}, '${escapeHtml(user.account)}', '${escapeHtml(user.name)}', '${escapeHtml(user.phone)}', '${escapeHtml(user.email)}', ${user.sex}, ${user.age})">
-                                        <i class="fas fa-edit"></i> 修改
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">
-                                        <i class="fas fa-trash"></i> 删除
-                                    </button>
-                                </td>
-                            </tr>`;
-                    });
-                    $('#userTable').html(html);
+                    renderUserTable(response.data);
                 } else if (response.status === 0) {
-                    $('#userTable').html('<tr><td colspan="7" style="text-align: center;">暂无匹配的用户数据</td></tr>');
+                    $('#userTable').html(`<tr><td colspan="10" style="text-align: center;">暂无匹配的${currentTab === 'active' ? '活跃' : '已删除'}用户数据</td></tr>`);
                 } else {
-                    console.error('搜索用户失败:', response.msg);
-                    $('#userTable').html('<tr><td colspan="7" style="text-align: center; color: var(--danger-color);">搜索用户失败: ' + escapeHtml(response.msg) + '</td></tr>');
+                    showError('搜索失败: ' + response.msg);
                 }
             },
             error: function(xhr, status, error) {
-                console.error('请求失败:', error);
-                $('#userTable').html('<tr><td colspan="7" style="text-align: center; color: var(--danger-color);">请求失败: ' + escapeHtml(error) + '</td></tr>');
+                showError('请求失败: ' + error);
+            },
+            complete: function() {
+                hideLoading();
             }
         });
     }
 
-    function openEditModal(id, account, name, phone, email, sex, age) {
+    function openEditModal(id, account, name, phone, email, sex, age, role) {
         currentEditId = id;
         $('#editId').val(id);
         $('#editAccount').val(account);
@@ -480,6 +645,7 @@
         $('#editEmail').val(email);
         $('#editSex').val(sex);
         $('#editAge').val(age || '');
+        $('#editRole').val(role || 1); // 默认值为1（普通用户）
 
         $('#editModal').addClass('show').show();
         $('body').css('overflow', 'hidden');
@@ -501,58 +667,114 @@
             phone: $('#editPhone').val(),
             email: $('#editEmail').val(),
             sex: parseInt($('#editSex').val()),
-            age: parseInt($('#editAge').val()) || null
+            age: parseInt($('#editAge').val()) || null,
+            role: parseInt($('#editRole').val()) || 1
         };
 
         if (!user.account || !user.name) {
-            alert('用户名和姓名不能为空');
+            showError('用户名和姓名不能为空');
             return;
         }
+
+        showLoading('#editModal .modal-content');
 
         $.ajax({
             url: 'http://localhost:8080/api/admin/user',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(user),
-            beforeSend: function() {
-                $('.modal-content').append('<div class="loading-overlay"><i class="fas fa-spinner fa-spin"></i> 保存中...</div>');
-            },
             success: function(response) {
                 if (response.status === 0) {
-                    showToast('success', '修改成功');
+                    showSuccess('修改成功');
                     closeModal();
                     loadUsers();
                 } else {
-                    showToast('error', '修改失败: ' + response.msg);
+                    showError('修改失败: ' + response.msg);
                 }
             },
             error: function(xhr, status, error) {
-                showToast('error', '请求失败: ' + error);
+                showError('请求失败: ' + error);
             },
             complete: function() {
-                $('.loading-overlay').remove();
+                hideLoading();
             }
         });
     }
 
-    function deleteUser(id) {
-        if (confirm('确定要删除此用户吗？此操作不可撤销！')) {
+    function confirmDeleteUser(id, role, type) {
+        currentDeleteId = id;
+        currentDeleteType = type;
+
+        if (type === 'soft') {
+            if (role === 2) {
+                showError('管理员用户不能删除');
+                return;
+            }
+            $('#deleteMessage').html('确定要删除此用户吗？用户将被移至已删除列表，可以恢复。');
+        } else {
+            $('#deleteMessage').html('确定要永久删除此用户吗？此操作不可撤销！');
+        }
+
+        $('#confirmDeleteModal').addClass('show').show();
+        $('body').css('overflow', 'hidden');
+    }
+
+    function closeConfirmDeleteModal() {
+        $('#confirmDeleteModal').removeClass('show');
+        setTimeout(() => {
+            $('#confirmDeleteModal').hide();
+            $('body').css('overflow', 'auto');
+        }, 300);
+    }
+
+    function confirmDelete() {
+        const url = currentDeleteType === 'soft'
+            ? `http://localhost:8080/api/admin/user/${currentDeleteId}`
+            : `http://localhost:8080/api/admin/user/${currentDeleteId}/force`;
+
+        showLoading('#confirmDeleteModal .modal-content');
+
+        $.ajax({
+            url: url,
+            type: 'DELETE',
+            success: function(response) {
+                if (response.status === 0) {
+                    showSuccess(currentDeleteType === 'soft' ? '删除成功' : '永久删除成功');
+                    closeConfirmDeleteModal();
+                    loadUsers();
+                } else {
+                    showError((currentDeleteType === 'soft' ? '删除失败: ' : '永久删除失败: ') + response.msg);
+                }
+            },
+            error: function(xhr, status, error) {
+                showError('请求失败: ' + error);
+            },
+            complete: function() {
+                hideLoading();
+            }
+        });
+    }
+
+    function restoreUser(id) {
+        if (confirm('确定要恢复此用户吗？用户将重新出现在活跃用户列表中。')) {
+            showLoading();
+
             $.ajax({
-                url: 'http://localhost:8080/api/admin/user/' + id,
-                type: 'DELETE',
-                beforeSend: function() {
-                    // 可以在这里添加加载指示器
-                },
+                url: `http://localhost:8080/api/admin/user/${id}/restore`,
+                type: 'POST',
                 success: function(response) {
                     if (response.status === 0) {
-                        showToast('success', '删除成功');
+                        showSuccess('恢复成功');
                         loadUsers();
                     } else {
-                        showToast('error', '删除失败: ' + response.msg);
+                        showError('恢复失败: ' + response.msg);
                     }
                 },
                 error: function(xhr, status, error) {
-                    showToast('error', '请求失败: ' + error);
+                    showError('请求失败: ' + error);
+                },
+                complete: function() {
+                    hideLoading();
                 }
             });
         }
@@ -567,6 +789,33 @@
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
+    }
+
+    // 显示加载动画
+    function showLoading(container = 'body') {
+        $(container).append(`
+            <div class="loading-overlay">
+                <svg class="spinner" viewBox="0 0 50 50">
+                    <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                </svg>
+                加载中...
+            </div>
+        `);
+    }
+
+    // 隐藏加载动画
+    function hideLoading() {
+        $('.loading-overlay').remove();
+    }
+
+    // 显示成功Toast通知
+    function showSuccess(message) {
+        showToast('success', message);
+    }
+
+    // 显示错误Toast通知
+    function showError(message) {
+        showToast('error', message);
     }
 
     // 显示Toast通知

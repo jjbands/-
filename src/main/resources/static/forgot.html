@@ -419,7 +419,7 @@
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
-                loginKey: account  // 使用loginKey参数，可以是用户名或手机号
+                loginKey: account  // 可以是用户名或手机号
             }),
             success: function(response) {
                 console.log('安全问题API响应:', response);
@@ -559,7 +559,6 @@
                     error: function(xhr) {
                         console.error('AJAX错误:', xhr);
                         let errorMsg = '服务器错误';
-                        
                         if (xhr.responseJSON && xhr.responseJSON.msg) {
                             errorMsg = xhr.responseJSON.msg;
                         } else if (xhr.status === 0) {

@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.machinery.mall.mapper.AdminMapper">
+    <!-- 获取活跃用户 -->
     <select id="getAllUsers" resultType="com.machinery.mall.entity.User">
-        SELECT id, account, name, phone, email, sex, age
+        SELECT id, account, name, phone, email, sex, age, role
         FROM users
         WHERE del = 0
     </select>
 
+    <!-- 获取已删除用户 -->
+    <select id="getDeletedUsers" resultType="com.machinery.mall.entity.User">
+        SELECT id, account, name, phone, email, sex, age, role
+        FROM users
+        WHERE del = 1
+    </select>
+
+    <!-- 更新用户信息 -->
     <update id="updateUser">
         UPDATE users
         SET account = #{account},
@@ -14,20 +23,47 @@
             phone = #{phone},
             email = #{email},
             sex = #{sex},
-            age = #{age}
+            age = #{age},
+            role = #{role}
         WHERE id = #{id}
     </update>
 
-    <update id="deleteUser">
+    <!-- 假删除用户 -->
+    <update id="softDeleteUser">
         UPDATE users
         SET del = 1
+        WHERE id = #{id} AND role =1  <!-- 只允许删除普通用户 -->
+    </update>
+
+    <!-- 恢复用户 -->
+    <update id="restoreUser">
+        UPDATE users
+        SET del = 0
         WHERE id = #{id}
     </update>
 
+    <!-- 强制删除用户 -->
+    <delete id="forceDeleteUser">
+        DELETE FROM users
+        WHERE id = #{id}
+    </delete>
+
+    <!-- 搜索活跃用户 -->
     <select id="searchUsers" resultType="com.machinery.mall.entity.User">
-        SELECT id, account, name, phone, email, sex, age
+        SELECT id, account, name, phone, email, sex, age, role
         FROM users
         WHERE del = 0
+          AND (account LIKE CONCAT('%', #{keyword}, '%')
+            OR name LIKE CONCAT('%', #{keyword}, '%')
+            OR phone LIKE CONCAT('%', #{keyword}, '%')
+            OR email LIKE CONCAT('%', #{keyword}, '%'))
+    </select>
+
+    <!-- 搜索已删除用户 -->
+    <select id="searchDeletedUsers" resultType="com.machinery.mall.entity.User">
+        SELECT id, account, name, phone, email, sex, age, role
+        FROM users
+        WHERE del = 1
           AND (account LIKE CONCAT('%', #{keyword}, '%')
             OR name LIKE CONCAT('%', #{keyword}, '%')
             OR phone LIKE CONCAT('%', #{keyword}, '%')
