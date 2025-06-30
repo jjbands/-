@@ -17,5 +17,7 @@ public interface UserService {
 
     boolean checkAnswer(String account, String question, String asw);
     boolean resetPassword(String account, String newPassword);
+    User getUserByAccount(String account);
+    boolean updateUserProfile(User user);
 }
 

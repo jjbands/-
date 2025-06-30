@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人资料 - 机械配件商城</title>
+    <style>
+        :root {
+            --primary-color: #0074d9;
+            --primary-hover: #0056b3;
+            --danger-color: #e74c3c;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #7f8c8d;
+            --white: #ffffff;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: var(--light-gray);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .account-container {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        .account-sidebar {
+            width: 220px;
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .account-sidebar ul {
+            list-style: none;
+        }
+
+        .account-sidebar li a {
+            display: block;
+            padding: 12px 20px;
+            color: #333;
+            text-decoration: none;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .account-sidebar li a.active,
+        .account-sidebar li a:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .account-content {
+            flex: 1;
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+        }
+
+        .account-title {
+            font-size: 24px;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .avatar-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-right: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .form-group input:disabled {
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .form-actions {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--medium-gray);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--light-gray);
+        }
+
+        @media (max-width: 768px) {
+            .account-container {
+                flex-direction: column;
+            }
+
+            .account-sidebar {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- 头部导航栏（与主站一致） -->
+<div class="header">
+    <!-- 包含logo、搜索框、用户信息等 -->
+</div>
+
+<div class="container">
+    <div class="account-container">
+        <div class="account-sidebar">
+            <ul>
+                <li><a href="myaccount.html" class="active">个人资料</a></li>
+                <li><a href="address_management.html">收货地址</a></li>
+                <li><a href="myorders.html">我的订单</a></li>
+                <li><a href="myfavorites.html">我的关注</a></li>
+                <li><a href="security.html">账户安全</a></li>
+            </ul>
+        </div>
+
+        <div class="account-content">
+            <h1 class="account-title">个人资料</h1>
+
+            <div class="avatar-container">
+                <div class="avatar" id="userAvatarLarge">U</div>
+            </div>
+
+            <form id="profileForm">
+                <div class="form-group">
+                    <label for="account">用户名</label>
+                    <input type="text" id="account" disabled>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">姓名</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="sex">性别</label>
+                        <select id="sex" name="sex">
+                            <option value="1">男</option>
+                            <option value="0">女</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone">手机号码</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">电子邮箱</label>
+                        <input type="email" id="email" name="email">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">年龄</label>
+                    <input type="number" id="age" name="age" min="1" max="120">
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" id="cancelBtn">取消</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">保存更改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="js/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // 从本地存储获取账号
+        const account = localStorage.getItem('account');
+        const username = localStorage.getItem('username');
+        console.log("本地存储内容:", {
+            account: account,
+            username: username,
+            token: localStorage.getItem('token')
+        });
+        // 调试输出本地存储内容
+        console.log("本地存储内容:", {
+            account: localStorage.getItem('account'),
+            username: localStorage.getItem('username'),
+            token: localStorage.getItem('token')
+        });
+
+        if (!account || account === 'undefined') {
+            alert('未检测到有效的登录信息，请重新登录');
+            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname);
+            return;
+        }
+
+        // 加载用户数据
+        function loadUserData() {
+            console.log("正在请求用户资料，账号:", account);
+
+            $.ajax({
+                url: 'http://localhost:8080/api/user/profile',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ account: account }),
+                success: function(response) {
+                    console.log("API响应:", response);
+                    if (response && response.status === 0) {
+                        const user = response.data;
+                        console.log("用户数据:", user);
+
+                        // 填充表单
+                        $('#account').val(user.account);
+                        $('#name').val(user.name || '');
+                        $('#phone').val(user.phone || '');
+                        $('#email').val(user.email || '');
+                        $('#age').val(user.age || '');
+                        $('#sex').val(user.sex || '1');
+
+                        // 更新头像
+                        const firstLetter = (user.name || user.account).charAt(0).toUpperCase();
+                        $('#userAvatarLarge').text(firstLetter);
+                    } else {
+                        console.error("API返回错误:", response);
+                        alert(response?.msg || '获取用户资料失败');
+
+                        // 如果用户不存在，可能是数据不一致，清除本地存储并重定向
+                        if(response.status === 2) {
+                            localStorage.clear();
+                            window.location.href = 'login.html';
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("API请求失败:", status, error);
+                    alert('请求失败: ' + status);
+                }
+            });
+        }
+
+        // 保存用户资料
+        $('#profileForm').submit(function(e) {
+            e.preventDefault();
+
+            const account = localStorage.getItem('account');
+            if (!account) {
+                alert('未检测到登录信息，请重新登录');
+                return;
+            }
+
+            // 收集表单数据并验证
+            const formData = {
+                account: account,
+                name: $('#name').val().trim(),
+                sex: parseInt($('#sex').val()),
+                phone: $('#phone').val().trim(),
+                email: $('#email').val().trim(),
+                age: $('#age').val() ? parseInt($('#age').val()) : null
+            };
+
+            console.log("提交的表单数据:", JSON.stringify(formData, null, 2));
+
+            // 验证必填字段
+            if (!formData.name || !formData.phone) {
+                alert('姓名和手机号是必填项');
+                return;
+            }
+
+            // 显示加载状态
+            const $btn = $('#saveBtn');
+            const btnText = $btn.text();
+            $btn.prop('disabled', true).text('保存中...');
+
+            $.ajax({
+                url: 'http://localhost:8080/api/user/updateProfile',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    console.log("更新响应:", response);
+                    if (response && response.status === 0) {
+                        alert('资料更新成功');
+                        // 更新本地存储的用户名
+                        localStorage.setItem('username', formData.name);
+                        // 重新加载数据
+                        loadUserData();
+                    } else {
+                        alert(response?.msg || '更新失败');
+                    }
+                },
+                error: function(xhr) {
+                    console.error("更新请求失败:", xhr);
+                    let errorMsg = '请求失败';
+                    if (xhr.responseJSON && xhr.responseJSON.msg) {
+                        errorMsg = xhr.responseJSON.msg;
+                    }
+                    alert(errorMsg);
+                },
+                complete: function() {
+                    $btn.prop('disabled', false).text(btnText);
+                }
+            });
+        });
+
+        // 取消按钮
+        $('#cancelBtn').click(function() {
+            loadUserData();
+        });
+
+        // 初始化加载数据
+        loadUserData();
+    });
+</script>
+</body>
+</html>

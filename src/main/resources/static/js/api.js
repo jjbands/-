@@ -42,7 +42,7 @@ class ApiService {
 
     // 根据产品名称搜索产品
     static async searchProductsByName(name) {
-        return await this.get(`${API_BASE_URL}/products/search`, { name });
+        return await this.get(`${API_BASE_URL}/products/searchByCategory`, { name });
     }
 }
 
@@ -83,42 +83,65 @@ class ProductDisplay {
     async loadCategories() {
         try {
             this.showLoading('#categoryList', '正在加载分类...');
-            const categories = await ApiService.getCategories();
-            this.displayCategories(categories);
+            const flatCategories = await ApiService.getCategories();
+            const tree = this.listToTree(flatCategories);
+            this.displayCategories(tree);
         } catch (error) {
             this.showError('#categoryList', '加载分类失败，请刷新页面重试');
         }
     }
 
-    // 显示产品分类
-    displayCategories(categories) {
-        if (!categories || categories.length === 0) {
-            $('#categoryList').html('<li><a href="#" style="color: #666;">暂无分类</a></li>');
-            return;
-        }
-
-        let html = '';
-        categories.forEach(category => {
-            html += `<li><a href="#" data-category-id="${category.id}">${category.name}</a></li>`;
+    // 平铺数组转树结构
+    listToTree(list) {
+        const map = {};
+        const roots = [];
+        list.forEach(item => {
+            map[item.id] = { ...item, children: [] };
         });
-        $('#categoryList').html(html);
-
-        // 绑定分类点击事件
-        this.bindCategoryEvents();
+        list.forEach(item => {
+            // 注意：parentId为0时是根节点
+            if (item.parentId !== 0 && map[item.parentId]) {
+                map[item.parentId].children.push(map[item.id]);
+            } else if (item.parentId === 0) {
+                roots.push(map[item.id]);
+            }
+        });
+        return roots;
     }
 
-    // 绑定分类点击事件
-    bindCategoryEvents() {
-        $('#categoryList a').off('click').on('click', (e) => {
+    // 递归渲染树状分类
+    displayCategories(tree) {
+        const $container = $('#categoryList');
+        $container.empty();
+        this.renderCategoryTree(tree, $container[0]);
+        // 绑定点击事件
+        this.bindCategoryTreeEvents();
+    }
+
+    // 递归渲染
+    renderCategoryTree(categories, parentUl) {
+        categories.forEach(cat => {
+            const li = document.createElement('li');
+            li.innerHTML = `<span class="category-name" data-category-id="${cat.id}">${cat.name}</span>`;
+            if (cat.children && cat.children.length > 0) {
+                const childUl = document.createElement('ul');
+                this.renderCategoryTree(cat.children, childUl);
+                li.appendChild(childUl);
+            }
+            parentUl.appendChild(li);
+        });
+    }
+
+    // 绑定树状分类点击事件
+    bindCategoryTreeEvents() {
+        $('#categoryList').off('click').on('click', '.category-name', (e) => {
             e.preventDefault();
-            const $link = $(e.currentTarget);
-            const categoryId = $link.data('category-id');
-            const categoryName = $link.text();
-
+            const $target = $(e.target);
+            const categoryId = $target.data('category-id');
+            const categoryName = $target.text();
             // 更新选中状态
-            $('#categoryList li').removeClass('active');
-            $link.parent().addClass('active');
-
+            $('#categoryList .category-name').removeClass('active');
+            $target.addClass('active');
             // 加载该分类的产品
             this.loadProducts(categoryId, categoryName);
         });

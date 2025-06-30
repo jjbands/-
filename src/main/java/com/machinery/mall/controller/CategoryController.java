@@ -31,10 +31,10 @@ public class CategoryController {
     }
 
     @GetMapping("/products")
-    public List<Products> getProductsByCategory(@RequestParam Integer categoryId) {
+    public List<Products> getProductsByCategory(@RequestParam("categoryId") Integer categoryId) {
         return productsService.getProductsByCategory(categoryId);
     }
-    @GetMapping("/products/search")
+    @GetMapping("/products/searchByCategory")
     public List<Products> searchProductsByName(@RequestParam String name) {
         return productsService.getProductsByName(name);
     }

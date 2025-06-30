@@ -1,12 +1,7 @@
 package com.machinery.mall.controller;
 
-/**
- * @author 你的名字
- * @version 1.0.0
- * @date: 2025/06/26  16:42
- */
-import com.machinery.mall.entity.Products;
-import com.machinery.mall.service.ProductsService;
+import com.machinery.mall.entity.User;
+import com.machinery.mall.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,25 +10,24 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = "*")
-public class ProductsController {
-    private ProductsService productsService;
-    @Autowired
-    public ProductsController(ProductsService productsService) {
-        this.productsService = productsService;
+@RequestMapping("/api/admin")
+@CrossOrigin
+public class AdminController {
 
+    private final AdminService adminService;
+
+    @Autowired
+    public AdminController(AdminService adminService) {
+        this.adminService = adminService;
     }
-    @GetMapping("/api/products/{id}")
-    public Products getProductById(@PathVariable Integer id) {
-        return productsService.getProductById(id);
-    }
-    @GetMapping("/api/products/all")
-    public Map<String, Object> getAllProducts() {
+
+    @GetMapping("/users")
+    public Map<String, Object> getAllUsers() {
         Map<String, Object> response = new HashMap<>();
         try {
-            List<Products> products = productsService.getAllProducts();
+            List<User> users = adminService.getAllUsers();
             response.put("status", 0);
-            response.put("data", products);
+            response.put("data", users);
             response.put("msg", "获取成功");
         } catch (Exception e) {
             response.put("status", 1);
@@ -42,11 +36,11 @@ public class ProductsController {
         return response;
     }
 
-    @PostMapping("/api/product")
-    public Map<String, Object> updateProduct(@RequestBody Products product) {
+    @PostMapping("/user")
+    public Map<String, Object> updateUser(@RequestBody User user) {
         Map<String, Object> response = new HashMap<>();
         try {
-            int result = productsService.updateProduct(product);
+            int result = adminService.updateUser(user);
             response.put("status", result > 0 ? 0 : 1);
             response.put("msg", result > 0 ? "更新成功" : "更新失败");
         } catch (Exception e) {
@@ -56,13 +50,13 @@ public class ProductsController {
         return response;
     }
 
-    @GetMapping("/api/products/search")
-    public Map<String, Object> searchProducts(@RequestParam String name) {
+    @GetMapping("/users/search")
+    public Map<String, Object> searchUsers(@RequestParam String keyword) {
         Map<String, Object> response = new HashMap<>();
         try {
-            List<Products> products = productsService.searchProductsByName(name);
+            List<User> users = adminService.searchUsers(keyword);
             response.put("status", 0);
-            response.put("data", products);
+            response.put("data", users);
             response.put("msg", "搜索成功");
         } catch (Exception e) {
             response.put("status", 1);
@@ -71,11 +65,11 @@ public class ProductsController {
         return response;
     }
 
-    @DeleteMapping("/api/product/{id}")
-    public Map<String, Object> deleteProduct(@PathVariable int id) {
+    @DeleteMapping("/user/{id}")
+    public Map<String, Object> deleteUser(@PathVariable int id) {
         Map<String, Object> response = new HashMap<>();
         try {
-            int result = productsService.deleteProduct(id);
+            int result = adminService.deleteUser(id);
             response.put("status", result > 0 ? 0 : 1);
             response.put("msg", result > 0 ? "删除成功" : "删除失败");
         } catch (Exception e) {

@@ -388,17 +388,23 @@
                     }),
                     success: function(response) {
                         if(response && response.status === 0) {
-                            localStorage.setItem('account', response.data.account);
+                            localStorage.setItem('account', response.data.account );
                             localStorage.setItem('username', response.data.username);
-                            localStorage.setItem('token', response.data.token);
+                            localStorage.setItem('token', response.data.token || 'generated-token');
                             localStorage.setItem('role', response.data.role); // 存储用户角色
+                            console.log('登录成功，存储的用户信息:', {
+                                account: localStorage.getItem('account'),
+                                username: localStorage.getItem('username'),
+                                token: localStorage.getItem('token'),
+                                role:localStorage.getItem('role')
+                            });
                             const role = response.data.role; // 获取用户角色信息
                             if (role === 1) {
                                 alert('用户登录成功！');
                                 window.location.href = 'index.html';
                             } else if (role === 2) {
                                 alert('管理员登录成功！');
-                                window.location.href = 'regulation.html';
+                                window.location.href = 'management.html';
                             } else {
                                 alert('未知角色，无法跳转');
                             }
