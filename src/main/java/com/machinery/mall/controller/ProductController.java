@@ -1,6 +1,5 @@
 package com.machinery.mall.controller;
 
-
 import com.machinery.mall.entity.Products;
 import com.machinery.mall.service.ProductsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,19 +10,18 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = "*")
-public class ProductsController {
-    private ProductsService productsService;
-    @Autowired
-    public ProductsController(ProductsService productsService) {
-        this.productsService = productsService;
+@RequestMapping("/api")
+@CrossOrigin
+public class ProductController {
 
+    private final ProductsService productsService;
+
+    @Autowired
+    public ProductController(ProductsService productsService) {
+        this.productsService = productsService;
     }
-    @GetMapping("/api/products/{id}")
-    public Products getProductById(@PathVariable Integer id) {
-        return productsService.getProductById(id);
-    }
-    @GetMapping("/api/products/all")
+
+    @GetMapping("/products/all")
     public Map<String, Object> getAllProducts() {
         Map<String, Object> response = new HashMap<>();
         try {
@@ -37,8 +35,28 @@ public class ProductsController {
         }
         return response;
     }
+    @PostMapping("/product/add")
+    public Map<String, Object> addProduct(@RequestBody Products product) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            product.setPartsId(product.getProductId());
 
-    @PostMapping("/api/product")
+            int result = productsService.addProduct(product);
+            if (result > 0) {
+                response.put("status", 0);
+                response.put("msg", "添加成功");
+            } else {
+                response.put("status", 1);
+                response.put("msg", "添加失败");
+            }
+        } catch (Exception e) {
+            response.put("status", 1);
+            response.put("msg", "添加失败: " + e.getMessage());
+        }
+        return response;
+    }
+
+    @PostMapping("/product")
     public Map<String, Object> updateProduct(@RequestBody Products product) {
         Map<String, Object> response = new HashMap<>();
         try {
@@ -52,7 +70,7 @@ public class ProductsController {
         return response;
     }
 
-    @GetMapping("/api/products/search")
+    @GetMapping("/products/search")
     public Map<String, Object> searchProducts(@RequestParam String name) {
         Map<String, Object> response = new HashMap<>();
         try {
@@ -67,7 +85,7 @@ public class ProductsController {
         return response;
     }
 
-    @DeleteMapping("/api/product/{id}")
+    @DeleteMapping("/product/{id}")
     public Map<String, Object> deleteProduct(@PathVariable int id) {
         Map<String, Object> response = new HashMap<>();
         try {

@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin(origins = "*")
+
 public class AdminController {
 
     private final AdminService adminService;
@@ -37,6 +37,18 @@ public class AdminController {
         return response;
     }
 
+
+    @PostMapping("/user")
+    public Map<String, Object> updateUser(@RequestBody User user) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            int result = adminService.updateUser(user);
+            response.put("status", result > 0 ? 0 : 1);
+            response.put("msg", result > 0 ? "更新成功" : "更新失败");
+        } catch (Exception e) {
+            response.put("status", 1);
+            response.put("msg", "更新失败: " + e.getMessage());
+          
     // 获取已删除用户
     @GetMapping("/users/deleted")
     public Map<String, Object> getDeletedUsers() {
@@ -49,9 +61,11 @@ public class AdminController {
         } catch (Exception e) {
             response.put("status", 1);
             response.put("msg", "获取失败: " + e.getMessage());
+
         }
         return response;
     }
+
 
     // 搜索活跃用户
     @GetMapping("/users/search")
@@ -68,6 +82,15 @@ public class AdminController {
         }
         return response;
     }
+
+
+    @DeleteMapping("/user/{id}")
+    public Map<String, Object> deleteUser(@PathVariable int id) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            int result = adminService.deleteUser(id);
+            response.put("status", result > 0 ? 0 : 1);
+            response.put("msg", result > 0 ? "删除成功" : "删除失败");
 
     // 搜索已删除用户
     @GetMapping("/users/deleted/search")
@@ -108,12 +131,15 @@ public class AdminController {
             int result = adminService.softDeleteUser(id);
             response.put("status", result > 0 ? 0 : 1);
             response.put("msg", result > 0 ? "删除成功" : "删除失败(可能尝试删除管理员)");
+
         } catch (Exception e) {
             response.put("status", 1);
             response.put("msg", "删除失败: " + e.getMessage());
         }
         return response;
     }
+
+
 
     // 恢复用户
     @PostMapping("/user/{id}/restore")
@@ -144,4 +170,5 @@ public class AdminController {
         }
         return response;
     }
+
 }

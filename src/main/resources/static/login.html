@@ -16,34 +16,34 @@
             --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
             background-color: var(--light-gray);
             color: var(--secondary-color);
             line-height: 1.6;
         }
-        
+
         .container {
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
-        
+
         /* 头部样式 */
         .header {
             text-align: center;
             margin: 40px 0;
             animation: fadeInDown 0.8s ease;
         }
-        
+
         .header h1 {
             color: var(--primary-color);
             font-size: 2.5rem;
@@ -51,7 +51,7 @@
             font-weight: 700;
             letter-spacing: 1px;
         }
-        
+
         .header p {
             color: var(--dark-gray);
             font-size: 1.1rem;
@@ -71,16 +71,16 @@
             transition: var(--transition);
             animation: fadeInUp 0.8s ease;
         }
-        
+
         .login-box:hover {
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
         }
-        
+
         .form-group {
             margin-bottom: 25px;
             position: relative;
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: 8px;
@@ -88,7 +88,7 @@
             color: var(--secondary-color);
             font-size: 0.95rem;
         }
-        
+
         .form-group input {
             width: 100%;
             padding: 14px 15px;
@@ -97,13 +97,13 @@
             font-size: 1rem;
             transition: var(--transition);
         }
-        
+
         .form-group input:focus {
             border-color: var(--primary-color);
             outline: none;
             box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.2);
         }
-        
+
         /* 记住我 & 忘记密码 */
         .remember-forgot {
             display: flex;
@@ -112,41 +112,41 @@
             margin-bottom: 25px;
             font-size: 0.9rem;
         }
-        
+
         .remember-me {
             display: flex;
             align-items: center;
         }
-        
+
         .remember-me input {
             margin-right: 8px;
             width: 16px;
             height: 16px;
             cursor: pointer;
         }
-        
+
         .remember-me label {
             cursor: pointer;
             color: var(--dark-gray);
         }
-        
+
         .forgot-register a {
             color: var(--primary-color);
             text-decoration: none;
             transition: var(--transition);
             margin-left: 10px;
         }
-        
+
         .forgot-register a:hover {
             text-decoration: underline;
             color: var(--primary-hover);
         }
-        
+
         .forgot-register span {
             color: var(--medium-gray);
             margin: 0 5px;
         }
-        
+
         /* 登录按钮 */
         .login-btn {
             width: 100%;
@@ -162,16 +162,16 @@
             letter-spacing: 1px;
             text-transform: uppercase;
         }
-        
+
         .login-btn:hover {
             background-color: var(--primary-hover);
             transform: translateY(-2px);
         }
-        
+
         .login-btn:active {
             transform: translateY(0);
         }
-        
+
         /* 特色服务 */
         .features {
             display: flex;
@@ -180,7 +180,7 @@
             margin: 60px 0;
             gap: 20px;
         }
-        
+
         .feature {
             flex: 1;
             min-width: 200px;
@@ -191,30 +191,30 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
             transition: var(--transition);
         }
-        
+
         .feature:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
-        
+
         .feature-icon {
             font-size: 2.5rem;
             color: var(--primary-color);
             margin-bottom: 20px;
             display: inline-block;
         }
-        
+
         .feature h3 {
             color: var(--secondary-color);
             margin-bottom: 10px;
             font-size: 1.2rem;
         }
-        
+
         .feature p {
             color: var(--dark-gray);
             font-size: 0.95rem;
         }
-        
+
         /* 页脚 */
         .footer {
             text-align: center;
@@ -224,7 +224,7 @@
             color: var(--dark-gray);
             border-top: 1px solid var(--medium-gray);
         }
-        
+
         /* 动画效果 */
         @keyframes fadeInDown {
             from {
@@ -236,7 +236,7 @@
                 transform: translateY(0);
             }
         }
-        
+
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -247,26 +247,26 @@
                 transform: translateY(0);
             }
         }
-        
+
         /* 响应式设计 */
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
             }
-            
+
             .header p {
                 font-size: 1rem;
             }
-            
+
             .login-box {
                 padding: 30px;
             }
-            
+
             .features {
                 flex-direction: column;
                 gap: 15px;
             }
-            
+
             .feature {
                 min-width: 100%;
             }
@@ -274,6 +274,7 @@
     </style>
 </head>
 <body>
+
     <div class="container">
         <div class="header">
             <h1>机械配件商城</h1>
@@ -316,23 +317,96 @@
                 <div class="feature-icon">★</div>
                 <h3>品质保障</h3>
                 <p>垂直专业 优质厂商</p>
+
             </div>
-            <div class="feature">
-                <div class="feature-icon">⚙️</div>
-                <h3>服务保障</h3>
-                <p>专业服务团队</p>
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" placeholder="请输入您的密码" required>
             </div>
-            <div class="feature">
-                <div class="feature-icon">$</div>
-                <h3>交易透明</h3>
-                <p>买卖双方签收价格</p>
+            <div class="remember-forgot">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">记住用户名</label>
+                </div>
+                <div class="forgot-register">
+                    <a href="forgot.html">忘记密码</a>
+                    <span>|</span>
+                    <a href="register.html">免费注册</a>
+                </div>
             </div>
+            <button type="submit" class="login-btn">登 录</button>
+        </form>
+    </div>
+
+    <div class="features">
+        <div class="feature">
+            <div class="feature-icon">✓</div>
+            <h3>真实资源</h3>
+            <p>一手资源 真实存在</p>
         </div>
-        
-        <div class="footer">
-            <p>Copyright © 2018 XXXXX数字科技有限公司 版权所有 保留一切权利 鲁ICP备XXXXXXXX号-X</p>
+        <div class="feature">
+            <div class="feature-icon">★</div>
+            <h3>品质保障</h3>
+            <p>垂直专业 优质厂商</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">⚙️</div>
+            <h3>服务保障</h3>
+            <p>专业服务团队</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">$</div>
+            <h3>交易透明</h3>
+            <p>买卖双方签收价格</p>
         </div>
     </div>
+
+    <div class="footer">
+        <p>Copyright © 2018 XXXXX数字科技有限公司 版权所有 保留一切权利 鲁ICP备XXXXXXXX号-X</p>
+    </div>
+</div>
+
+<script src="js/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        if(localStorage.getItem('rememberAccount') === 'true') {
+            $('#remember').prop('checked', true);
+            $('#username').val(localStorage.getItem('account'));
+        }
+
+        $('#loginForm').submit(function(e) {
+            e.preventDefault();
+
+            const account = $('#username').val().trim();
+            const password = $('#password').val().trim();
+            const remember = $('#remember').is(':checked');
+
+            if(!account) {
+                alert('请输入用户名或手机号');
+                $('#username').focus();
+                return;
+            }
+
+            if(!password) {
+                alert('请输入密码');
+                $('#password').focus();
+                return;
+            }
+
+            // 如果勾选了记住用户名
+            if(remember) {
+                localStorage.setItem('rememberAccount', 'true');
+                localStorage.setItem('account', account);
+            } else {
+                localStorage.removeItem('rememberAccount');
+                localStorage.removeItem('account');
+            }
+
+            // 显示加载状态
+            const $btn = $(this).find('.login-btn');
+            const btnText = $btn.text();
+            $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> 登录中...');
+
 
     <script src="js/jquery.min.js"></script>
     <script>
@@ -429,5 +503,6 @@
             });
         });
     </script>
+
 </body>
 </html>

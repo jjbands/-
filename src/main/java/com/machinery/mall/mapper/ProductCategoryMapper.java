@@ -5,13 +5,19 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
-/**
- * @author 你的名字
- * @version 1.0.0
- * @date: 2025/06/26  14:56
- */
 @Mapper
 public interface ProductCategoryMapper {
     List<ProductCategory> selectAll();
+
+    List<ProductCategory> selectParentOptions();
+    List<ProductCategory> selectByParentId(Integer parentId);
+    List<ProductCategory> selectByLevel(Integer level);
+    ProductCategory selectById(Integer id);
+    int insert(ProductCategory category);
+    int update(ProductCategory category);
+    int delete(Integer id);
+    int countByParentId(Integer parentId);
+
     List<Integer> selectAllSubCategoryIds(Integer parentId);
+
 }

@@ -4,14 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>后台管理 - 用户管理</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root {
             --primary-color: #4361ee;
             --secondary-color: #3f37c9;
             --success-color: #4cc9f0;
             --danger-color: #f72585;
+
             --warning-color: #f59e0b;
+
             --light-color: #f8f9fa;
             --dark-color: #212529;
             --border-color: #dee2e6;
@@ -120,6 +124,7 @@
             transform: translateY(-2px);
         }
 
+
         .btn-warning {
             background-color: var(--warning-color);
             color: white;
@@ -130,6 +135,7 @@
             transform: translateY(-2px);
         }
 
+
         .btn-sm {
             padding: 6px 12px;
             font-size: 0.8rem;
@@ -139,7 +145,9 @@
             margin-right: 5px;
         }
 
+
         /* 模态框样式 */
+
         .modal {
             display: none;
             position: fixed;
@@ -201,8 +209,10 @@
         }
 
         .form-group {
+
             margin-bottom: 1.5rem;
             position: relative;
+
         }
 
         .form-group label {
@@ -234,6 +244,7 @@
             margin-top: 20px;
         }
 
+
         /* 新增错误状态样式 */
         .is-invalid {
             border-color: var(--danger-color) !important;
@@ -250,6 +261,7 @@
         .is-invalid ~ .invalid-feedback {
             display: block;
         }
+
 
         .status-badge {
             display: inline-block;
@@ -268,6 +280,7 @@
             background-color: #fee2e2;
             color: #b91c1c;
         }
+
 
         .status-deleted {
             background-color: #e5e7eb;
@@ -301,6 +314,7 @@
         .search-btn:hover {
             background-color: var(--secondary-color);
         }
+
 
         .tab-container {
             display: flex;
@@ -386,6 +400,7 @@
             }
         }
 
+
         @media (max-width: 768px) {
             .modal-content {
                 width: 90%;
@@ -404,6 +419,7 @@
 <div class="container">
     <div class="header">
         <h1><i class="fas fa-users"></i> 用户管理</h1>
+
         <h1>
             <a href="product_management.html" style="text-decoration: none; color: inherit;">
                 <i class="fas fa-box-open"></i> 商品管理
@@ -415,37 +431,47 @@
         </div>
     </div>
 
+
     <div class="tab-container">
         <div class="tab active" onclick="switchTab('active')"><i class="fas fa-user-check"></i> 活跃用户</div>
         <div class="tab" onclick="switchTab('deleted')"><i class="fas fa-user-slash"></i> 已删除用户</div>
     </div>
+
 
     <div class="card">
         <div class="table-container">
             <table>
                 <thead>
                 <tr>
+
                     <th>ID</th>
+
                     <th>用户名</th>
                     <th>姓名</th>
                     <th>手机号</th>
                     <th>邮箱</th>
                     <th>性别</th>
                     <th>年龄</th>
+
                     <th>角色</th>
                     <th>状态</th>
+
                     <th>操作</th>
                 </tr>
                 </thead>
                 <tbody id="userTable">
+
                 <!-- 数据将通过JavaScript动态加载 -->
+
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
+
 <!-- 修改用户模态框 -->
+
 <div id="editModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -457,11 +483,14 @@
             <div class="form-group">
                 <label for="editAccount"><i class="fas fa-user"></i> 用户名</label>
                 <input type="text" id="editAccount" class="form-control" required>
+
                 <div class="invalid-feedback">用户名不能为空且至少3个字符</div>
+
             </div>
             <div class="form-group">
                 <label for="editName"><i class="fas fa-id-card"></i> 姓名</label>
                 <input type="text" id="editName" class="form-control" required>
+
                 <div class="invalid-feedback">请输入至少2个字符的姓名</div>
             </div>
             <div class="form-group">
@@ -472,7 +501,9 @@
             <div class="form-group">
                 <label for="editEmail"><i class="fas fa-envelope"></i> 邮箱</label>
                 <input type="email" id="editEmail" class="form-control">
+
                 <div class="invalid-feedback">请输入有效的电子邮箱</div>
+
             </div>
             <div class="form-group">
                 <label for="editSex"><i class="fas fa-venus-mars"></i> 性别</label>
@@ -483,6 +514,7 @@
             </div>
             <div class="form-group">
                 <label for="editAge"><i class="fas fa-birthday-cake"></i> 年龄</label>
+
                 <input type="number" id="editAge" class="form-control" min="1" max="120">
                 <div class="invalid-feedback">请输入1-120之间的有效年龄</div>
             </div>
@@ -492,6 +524,7 @@
                     <option value="1">普通用户</option>
                     <option value="2">管理员</option>
                 </select>
+
             </div>
             <div class="form-actions">
                 <button type="button" class="btn btn-primary" onclick="submitEdit()">
@@ -504,6 +537,7 @@
         </form>
     </div>
 </div>
+
 
 <!-- 确认删除模态框 -->
 <div id="confirmDeleteModal" class="modal">
@@ -526,7 +560,7 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="js/jquery.min.js"></script>
 <script>
     let currentEditId = null;
     let currentDeleteId = null;
@@ -644,6 +678,7 @@
                 </tr>`;
         });
         $('#userTable').html(html);
+
     }
 
     function searchUsers() {
@@ -652,6 +687,7 @@
             loadUsers();
             return;
         }
+
 
         const url = currentTab === 'active'
             ? 'http://localhost:8080/api/admin/users/search'
@@ -683,6 +719,7 @@
     }
 
     function openEditModal(id, account, name, phone, email, sex, age, role) {
+
         currentEditId = id;
         $('#editId').val(id);
         $('#editAccount').val(account);
@@ -691,7 +728,9 @@
         $('#editEmail').val(email);
         $('#editSex').val(sex);
         $('#editAge').val(age || '');
+
         $('#editRole').val(role || 1); // 默认值为1（普通用户）
+
 
         $('#editModal').addClass('show').show();
         $('body').css('overflow', 'hidden');
@@ -704,6 +743,7 @@
             $('body').css('overflow', 'auto');
         }, 300);
     }
+
 
     function validateUserForm(user) {
         let isValid = true;
@@ -767,11 +807,13 @@
         const btnText = $btn.text();
         $btn.prop('disabled', true).text('保存中...');
 
+
         $.ajax({
             url: 'http://localhost:8080/api/admin/user',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(user),
+
             success: function(response) {
                 if (response.status === 0) {
                     showSuccess('用户信息更新成功');
@@ -884,6 +926,7 @@
             .replace(/'/g, "&#039;");
     }
 
+
     // 显示加载动画
     function showLoading(container = 'body') {
         $(container).append(`
@@ -927,6 +970,7 @@
             <span>${message}</span>
         `;
 
+
         document.body.appendChild(toast);
 
         setTimeout(() => {
@@ -936,6 +980,7 @@
                 setTimeout(() => {
                     document.body.removeChild(toast);
                 }, 300);
+
             }, duration);
         }, 100);
     }

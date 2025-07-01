@@ -6,6 +6,50 @@
         SELECT * FROM product_category WHERE status = 1 ORDER BY sort_order ASC
     </select>
 
+    <select id="selectParentOptions" resultType="com.machinery.mall.entity.ProductCategory">
+        SELECT * FROM product_category
+        WHERE status = 1 AND level IN (0, 1)
+        ORDER BY level, sort_order
+    </select>
+
+    <select id="selectByParentId" resultType="com.machinery.mall.entity.ProductCategory">
+        SELECT * FROM product_category
+        WHERE parent_id = #{parentId} AND status = 1
+        ORDER BY sort_order
+    </select>
+
+    <select id="selectByLevel" resultType="com.machinery.mall.entity.ProductCategory">
+        SELECT * FROM product_category
+        WHERE level = #{level} AND status = 1
+        ORDER BY sort_order
+    </select>
+
+    <select id="selectById" resultType="com.machinery.mall.entity.ProductCategory">
+        SELECT * FROM product_category WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.machinery.mall.entity.ProductCategory">
+        INSERT INTO product_category (parent_id, name, sort_order, status, level)
+        VALUES (#{parentId}, #{name}, #{sortOrder}, #{status}, #{level})
+    </insert>
+
+    <update id="update" parameterType="com.machinery.mall.entity.ProductCategory">
+        UPDATE product_category
+        SET parent_id = #{parentId},
+            name = #{name},
+            sort_order = #{sortOrder},
+            status = #{status},
+            level = #{level}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM product_category WHERE id = #{id}
+    </delete>
+
+    <select id="countByParentId" resultType="int">
+        SELECT COUNT(*) FROM product_category WHERE parent_id = #{parentId} AND status = 1
+
     <select id="selectAllSubCategoryIds" resultType="int">
         WITH RECURSIVE subcategories AS (
             SELECT id FROM product_category WHERE id = #{parentId} AND status = 1

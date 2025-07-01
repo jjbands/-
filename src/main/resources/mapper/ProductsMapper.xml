@@ -2,21 +2,28 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.machinery.mall.mapper.ProductsMapper">
-    <select id="selectByCategoryId" resultType="com.machinery.mall.entity.Products">
+<!--  保留但要改名  -->
+<!--     <select id="selectByCategoryId" resultType="com.machinery.mall.entity.Products">
         SELECT * FROM products
         WHERE parts_id = #{categoryId}
           AND status = 2
         ORDER BY created DESC
-    </select>
+    </select> -->
     <select id="selectByName" resultType="com.machinery.mall.entity.Products">
         SELECT * FROM products
         WHERE name LIKE CONCAT('%', #{name}, '%')
         ORDER BY created DESC
     </select>
 
+    <select id="countByCategoryId" resultType="int">
+        SELECT COUNT(*) FROM products WHERE parts_id = #{categoryId}
+    </select>
+
     <select id="selectById" resultType="com.machinery.mall.entity.Products">
         SELECT * FROM products WHERE id = #{id}
     </select>
+
+
     <select id="getAllProducts" resultType="com.machinery.mall.entity.Products">
         SELECT id, name, product_id as productId, parts_id as partsId,
                icon_url as iconUrl, sub_images as subImages, detail,
@@ -45,6 +52,12 @@
         WHERE name LIKE CONCAT('%', #{name}, '%')
     </select>
 
+
+    <insert id="addProduct" parameterType="com.machinery.mall.entity.Products">
+        INSERT INTO products (name, price, stock, product_id, detail, parts_id)
+        VALUES (#{name}, #{price}, #{stock}, #{productId}, #{detail}, #{partsId})
+    </insert>
+
     <select id="selectByCategoryIds" resultType="com.machinery.mall.entity.Products">
         SELECT * FROM products
         WHERE parts_id IN
@@ -71,4 +84,5 @@
             updated = NOW()
         WHERE id = #{id}
     </update>
+
 </mapper>

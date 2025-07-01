@@ -8,6 +8,7 @@
         WHERE del = 0
     </select>
 
+
     <!-- 获取已删除用户 -->
     <select id="getDeletedUsers" resultType="com.machinery.mall.entity.User">
         SELECT id, account, name, phone, email, sex, age, role
@@ -16,6 +17,7 @@
     </select>
 
     <!-- 更新用户信息 -->
+
     <update id="updateUser">
         UPDATE users
         SET account = #{account},
@@ -59,6 +61,7 @@
             OR email LIKE CONCAT('%', #{keyword}, '%'))
     </select>
 
+
     <!-- 搜索已删除用户 -->
     <select id="searchDeletedUsers" resultType="com.machinery.mall.entity.User">
         SELECT id, account, name, phone, email, sex, age, role
@@ -69,4 +72,5 @@
             OR phone LIKE CONCAT('%', #{keyword}, '%')
             OR email LIKE CONCAT('%', #{keyword}, '%'))
     </select>
+
 </mapper>

@@ -3,6 +3,9 @@ package com.machinery.mall.service;
 import com.machinery.mall.entity.Products;
 import com.machinery.mall.mapper.ProductCategoryMapper;
 import com.machinery.mall.mapper.ProductsMapper;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.machinery.mall.mapper.UserMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +16,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * @author 你的名字
- * @version 1.0.0
- * @date: 2025/06/26  14:59
- */
+
 @Service
 public class ProductsServiceImpl implements ProductsService {
+
+
+//保留但要改名
+//     @Override
+//     public List<Products> getProductsByCategory(Integer categoryId) {
+//         return productsMapper.selectByCategoryId(categoryId);
+//     }
+
     private ProductsMapper productsMapper;
 
     private ProductCategoryMapper categoryMapper;
@@ -34,6 +41,7 @@ public class ProductsServiceImpl implements ProductsService {
         return productsMapper.selectByCategoryIds(categoryIds);
     }
 
+
     @Override
     public List<Products> getProductsByName(String name) {
         return productsMapper.selectByName(name);
@@ -43,6 +51,12 @@ public class ProductsServiceImpl implements ProductsService {
         return productsMapper.selectById(id);
     }
     @Override
+
+    public int countByCategoryId(Integer categoryId) {
+        return productsMapper.countByCategoryId(categoryId);
+    }
+    @Override
+
     public List<Products> getAllProducts() {
         return productsMapper.getAllProducts();
     }
@@ -60,5 +74,12 @@ public class ProductsServiceImpl implements ProductsService {
     @Override
     public List<Products> searchProductsByName(String name) {
         return productsMapper.searchProductsByName(name);
+
     }
+
+    @Override
+    public int addProduct(Products product) {
+        return productsMapper.addProduct(product);
     }
+
+}

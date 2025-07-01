@@ -453,6 +453,7 @@
         });
 </script>
 <script>
+
 // 平铺数组转树结构
 function listToTree(list) {
     const map = {};
@@ -548,6 +549,7 @@ function loadProductsByCategoryId(categoryId, categoryName) {
                 const price = product.price ? `¥${product.price}` : '¥0.00';
                 const stock = product.stock || 0;
                 html += `
+
                 <div class=\"product-card\" data-product-id=\"${product.id}\">
                     <img src=\"${imageUrl}\" alt=\"${product.name}\" class=\"product-image\">
                     <div class=\"product-name\">${product.name}</div>
@@ -559,6 +561,7 @@ function loadProductsByCategoryId(categoryId, categoryName) {
                     </div>
                 </div>
                 `;
+
             });
             html += '</div>';
             container.innerHTML = html;
@@ -575,6 +578,7 @@ fetch('/api/categories')
         const tree = listToTree(list);
         renderMainCategories(tree);
     });
+
 </script>
 </body>
 </html>

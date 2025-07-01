@@ -8,6 +8,7 @@ import java.util.List;
 @Mapper
 public interface AdminMapper {
     List<User> getAllUsers();
+    int deleteUser(@Param("id") int id);
     List<User> getDeletedUsers();
     List<User> searchUsers(@Param("keyword") String keyword);
     List<User> searchDeletedUsers(@Param("keyword") String keyword);
