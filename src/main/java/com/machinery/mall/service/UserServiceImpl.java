@@ -2,14 +2,15 @@ package com.machinery.mall.service;
 
 import com.machinery.mall.entity.User;
 import com.machinery.mall.mapper.UserMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-
     private UserMapper userMapper;
+    @Autowired
     public UserServiceImpl(UserMapper userMapper) {
         this.userMapper = userMapper;}
     @Override
@@ -78,5 +79,14 @@ public class UserServiceImpl implements UserService {
         }
 
         return result > 0;
+    }
+    @Override
+    public User getUserByAccount(String account) {
+        return userMapper.selectByAccount(account);
+    }
+
+    @Override
+    public boolean updateUserProfile(User user) {
+        return userMapper.updateProfile(user) > 0;
     }
 }

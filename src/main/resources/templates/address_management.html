@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>收货地址管理 - 机械电商平台</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script th:inline="javascript">
+        window.currentUser = { account: [[${account}]] };
+    </script>
+    <style>
+        .address-table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+        .address-table th, .address-table td { border: 1px solid #e0e0e0; padding: 10px; text-align: center; }
+        .address-table th { background: #f8f8f8; }
+        .address-table .default-badge { color: #fff; background: #67c23a; border-radius: 4px; padding: 2px 8px; font-size: 12px; }
+        .address-table button { margin: 0 2px; padding: 4px 10px; border: none; border-radius: 4px; background: #409eff; color: #fff; cursor: pointer; }
+        .address-table button.delete { background: #f56c6c; }
+        .address-table button.save { background: #67c23a; }
+        .address-table button.cancel { background: #909399; }
+        .address-table button.default { background: #e6a23c; }
+        .address-table input, .address-table select { padding: 4px 6px; border: 1px solid #dcdfe6; border-radius: 4px; }
+        .add-btn { margin: 20px 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2 style="margin-top:30px;">管理地址</h2>
+    <table class="address-table">
+        <thead>
+            <tr>
+                <th>收货人</th>
+                <th>联系方式</th>
+                <th>收货地址</th>
+                <th>详细地址</th>
+                <th>默认地址</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody id="addressTableBody"></tbody>
+    </table>
+    <button class="add-btn" onclick="addRow()">新增</button>
+
+    <script src="/js/jquery.min.js"></script>
+    <script>
+    // 省市区数据（可替换为ajax加载）
+    let regionData = [
+      {"name":"河北省","cities":[{"name":"秦皇岛市","districts":["海港区","山海关区","北戴河区","抚宁区","青龙满族自治县","昌黎县"]},{"name":"石家庄市","districts":["长安区","桥西区","新华区"]}]},
+      {"name":"北京市","cities":[{"name":"北京市","districts":["东城区","西城区","朝阳区"]}]}
+    ];
+    let addressList = [];
+    let editingIndex = null;
+
+    // 可用ajax加载后端数据
+    function loadAddressList() {
+        // 示例：可用ajax从后端加载
+        // $.post('/api/address/list', {account: window.currentUser.account}, function(res){ addressList = res.data; renderTable(); });
+        renderTable();
+    }
+
+    function renderTable() {
+        let html = '';
+        addressList.forEach((addr, idx) => {
+            if (editingIndex === idx) {
+                html += renderEditRow(addr, idx);
+            } else {
+                html += renderViewRow(addr, idx);
+            }
+        });
+        $('#addressTableBody').html(html);
+    }
+
+    function renderViewRow(addr, idx) {
+        return `<tr>
+            <td>${addr.name||''}</td>
+            <td>${addr.mobile||''}</td>
+            <td>${addr.province||''} / ${addr.city||''} / ${addr.district||''}</td>
+            <td>${addr.addr||''}</td>
+            <td>${addr.dfault ? '<span class="default-badge">默认</span>' : ''}</td>
+            <td>
+                <button onclick="editRow(${idx})">编辑</button>
+                <button class="delete" onclick="deleteRow(${idx})">删除</button>
+                ${!addr.dfault ? `<button class="default" onclick="setDefault(${idx})">设为默认</button>` : ''}
+            </td>
+        </tr>`;
+    }
+
+    function renderEditRow(addr, idx) {
+        return `<tr>
+            <td><input type="text" id="name_${idx}" value="${addr.name||''}"></td>
+            <td><input type="text" id="mobile_${idx}" value="${addr.mobile||''}"></td>
+            <td>
+                <select id="province_${idx}" onchange="onProvinceChange(${idx})"></select>
+                <select id="city_${idx}" onchange="onCityChange(${idx})"></select>
+                <select id="district_${idx}"></select>
+            </td>
+            <td><input type="text" id="addr_${idx}" value="${addr.addr||''}"></td>
+            <td><input type="checkbox" id="dfault_${idx}" ${addr.dfault ? 'checked' : ''}></td>
+            <td>
+                <button class="save" onclick="saveRow(${idx})">保存</button>
+                <button class="cancel" onclick="cancelEdit()">取消</button>
+            </td>
+        </tr>`;
+    }
+
+    function addRow() {
+        addressList.push({name:'', mobile:'', province:'', city:'', district:'', addr:'', dfault:0});
+        editingIndex = addressList.length - 1;
+        renderTable();
+        renderRegionSelect(editingIndex);
+    }
+
+    function editRow(idx) {
+        editingIndex = idx;
+        renderTable();
+        renderRegionSelect(idx, addressList[idx]);
+    }
+
+    function deleteRow(idx) {
+        if (confirm('确定删除？')) {
+            addressList.splice(idx, 1);
+            editingIndex = null;
+            renderTable();
+        }
+    }
+
+    function saveRow(idx) {
+        let addr = addressList[idx];
+        addr.name = $(`#name_${idx}`).val();
+        addr.mobile = $(`#mobile_${idx}`).val();
+        addr.province = $(`#province_${idx}`).val();
+        addr.city = $(`#city_${idx}`).val();
+        addr.district = $(`#district_${idx}`).val();
+        addr.addr = $(`#addr_${idx}`).val();
+        addr.dfault = $(`#dfault_${idx}`).is(':checked') ? 1 : 0;
+        if (addr.dfault) {
+            addressList.forEach((a, i) => { if (i !== idx) a.dfault = 0; });
+        }
+        editingIndex = null;
+        renderTable();
+    }
+
+    function cancelEdit() {
+        editingIndex = null;
+        renderTable();
+    }
+
+    function setDefault(idx) {
+        addressList.forEach((a, i) => a.dfault = (i === idx ? 1 : 0));
+        renderTable();
+    }
+
+    // 省市区三级联动渲染
+    function renderRegionSelect(idx, addr = {}) {
+        let $province = $(`#province_${idx}`);
+        let $city = $(`#city_${idx}`);
+        let $district = $(`#district_${idx}`);
+        $province.html('<option value="">请选择</option>');
+        regionData.forEach(p => $province.append(`<option value="${p.name}">${p.name}</option>`));
+        if (addr.province) $province.val(addr.province);
+
+        $city.html('<option value="">请选择</option>');
+        if (addr.province) {
+            let cities = regionData.find(p => p.name === addr.province)?.cities || [];
+            cities.forEach(c => $city.append(`<option value="${c.name}">${c.name}</option>`));
+            if (addr.city) $city.val(addr.city);
+        }
+
+        $district.html('<option value="">请选择</option>');
+        if (addr.province && addr.city) {
+            let cities = regionData.find(p => p.name === addr.province)?.cities || [];
+            let districts = cities.find(c => c.name === addr.city)?.districts || [];
+            districts.forEach(d => $district.append(`<option value="${d}">${d}</option>`));
+            if (addr.district) $district.val(addr.district);
+        }
+    }
+
+    function onProvinceChange(idx) {
+        let province = $(`#province_${idx}`).val();
+        let $city = $(`#city_${idx}`);
+        $city.html('<option value="">请选择</option>');
+        let cities = regionData.find(p => p.name === province)?.cities || [];
+        cities.forEach(c => $city.append(`<option value="${c.name}">${c.name}</option>`));
+        $(`#district_${idx}`).html('<option value="">请选择</option>');
+    }
+
+    function onCityChange(idx) {
+        let province = $(`#province_${idx}`).val();
+        let city = $(`#city_${idx}`).val();
+        let $district = $(`#district_${idx}`);
+        $district.html('<option value="">请选择</option>');
+        let cities = regionData.find(p => p.name === province)?.cities || [];
+        let districts = cities.find(c => c.name === city)?.districts || [];
+        districts.forEach(d => $district.append(`<option value="${d}">${d}</option>`));
+    }
+
+    // 页面加载时渲染
+    $(function(){
+        loadAddressList();
+    });
+    </script>
+</body>
+</html> 

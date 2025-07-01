@@ -58,6 +58,7 @@
             margin-bottom: 5px;
         }
 
+
         /* 登录框样式 */
         .login-box {
             background: var(--white);
@@ -273,18 +274,50 @@
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1>机械配件商城</h1>
-        <p>一个账号，玩转商城所有服务！</p>
-        <p>购机端，购买二手设备，购配件，购模型，服务保障</p>
-    </div>
 
-    <div class="login-box">
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">用户名/已验证的手机号码</label>
-                <input type="text" id="username" name="account" placeholder="请输入您的用户名或手机号" required>
+    <div class="container">
+        <div class="header">
+            <h1>机械配件商城</h1>
+            <p>一个账号，玩转商城所有服务！</p>
+            <p>购机端，购买二手设备，购配件，购模型，服务保障</p>
+        </div>
+        
+        <div class="login-box">
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">用户名/已验证的手机号码</label>
+                    <input type="text" id="username" name="account" placeholder="请输入您的用户名或手机号" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password"  placeholder="请输入您的密码" required>
+                </div>
+                <div class="remember-forgot">
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">记住用户名</label>
+                    </div>
+                    <div class="forgot-register">
+                        <a href="forgot.html">忘记密码</a>
+                        <span>|</span>
+                        <a href="register.html">免费注册</a>
+                    </div>
+                </div>
+                <button type="submit" class="login-btn">登 录</button>
+            </form>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">✓</div>
+                <h3>真实资源</h3>
+                <p>一手资源 真实存在</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">★</div>
+                <h3>品质保障</h3>
+                <p>垂直专业 优质厂商</p>
+
             </div>
             <div class="form-group">
                 <label for="password">密码</label>
@@ -374,37 +407,101 @@
             const btnText = $btn.text();
             $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> 登录中...');
 
-            // 调用登录API
-            $.ajax({
-                url: 'http://localhost:8080/api/user/login',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    loginKey: account,
-                    password: password
-                }),
-                success: function(response) {
-                    if(response && response.status === 0) {
-                        alert('登录成功！');
-                        window.location.href = 'index.html';
-                    } else {
-                        const errorMsg = response && response.msg ? response.msg : '用户名/手机号或密码错误';
-                        alert(errorMsg);
-                    }
-                },
-                error: function(xhr) {
-                    let errorMsg = '登录失败，请稍后再试';
-                    if (xhr.responseJSON && xhr.responseJSON.msg) {
-                        errorMsg = xhr.responseJSON.msg;
-                    }
-                    alert(errorMsg);
-                },
-                complete: function() {
-                    $btn.prop('disabled', false).text(btnText);
+
+    <script src="js/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // 检查本地存储中是否有记住的用户名
+            if(localStorage.getItem('rememberAccount') === 'true') {
+                $('#remember').prop('checked', true);
+                $('#username').val(localStorage.getItem('account'));
+            }
+
+            // 登录表单提交
+            $('#loginForm').submit(function(e) {
+                e.preventDefault();
+
+                const account = $('#username').val().trim();
+                const password = $('#password').val().trim();
+                const remember = $('#remember').is(':checked');
+
+                // 简单验证
+                if(!account) {
+                    alert('请输入用户名或手机号');
+                    $('#username').focus();
+                    return;
                 }
+
+                if(!password) {
+                    alert('请输入密码');
+                    $('#password').focus();
+                    return;
+                }
+
+                // 如果勾选了记住用户名
+                if(remember) {
+                    localStorage.setItem('rememberAccount', 'true');
+                    localStorage.setItem('account', account);
+                } else {
+                    localStorage.removeItem('rememberAccount');
+                    localStorage.removeItem('account');
+                }
+
+                // 显示加载状态
+                const $btn = $(this).find('.login-btn');
+                const btnText = $btn.text();
+                $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> 登录中...');
+
+                // 调用登录API
+                $.ajax({
+                    url: 'http://localhost:8080/api/user/login',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        loginKey: account,
+                        password: password
+                    }),
+                    success: function(response) {
+                        if(response && response.status === 0) {
+                            localStorage.setItem('userId', response.data.userId);
+                            localStorage.setItem('account', response.data.account );
+                            localStorage.setItem('username', response.data.username);
+                            localStorage.setItem('token', response.data.token || 'generated-token');
+                            localStorage.setItem('role', response.data.role); // 存储用户角色
+                            console.log('登录成功，存储的用户信息:', {
+                                account: localStorage.getItem('account'),
+                                username: localStorage.getItem('username'),
+                                token: localStorage.getItem('token'),
+                                role:localStorage.getItem('role')
+                            });
+                            const role = response.data.role; // 获取用户角色信息
+                            if (role === 1) {
+                                alert('用户登录成功！');
+                                window.location.href = 'index.html';
+                            } else if (role === 2) {
+                                alert('管理员登录成功！');
+                                window.location.href = 'management.html';
+                            } else {
+                                alert('未知角色，无法跳转');
+                            }
+                        } else {
+                            const errorMsg = response && response.msg ? response.msg : '用户名/手机号或密码错误';
+                            alert(errorMsg);
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMsg = '登录失败，请稍后再试';
+                        if (xhr.responseJSON && xhr.responseJSON.msg) {
+                            errorMsg = xhr.responseJSON.msg;
+                        }
+                        alert(errorMsg);
+                    },
+                    complete: function() {
+                        $btn.prop('disabled', false).text(btnText);
+                    }
+                });
             });
         });
-    });
-</script>
+    </script>
 </body>
 </html>

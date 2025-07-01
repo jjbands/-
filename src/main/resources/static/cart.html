@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的购物车 - 机械配件商城</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: "微软雅黑", Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+        }
+
+        /* 头部样式 - 与首页保持一致 */
+        .header {
+            background: #fff;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .header .container {
+            width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0074d9;
+        }
+
+        .user-info {
+            font-size: 14px;
+        }
+
+        .cart-icon {
+            margin-right: 20px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        #cartCount {
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+        }
+
+        /* 购物车主体样式 */
+        .cart-container {
+            width: 1200px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .cart-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            color: #333;
+        }
+
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .cart-table th {
+            background: #f5f5f5;
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .cart-table td {
+            padding: 15px 10px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        .cart-product {
+            display: flex;
+            align-items: center;
+        }
+
+        .cart-product img {
+            width: 80px;
+            height: 60px;
+            margin-right: 15px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .cart-total {
+            text-align: right;
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .cart-actions {
+            margin-top: 30px;
+            text-align: right;
+        }
+
+        .btn-checkout {
+            padding: 12px 30px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-checkout:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #e74c3c;
+        }
+
+        /* 操作按钮样式 */
+        .action-btn {
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+        }
+
+        /* Toast消息样式 */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .toast.error {
+            background: #e74c3c;
+        }
+
+        .toast.warning {
+            background: #ff9800;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* 加载动画 */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .header .container,
+            .cart-container {
+                width: 100%;
+                padding: 15px;
+                box-sizing: border-box;
+            }
+
+            .cart-product {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .cart-product img {
+                margin-bottom: 10px;
+            }
+
+            .cart-table th,
+            .cart-table td {
+                padding: 10px 5px;
+                font-size: 14px;
+            }
+
+            .quantity-input {
+                width: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- 头部区域 -->
+<div class="header">
+    <div class="container">
+        <div class="logo">机械配件商城</div>
+        <div class="user-info">
+            <a href="cart.html" class="cart-icon">
+                <span>购物车</span>
+                <span id="cartCount">0</span>
+            </a>
+            <span id="authInfo">
+                <span id="loginText">访问<a href="login.html" style="color:#0074d9;margin:0 5px;">登录</a>|<a href="register.html" style="color:#0074d9;margin:0 5px;">注册</a></span>
+                <span id="userInfo" style="display:none;">
+                    <span id="usernameDisplay"></span>
+                    <a href="javascript:logout()" style="color:#e74c3c;margin-left:10px;">退出</a>
+                </span>
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- 购物车主体内容 -->
+<div class="cart-container">
+    <h2 class="cart-title">我的购物车</h2>
+    <div id="cartContent">
+        <div class="loading">正在加载购物车...</div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(function() {
+        // 初始化检查登录状态
+        checkLoginStatus();
+
+        // 加载购物车内容
+        loadCart();
+    });
+
+    // 检查登录状态
+    function checkLoginStatus() {
+        const token = localStorage.getItem('token');
+        const userId = parseInt(localStorage.getItem('userId'));
+        const username = localStorage.getItem('username');
+
+        if (token && !isNaN(userId) && userId > 0 && username) {
+            // 用户已登录
+            $('#loginText').hide();
+            $('#userInfo').show();
+            $('#usernameDisplay').text(username);
+            return true;
+        } else {
+            // 用户未登录
+            $('#loginText').show();
+            $('#userInfo').hide();
+            showToast('请先登录查看购物车', 'error');
+            setTimeout(() => {
+                window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+            }, 1500);
+            return false;
+        }
+    }
+
+    // 加载购物车数据
+    function loadCart() {
+        if (!checkLoginStatus()) return;
+
+        const userId = parseInt(localStorage.getItem('userId'));
+        const token = localStorage.getItem('token');
+
+        if (isNaN(userId) || userId <= 0 || !token) {
+            showToast('用户信息无效，请重新登录', 'error');
+            logout();
+            return;
+        }
+
+        $('#cartContent').html('<div class="loading">正在加载购物车...</div>');
+
+        $.ajax({
+            url: 'http://localhost:8080/api/cart/list',
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            data: { userId: userId },
+            dataType: 'json',
+            success: function(response) {
+                if (response && response.status === 0) {
+                    renderCart(response.data);
+                } else {
+                    throw new Error(response.msg || '加载购物车失败');
+                }
+            },
+            error: function(xhr) {
+                if (xhr.status === 401) {
+                    showToast('登录已过期，请重新登录', 'error');
+                    logout();
+                } else {
+                    console.error('加载购物车错误:', xhr.responseText);
+                    $('#cartContent').html('<div class="error">加载购物车失败，请稍后重试</div>');
+                }
+            }
+        });
+    }
+
+    // 渲染购物车内容
+    function renderCart(cartItems) {
+        if (!cartItems || cartItems.length === 0) {
+            $('#cartContent').html('<div class="empty-cart">购物车是空的，快去选购商品吧！</div>');
+            return;
+        }
+
+        let html = `
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>商品信息</th>
+                    <th>单价</th>
+                    <th>数量</th>
+                    <th>小计</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+        let total = 0;
+        cartItems.forEach(item => {
+            // 确保所有ID和价格都是数字
+            const cartItemId = parseInt(item.id);
+            const price = parseFloat(item.price) || 0;
+            const quantity = parseInt(item.quantity) || 1;
+            const subtotal = price * quantity;
+            total += subtotal;
+
+            html += `
+            <tr data-id="${cartItemId}">
+                <td>
+                    <div class="cart-product">
+                        <img src="${item.iconUrl || 'https://placehold.co/80x60?text=产品图片'}" alt="${item.productName}">
+                        <div>
+                            <div class="product-name">${item.productName}</div>
+                            <div class="product-spec" style="color:#666;font-size:12px;">${item.spec || '暂无规格信息'}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>¥${price.toFixed(2)}</td>
+                <td>
+                    <input type="number" class="quantity-input" value="${quantity}" min="1"
+                           onchange="updateCartItemQuantity(${cartItemId}, this.value)">
+                </td>
+                <td>¥${subtotal.toFixed(2)}</td>
+                <td>
+                    <button class="action-btn" onclick="removeCartItem(${cartItemId})">删除</button>
+                </td>
+            </tr>`;
+        });
+
+        html += `</tbody></table>
+            <div class="cart-total">
+                <strong>总计: ¥${total.toFixed(2)}</strong>
+            </div>
+            <div class="cart-actions">
+                <button class="btn-checkout" onclick="checkout()">去结算</button>
+            </div>`;
+
+        $('#cartContent').html(html);
+    }
+
+    // 更新购物车商品数量
+    function updateCartItemQuantity(id, quantity) {
+        id = parseInt(id);
+        quantity = parseInt(quantity);
+        const $input = $(event.target);
+
+        if (isNaN(id) || id <= 0) {
+            showToast('商品ID无效', 'error');
+            loadCart();
+            return;
+        }
+
+        if (isNaN(quantity) || quantity < 1) {
+            showToast('数量必须大于0', 'error');
+            $input.val($input.data('old-value') || 1);
+            return;
+        }
+
+        const token = localStorage.getItem('token');
+        const userId = parseInt(localStorage.getItem('userId'));
+
+        if (isNaN(userId) || userId <= 0 || !token) {
+            showToast('请先登录', 'error');
+            logout();
+            return;
+        }
+
+        $input.prop('disabled', true);
+
+        $.ajax({
+            url: 'http://localhost:8080/api/cart/quantity',
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            data: JSON.stringify({
+                userId: userId,
+                id: id,
+                quantity: quantity
+            }),
+            success: function(response) {
+                if (response && response.status === 0) {
+                    showToast('数量更新成功');
+                    loadCart();
+                    updateCartCount();
+                } else {
+                    throw new Error(response.msg || '更新数量失败');
+                }
+            },
+            error: function(xhr) {
+                if (xhr.status === 401) {
+                    logout();
+                } else {
+                    showToast(xhr.responseJSON?.msg || '更新数量失败', 'error');
+                    loadCart(); // 恢复原始值
+                }
+            },
+            complete: function() {
+                $input.prop('disabled', false);
+            }
+        });
+    }
+
+    // 删除购物车商品
+    function removeCartItem(id) {
+        id = parseInt(id);
+        if (isNaN(id) {
+            showToast('商品ID无效', 'error');
+            return;
+        }
+
+        if (!confirm('确定要从购物车移除该商品吗？')) return;
+
+        const token = localStorage.getItem('token');
+        const userId = parseInt(localStorage.getItem('userId'));
+
+        if (isNaN(userId) || userId <= 0 || !token) {
+            showToast('请先登录', 'error');
+            logout();
+            return;
+        }
+
+        const $btn = $(event.target);
+        $btn.html('<span class="spinner"></span>删除中...').prop('disabled', true);
+
+        $.ajax({
+            url: `http://localhost:8080/api/cart/${id}`,
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            data: { userId: userId },
+            success: function(response) {
+                if (response && response.status === 0) {
+                    showToast('商品已移除');
+                    loadCart();
+                    updateCartCount();
+                } else {
+                    throw new Error(response.msg || '移除商品失败');
+                }
+            },
+            error: function(xhr) {
+                if (xhr.status === 401) {
+                    logout();
+                } else {
+                    showToast(xhr.responseJSON?.msg || '移除商品失败', 'error');
+                }
+            },
+            complete: function() {
+                $btn.html('删除').prop('disabled', false);
+            }
+        });
+    }
+
+    // 结算
+    function checkout() {
+        if (!checkLoginStatus()) return;
+
+        // 检查购物车是否有商品
+        if ($('#cartContent').find('table').length === 0) {
+            showToast('购物车是空的，无法结算', 'error');
+            return;
+        }
+
+        window.location.href = 'checkout.html';
+    }
+
+    // 更新购物车数量显示
+    function updateCartCount() {
+        const userId = parseInt(localStorage.getItem('userId'));
+        const token = localStorage.getItem('token');
+
+        if (isNaN(userId) || userId <= 0 || !token) return;
+
+        $.ajax({
+            url: 'http://localhost:8080/api/cart/count',
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            data: { userId: userId },
+            success: function(response) {
+                if (response && response.status === 0) {
+                    $('#cartCount').text(response.data.count || 0);
+                }
+            },
+            error: function(xhr) {
+                console.error('更新购物车数量错误:', xhr.responseText);
+            }
+        });
+    }
+
+    // 退出登录
+    function logout() {
+        localStorage.clear();
+        window.location.href = 'login.html';
+    }
+
+    // 显示提示消息
+    function showToast(message, type = 'success') {
+        const $toast = $(`<div class="toast ${type}">${message}</div>`);
+        $('body').append($toast);
+
+        setTimeout(() => {
+            $toast.fadeOut(400, () => $toast.remove());
+        }, 3000);
+    }
+</script>
+</body>
+</html>

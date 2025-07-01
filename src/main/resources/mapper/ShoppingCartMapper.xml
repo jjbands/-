@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.machinery.mall.mapper.ShoppingCartMapper">
+
+    <insert id="insert" parameterType="com.machinery.mall.entity.ShoppingCart">
+        INSERT INTO shopping_cart (user_id, product_id, quantity, created, updated)
+        VALUES (#{userId}, #{productId}, #{quantity}, NOW(), NOW())
+    </insert>
+
+    <select id="selectByUserIdAndProductId" resultType="com.machinery.mall.entity.ShoppingCart">
+        SELECT * FROM shopping_cart
+        WHERE user_id = #{userId} AND product_id = #{productId}
+    </select>
+
+    <update id="updateQuantity">
+        UPDATE shopping_cart
+        SET quantity = #{quantity}, updated = NOW()
+        WHERE id = #{id}
+    </update>
+    <select id="selectCartCountByUserId" resultType="int">
+        SELECT SUM(quantity) FROM shopping_cart WHERE user_id = #{userId}
+    </select>
+
+    <select id="selectCartListByUserId" resultType="com.machinery.mall.entity.ShoppingCart">
+        SELECT sc.*, p.name as product_name, p.icon_url, p.price
+        FROM shopping_cart sc
+                 JOIN products p ON sc.product_id = p.id
+        WHERE sc.user_id = #{userId}
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM shopping_cart WHERE id = #{id}
+    </delete>
+</mapper>

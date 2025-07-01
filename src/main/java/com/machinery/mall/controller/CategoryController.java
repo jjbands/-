@@ -354,33 +354,11 @@ public class CategoryController {
 
     // 根据分类ID获取商品
     @GetMapping("/products")
-    public Map<String, Object> getProductsByCategory(@RequestParam Integer categoryId) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            List<Products> products = productsService.getProductsByCategory(categoryId);
-            response.put("status", 0);
-            response.put("data", products);
-            response.put("msg", "获取成功");
-        } catch (Exception e) {
-            response.put("status", 1);
-            response.put("msg", "获取失败: " + e.getMessage());
-        }
-        return response;
+    public List<Products> getProductsByCategory(@RequestParam("categoryId") Integer categoryId) {
+        return productsService.getProductsByCategory(categoryId);
     }
-
-    // 根据名称搜索商品
     @GetMapping("/products/searchByCategory")
-    public Map<String, Object> searchProductsByName(@RequestParam String name) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            List<Products> products = productsService.getProductsByName(name);
-            response.put("status", 0);
-            response.put("data", products);
-            response.put("msg", "获取成功");
-        } catch (Exception e) {
-            response.put("status", 1);
-            response.put("msg", "获取失败: " + e.getMessage());
-        }
-        return response;
+    public List<Products> searchProductsByName(@RequestParam String name) {
+        return productsService.getProductsByName(name);
     }
 }

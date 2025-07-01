@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>后台管理 - 商品管理</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <style>
         :root {
             --primary-color: #4361ee;
@@ -116,7 +118,9 @@
         }
 
         .btn-danger:hover {
+
             opacity:0.9;
+
             transform: translateY(-2px);
         }
 
@@ -305,6 +309,7 @@
             opacity: 1;
         }
 
+
         /* 分类树样式 */
         .category-tree-container {
             display: flex;
@@ -391,6 +396,7 @@
             left: -9999px;
         }
 
+
         @media (max-width: 768px) {
             .modal-content {
                 width: 90%;
@@ -402,6 +408,7 @@
                 align-items: flex-start;
                 gap: 10px;
             }
+
 
             .category-selector {
                 flex-direction: column;
@@ -419,6 +426,7 @@
                 font-weight: bold;
                 color: var(--primary-color);
             }
+
         }
     </style>
 </head>
@@ -426,6 +434,7 @@
 <div class="container">
     <div class="header">
         <h1><i class="fas fa-boxes"></i> 商品管理</h1>
+
         <div class="search-bar">
             <input type="text" class="search-input" id="searchInput" placeholder="搜索商品...">
             <button class="search-btn" onclick="searchProducts()"> <i class="fas fa-search"></i> 搜索</button>
@@ -452,6 +461,7 @@
         </div>
     </div>
 </div>
+
 
 
 <div id="editModal" class="modal">
@@ -488,6 +498,7 @@
                 <button type="button" class="btn btn-primary" onclick="submitEdit()">
                     <i class="fas fa-save"></i> 保存
                 </button>
+
                 <button type="button" class="btn" onclick="closeModal()"> <i class="fas fa-times"></i> 取消</button>
             </div>
         </form>
@@ -549,9 +560,11 @@
                 </button>
                 <button type="button" class="btn" onclick="closeModal()"> <i class="fas fa-times"></i> 取消</button>
             </div>
+
         </form>
     </div>
 </div>
+
 
 
 <div id="categoryModal" class="modal">
@@ -620,16 +633,19 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
     let currentEditId = null;
 
     $(document).ready(function() {
         loadProducts();
+
         loadTopLevelCategories();
 
         $('#addProductBtn').click(function() {
             openAddModal();
         });
+
     });
 
     function loadProducts() {
@@ -729,7 +745,9 @@
         });
     }
 
+
     // 打开编辑模态框
+
     function openEditModal(id, name, price, status, isHot) {
         currentEditId = id;
         $('#editId').val(id);
@@ -742,6 +760,7 @@
         $('body').css('overflow', 'hidden');
     }
 
+
     // 关闭模态框
     function closeModal() {
         $('#editModal').removeClass('show');
@@ -749,11 +768,14 @@
         setTimeout(() => {
             $('#editModal').hide();
             $('#addModal').hide();
+
             $('body').css('overflow', 'auto');
         }, 300);
     }
 
+
     // 提交编辑
+
     function submitEdit() {
         const product = {
             id: currentEditId,
@@ -762,6 +784,9 @@
             status: parseInt($('#editStatus').val()),
             isHot: parseInt($('#editIsHot').val())
         };
+
+
+        // 验证输入
 
         if (!product.name) {
             showToast('error', '商品名称不能为空');
@@ -809,7 +834,9 @@
         });
     }
 
+
     // 删除商品
+
     function deleteProduct(id) {
         if (confirm('确定要删除此商品吗？此操作不可撤销！')) {
             $.ajax({
@@ -835,6 +862,7 @@
             });
         }
     }
+
 
     // 打开新增模态框
     function openAddModal() {
@@ -1212,6 +1240,7 @@
     function collapseAll() {
         $('#categoryTree ul').hide();
         $('#categoryTree .toggle').html('<i class="fas fa-caret-right"></i>');
+
     }
 
     function showToast(type, message) {
@@ -1231,6 +1260,7 @@
         }, 100);
     }
 
+
     function escapeHtml(unsafe) {
         if (!unsafe) return unsafe;
         return unsafe.toString()
@@ -1240,6 +1270,7 @@
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
     }
+
 </script>
 </body>
 </html>

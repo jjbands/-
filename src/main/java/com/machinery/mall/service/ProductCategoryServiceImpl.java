@@ -10,7 +10,11 @@ import java.util.List;
 @Service
 public class ProductCategoryServiceImpl implements ProductCategoryService {
 
-    private final ProductCategoryMapper categoryMapper;
+
+   
+
+
+    private ProductCategoryMapper categoryMapper;
 
     @Autowired
     public ProductCategoryServiceImpl(ProductCategoryMapper categoryMapper) {

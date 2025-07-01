@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>后台管理 - 用户管理</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <style>
         :root {
             --primary-color: #4361ee;
@@ -120,6 +122,17 @@
             transform: translateY(-2px);
         }
 
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
         .btn-sm {
             padding: 6px 12px;
             font-size: 0.8rem;
@@ -128,6 +141,9 @@
         .btn i {
             margin-right: 5px;
         }
+
+
+        /* 模态框样式 */
 
         .modal {
             display: none;
@@ -190,7 +206,9 @@
         }
 
         .form-group {
+
             margin-bottom: 20px;
+
         }
 
         .form-group label {
@@ -222,6 +240,24 @@
             margin-top: 20px;
         }
 
+        /* 新增错误状态样式 */
+        .is-invalid {
+            border-color: var(--danger-color) !important;
+        }
+
+        .invalid-feedback {
+            color: var(--danger-color);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .is-invalid + .invalid-feedback,
+        .is-invalid ~ .invalid-feedback {
+            display: block;
+        }
+
+
         .status-badge {
             display: inline-block;
             padding: 4px 8px;
@@ -238,6 +274,12 @@
         .status-inactive {
             background-color: #fee2e2;
             color: #b91c1c;
+        }
+
+
+        .status-deleted {
+            background-color: #e5e7eb;
+            color: #4b5563;
         }
 
         .search-bar {
@@ -268,6 +310,92 @@
             background-color: var(--secondary-color);
         }
 
+
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .tab:hover:not(.active) {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        /* Toast通知样式 */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 4px;
+            color: white;
+            font-weight: 500;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .toast-success {
+            background-color: #10b981;
+        }
+
+        .toast-error {
+            background-color: #ef4444;
+        }
+
+        .toast-warning {
+            background-color: #f59e0b;
+        }
+
+        /* 加载动画 */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .spinner {
+            animation: rotate 2s linear infinite;
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+        }
+
+        @keyframes rotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+
         @media (max-width: 768px) {
             .modal-content {
                 width: 90%;
@@ -286,32 +414,59 @@
 <div class="container">
     <div class="header">
         <h1><i class="fas fa-users"></i> 用户管理</h1>
+
+        <h1>
+            <a href="product_management.html" style="text-decoration: none; color: inherit;">
+                <i class="fas fa-box-open"></i> 商品管理
+            </a>
+        </h1>
+
         <div class="search-bar">
             <input type="text" class="search-input" id="searchInput" placeholder="搜索用户...">
             <button class="search-btn" onclick="searchUsers()"><i class="fas fa-search"></i> 搜索</button>
         </div>
     </div>
 
+
+    <div class="tab-container">
+        <div class="tab active" onclick="switchTab('active')"><i class="fas fa-user-check"></i> 活跃用户</div>
+        <div class="tab" onclick="switchTab('deleted')"><i class="fas fa-user-slash"></i> 已删除用户</div>
+    </div>
+
+
     <div class="card">
         <div class="table-container">
             <table>
                 <thead>
                 <tr>
+
+                    <th>ID</th>
+
                     <th>用户名</th>
                     <th>姓名</th>
                     <th>手机号</th>
                     <th>邮箱</th>
                     <th>性别</th>
                     <th>年龄</th>
+
+                    <th>角色</th>
+                    <th>状态</th>
+
                     <th>操作</th>
                 </tr>
                 </thead>
                 <tbody id="userTable">
+
+                <!-- 数据将通过JavaScript动态加载 -->
+
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+
+<!-- 修改用户模态框 -->
 
 <div id="editModal" class="modal">
     <div class="modal-content">
@@ -324,18 +479,33 @@
             <div class="form-group">
                 <label for="editAccount"><i class="fas fa-user"></i> 用户名</label>
                 <input type="text" id="editAccount" class="form-control" required>
+
+                <div class="invalid-feedback">用户名不能为空且至少3个字符</div>
+
             </div>
             <div class="form-group">
                 <label for="editName"><i class="fas fa-id-card"></i> 姓名</label>
                 <input type="text" id="editName" class="form-control" required>
+
             </div>
             <div class="form-group">
                 <label for="editPhone"><i class="fas fa-phone"></i> 手机号</label>
                 <input type="text" id="editPhone" class="form-control">
+
+                <div class="invalid-feedback">请输入至少2个字符的姓名</div>
+            </div>
+            <div class="form-group">
+                <label for="editPhone"><i class="fas fa-phone"></i> 手机号</label>
+                <input type="text" id="editPhone" class="form-control" required>
+                <div class="invalid-feedback">请输入有效的手机号码</div>
+
             </div>
             <div class="form-group">
                 <label for="editEmail"><i class="fas fa-envelope"></i> 邮箱</label>
                 <input type="email" id="editEmail" class="form-control">
+
+                <div class="invalid-feedback">请输入有效的电子邮箱</div>
+
             </div>
             <div class="form-group">
                 <label for="editSex"><i class="fas fa-venus-mars"></i> 性别</label>
@@ -347,6 +517,17 @@
             <div class="form-group">
                 <label for="editAge"><i class="fas fa-birthday-cake"></i> 年龄</label>
                 <input type="number" id="editAge" class="form-control">
+
+                <input type="number" id="editAge" class="form-control" min="1" max="120">
+                <div class="invalid-feedback">请输入1-120之间的有效年龄</div>
+            </div>
+            <div class="form-group">
+                <label for="editRole"><i class="fas fa-user-tag"></i> 角色</label>
+                <select id="editRole" class="form-control">
+                    <option value="1">普通用户</option>
+                    <option value="2">管理员</option>
+                </select>
+
             </div>
             <div class="form-actions">
                 <button type="button" class="btn btn-primary" onclick="submitEdit()">
@@ -359,6 +540,7 @@
         </form>
     </div>
 </div>
+
 
 <script src="js/jquery.min.js"></script>
 <script>
@@ -411,6 +593,147 @@
                 $('#userTable').html('<tr><td colspan="7" style="text-align: center; color: var(--danger-color);">请求失败: ' + escapeHtml(error) + '</td></tr>');
             }
         });
+
+<!-- 确认删除模态框 -->
+<div id="confirmDeleteModal" class="modal">
+    <div class="modal-content" style="width: 400px;">
+        <div class="modal-header">
+            <h2><i class="fas fa-exclamation-triangle"></i> 确认删除</h2>
+            <span class="close" onclick="closeConfirmDeleteModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p id="deleteMessage">确定要删除此用户吗？</p>
+        </div>
+        <div class="form-actions">
+            <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+                <i class="fas fa-trash"></i> 确认删除
+            </button>
+            <button type="button" class="btn" onclick="closeConfirmDeleteModal()" style="background-color: var(--light-color);">
+                <i class="fas fa-times"></i> 取消
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    let currentEditId = null;
+    let currentDeleteId = null;
+    let currentTab = 'active'; // 当前标签页，'active'或'deleted'
+    let currentDeleteType = 'soft'; // 'soft'或'force'
+
+    $(document).ready(function() {
+        loadUsers();
+
+        // 实时验证
+        $('#editName').on('input', function() {
+            if ($(this).val().trim().length >= 2) {
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        $('#editPhone').on('input', function() {
+            if (/^1[3-9]\d{9}$/.test($(this).val())) {
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        $('#editEmail').on('input', function() {
+            if (/^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/.test($(this).val()) || $(this).val() === '') {
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        $('#editAge').on('input', function() {
+            const age = parseInt($(this).val());
+            if ((age >= 1 && age <= 120) || $(this).val() === '') {
+                $(this).removeClass('is-invalid');
+            }
+        });
+    });
+
+    function switchTab(tab) {
+        currentTab = tab;
+        $('.tab').removeClass('active');
+        $(`.tab:contains(${tab === 'active' ? '活跃用户' : '已删除用户'})`).addClass('active');
+        loadUsers();
+    }
+
+    function loadUsers() {
+        const url = currentTab === 'active'
+            ? 'http://localhost:8080/api/admin/users'
+            : 'http://localhost:8080/api/admin/users/deleted';
+
+        showLoading();
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 0 && response.data && response.data.length > 0) {
+                    renderUserTable(response.data);
+                } else if (response.status === 0) {
+                    $('#userTable').html(`<tr><td colspan="10" style="text-align: center;">暂无${currentTab === 'active' ? '活跃' : '已删除'}用户数据</td></tr>`);
+                } else {
+                    showError('加载用户数据失败: ' + response.msg);
+                }
+            },
+            error: function(xhr, status, error) {
+                showError('请求失败: ' + error);
+            },
+            complete: function() {
+                hideLoading();
+            }
+        });
+    }
+
+    function renderUserTable(users) {
+        let html = '';
+        $.each(users, function(i, user) {
+            // 角色文本
+            let roleText = user.role === 1 ? '普通用户' : '<span style="color: var(--danger-color);">管理员</span>';
+
+            // 状态文本
+            let statusText = '';
+            if (currentTab === 'deleted') {
+                statusText = '<span class="status-badge status-deleted"><i class="fas fa-user-slash"></i> 已删除</span>';
+            } else {
+                statusText = '<span class="status-badge status-active"><i class="fas fa-user-check"></i> 活跃</span>';
+            }
+
+            html += `<tr>
+                    <td>${user.id}</td>
+                    <td>${escapeHtml(user.account) || '-'}</td>
+                    <td>${escapeHtml(user.name) || '-'}</td>
+                    <td>${escapeHtml(user.phone) || '-'}</td>
+                    <td>${escapeHtml(user.email) || '-'}</td>
+                    <td>${user.sex === 1 ? '<span class="status-badge status-active"><i class="fas fa-male"></i> 男</span>' :
+                '<span class="status-badge status-inactive"><i class="fas fa-female"></i> 女</span>'}</td>
+                    <td>${user.age || '-'}</td>
+                    <td>${roleText}</td>
+                    <td>${statusText}</td>
+                    <td>
+                        ${currentTab === 'active' ? `
+                        <button class="btn btn-primary btn-sm" onclick="openEditModal(${user.id}, '${escapeHtml(user.account)}', '${escapeHtml(user.name)}', '${escapeHtml(user.phone)}', '${escapeHtml(user.email)}', ${user.sex}, ${user.age || 0}, ${user.role || 1})">
+                            <i class="fas fa-edit"></i> 修改
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="confirmDeleteUser(${user.id}, ${user.role || 1}, 'soft')">
+                            <i class="fas fa-trash"></i> 删除
+                        </button>
+                        ` : `
+                        <button class="btn btn-warning btn-sm" onclick="restoreUser(${user.id})">
+                            <i class="fas fa-undo"></i> 恢复
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="confirmDeleteUser(${user.id}, ${user.role || 1}, 'force')">
+                            <i class="fas fa-trash"></i> 永久删除
+                        </button>
+                        `}
+                    </td>
+                </tr>`;
+        });
+        $('#userTable').html(html);
+
     }
 
     function searchUsers() {
@@ -419,6 +742,7 @@
             loadUsers();
             return;
         }
+
 
         $.ajax({
             url: 'http://localhost:8080/api/admin/users/search',
@@ -474,7 +798,7 @@
         $('#editEmail').val(email);
         $('#editSex').val(sex);
         $('#editAge').val(age || '');
-
+        $('#editRole').val(role || 1); // 默认值为1（普通用户）
         $('#editModal').addClass('show').show();
         $('body').css('overflow', 'hidden');
     }
@@ -486,6 +810,7 @@
             $('body').css('overflow', 'auto');
         }, 300);
     }
+
 
     function submitEdit() {
         const user = {
@@ -503,11 +828,76 @@
             return;
         }
 
+
+    function validateUserForm(user) {
+        let isValid = true;
+
+        // 验证用户名
+        if (!user.account || user.account.length < 3) {
+            $('#editAccount').addClass('is-invalid');
+            isValid = false;
+        }
+
+        // 验证姓名
+        if (!user.name || user.name.length < 2) {
+            $('#editName').addClass('is-invalid');
+            isValid = false;
+        }
+
+        // 验证手机号
+        if (!user.phone || !/^1[3-9]\d{9}$/.test(user.phone)) {
+            $('#editPhone').addClass('is-invalid');
+            isValid = false;
+        }
+
+        // 验证邮箱
+        if (user.email && !/^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/.test(user.email)) {
+            $('#editEmail').addClass('is-invalid');
+            isValid = false;
+        }
+
+        // 验证年龄
+        if (user.age && (user.age < 1 || user.age > 120)) {
+            $('#editAge').addClass('is-invalid');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    function submitEdit() {
+        const user = {
+            id: currentEditId,
+            account: $('#editAccount').val().trim(),
+            name: $('#editName').val().trim(),
+            phone: $('#editPhone').val().trim(),
+            email: $('#editEmail').val().trim(),
+            sex: parseInt($('#editSex').val()),
+            age: $('#editAge').val() ? parseInt($('#editAge').val()) : null,
+            role: parseInt($('#editRole').val()) || 1
+        };
+
+        // 重置错误状态
+        $('.form-control').removeClass('is-invalid');
+
+        // 验证表单
+        if (!validateUserForm(user)) {
+            showError('请检查表单中的错误');
+            return;
+        }
+
+        // 显示加载状态
+        const $btn = $('#editModal .btn-primary');
+        const btnText = $btn.text();
+        $btn.prop('disabled', true).text('保存中...');
+
+
         $.ajax({
             url: 'http://localhost:8080/api/admin/user',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(user),
+
             beforeSend: function() {
                 $('.modal-content').append('<div class="loading-overlay"><i class="fas fa-spinner fa-spin"></i> 保存中...</div>');
             },
@@ -551,6 +941,110 @@
         }
     }
 
+
+            success: function(response) {
+                if (response.status === 0) {
+                    showSuccess('用户信息更新成功');
+                    closeModal();
+                    loadUsers();
+                } else {
+                    showError(response.msg || '更新失败');
+                }
+            },
+            error: function(xhr) {
+                let errorMsg = '请求失败';
+                if (xhr.responseJSON && xhr.responseJSON.msg) {
+                    errorMsg = xhr.responseJSON.msg;
+                }
+                showError(errorMsg);
+            },
+            complete: function() {
+                $btn.prop('disabled', false).text(btnText);
+            }
+        });
+    }
+
+    function confirmDeleteUser(id, role, type) {
+        currentDeleteId = id;
+        currentDeleteType = type;
+
+        if (type === 'soft') {
+            if (role === 2) {
+                showError('管理员用户不能删除');
+                return;
+            }
+            $('#deleteMessage').html('确定要删除此用户吗？用户将被移至已删除列表，可以恢复。');
+        } else {
+            $('#deleteMessage').html('确定要永久删除此用户吗？此操作不可撤销！');
+        }
+
+        $('#confirmDeleteModal').addClass('show').show();
+        $('body').css('overflow', 'hidden');
+    }
+
+    function closeConfirmDeleteModal() {
+        $('#confirmDeleteModal').removeClass('show');
+        setTimeout(() => {
+            $('#confirmDeleteModal').hide();
+            $('body').css('overflow', 'auto');
+        }, 300);
+    }
+
+    function confirmDelete() {
+        const url = currentDeleteType === 'soft'
+            ? `http://localhost:8080/api/admin/user/${currentDeleteId}`
+            : `http://localhost:8080/api/admin/user/${currentDeleteId}/force`;
+
+        showLoading('#confirmDeleteModal .modal-content');
+
+        $.ajax({
+            url: url,
+            type: 'DELETE',
+            success: function(response) {
+                if (response.status === 0) {
+                    showSuccess(currentDeleteType === 'soft' ? '删除成功' : '永久删除成功');
+                    closeConfirmDeleteModal();
+                    loadUsers();
+                } else {
+                    showError((currentDeleteType === 'soft' ? '删除失败: ' : '永久删除失败: ') + response.msg);
+                }
+            },
+            error: function(xhr, status, error) {
+                showError('请求失败: ' + error);
+            },
+            complete: function() {
+                hideLoading();
+            }
+        });
+    }
+
+    function restoreUser(id) {
+        if (confirm('确定要恢复此用户吗？用户将重新出现在活跃用户列表中。')) {
+            showLoading();
+
+            $.ajax({
+                url: `http://localhost:8080/api/admin/user/${id}/restore`,
+                type: 'POST',
+                success: function(response) {
+                    if (response.status === 0) {
+                        showSuccess('恢复成功');
+                        loadUsers();
+                    } else {
+                        showError('恢复失败: ' + response.msg);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showError('请求失败: ' + error);
+                },
+                complete: function() {
+                    hideLoading();
+                }
+            });
+        }
+    }
+
+    // 辅助函数：防止XSS攻击
+
     function escapeHtml(unsafe) {
         if (!unsafe) return unsafe;
         return unsafe.toString()
@@ -561,10 +1055,56 @@
             .replace(/'/g, "&#039;");
     }
 
+
     function showToast(type, message) {
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
         toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+
+    // 显示加载动画
+    function showLoading(container = 'body') {
+        $(container).append(`
+            <div class="loading-overlay">
+                <svg class="spinner" viewBox="0 0 50 50">
+                    <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                </svg>
+                加载中...
+            </div>
+        `);
+    }
+
+    // 隐藏加载动画
+    function hideLoading() {
+        $('.loading-overlay').remove();
+    }
+
+    // 显示成功Toast通知
+    function showSuccess(message) {
+        showToast('success', message);
+    }
+
+    // 显示错误Toast通知
+    function showError(message) {
+        showToast('error', message);
+    }
+
+    // 显示Toast通知
+    function showToast(type, message, duration = 3000) {
+        const iconMap = {
+            success: 'check-circle',
+            error: 'exclamation-circle',
+            warning: 'exclamation-triangle',
+            info: 'info-circle'
+        };
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+            <i class="fas fa-${iconMap[type] || 'info-circle'}"></i>
+            <span>${message}</span>
+        `;
+
+
         document.body.appendChild(toast);
 
         setTimeout(() => {
@@ -574,7 +1114,10 @@
                 setTimeout(() => {
                     document.body.removeChild(toast);
                 }, 300);
-            }, 3000);
+
+            }, duration);
+
+
         }, 100);
     }
 </script>

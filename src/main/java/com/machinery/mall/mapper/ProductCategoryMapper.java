@@ -16,4 +16,6 @@ public interface ProductCategoryMapper {
     int update(ProductCategory category);
     int delete(Integer id);
     int countByParentId(Integer parentId);
+    List<Integer> selectAllSubCategoryIds(Integer parentId);
+
 }
