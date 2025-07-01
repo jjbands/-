@@ -1,5 +1,10 @@
 package com.machinery.mall.controller;
 
+/**
+ * @author 你的名字
+ * @version 1.0.0
+ * @date: 2025/06/25  09:20
+ */
 import com.machinery.mall.entity.User;
 import com.machinery.mall.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,8 +78,10 @@ public class UserController {
         Map<String, Object> response = new HashMap<>();
         String loginKey = request.get("loginKey");
 
+        // 先尝试用用户名查找安全问题
         String question = userService.getQuestionByAccount(loginKey);
 
+        // 如果用户名查找失败，尝试用手机号查找
         if (question == null) {
             question = userService.getQuestionByPhone(loginKey);
         }

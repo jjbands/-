@@ -19,7 +19,7 @@
         <result column="del" property="del" jdbcType="INTEGER"/>
     </resultMap>
 
-
+    <!-- 其他SQL语句与之前相同 -->
     <insert id="insert" parameterType="com.machinery.mall.entity.User" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO users (
             account, password, name, email, phone,

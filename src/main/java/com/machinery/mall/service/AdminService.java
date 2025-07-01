@@ -5,7 +5,6 @@ import java.util.List;
 
 public interface AdminService {
     List<User> getAllUsers();
-    int deleteUser(int id);
     List<User> getDeletedUsers();
     List<User> searchUsers(String keyword);
     List<User> searchDeletedUsers(String keyword);

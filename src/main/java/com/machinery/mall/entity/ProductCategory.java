@@ -1,11 +1,15 @@
 package com.machinery.mall.entity;
 
-
+/**
+ * @author 你的名字
+ * @version 1.0.0
+ * @date: 2025/06/26  14:55
+ */
 import java.util.Date;
 
 public class ProductCategory {
     private Integer id;
-    private Integer parentId = 0; // 默认值为0
+    private Integer parentId;
     private String name;
     private Integer sortOrder;
     private Integer status;
@@ -13,18 +17,12 @@ public class ProductCategory {
     private Date created;
     private Date updated;
 
-    // 添加无参构造函数
-    public ProductCategory() {
-    }
-
-    // 原有的全参构造函数
-    public ProductCategory(Integer id, Integer parentId, String name, Integer sortOrder,
-                           Integer status, Integer level, Date created, Date updated) {
+    public ProductCategory(Integer id, Integer parentId, String name, Integer sortOrder, Integer status, Integer level, Date created, Date updated) {
         this.id = id;
-        this.parentId = parentId != null ? parentId : 0;
+        this.parentId = parentId;
         this.name = name;
-        this.sortOrder = sortOrder != null ? sortOrder : 0;
-        this.status = status != null ? status : 1;
+        this.sortOrder = sortOrder;
+        this.status = status;
         this.level = level;
         this.created = created;
         this.updated = updated;
@@ -48,6 +46,7 @@ public class ProductCategory {
     public void setParentId(Integer parentId) {
         this.parentId = parentId;
     }
+
     public String getName() {
         return name;
     }

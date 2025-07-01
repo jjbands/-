@@ -1,5 +1,10 @@
 package com.machinery.mall.mapper;
 
+/**
+ * @author 你的名字
+ * @version 1.0.0
+ * @date: 2025/06/25  09:11
+ */
 import com.machinery.mall.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

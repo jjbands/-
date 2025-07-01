@@ -1,6 +1,10 @@
 package com.machinery.mall.entity;
 
-
+/**
+ * @author 你的名字
+ * @version 1.0.0
+ * @date: 2025/06/26  14:56
+ */
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -20,6 +24,8 @@ public class Products {
     private Date created;
     private Date updated;
 
+
+    // getter/setter
 
 
     public Products(Integer id, String name, Integer partsId, Integer productId, String iconUrl, String subImages, String detail, String specParam, BigDecimal price, Integer stock, Integer status, Integer isHot, Date created, Date updated) {
@@ -150,5 +156,4 @@ public class Products {
     public void setUpdated(Date updated) {
         this.updated = updated;
     }
-
 }
