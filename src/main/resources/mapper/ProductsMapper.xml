@@ -54,4 +54,21 @@
         AND status = 2
         ORDER BY created DESC
     </select>
+
+    <update id="updateById" parameterType="com.machinery.mall.entity.Products">
+        UPDATE products
+        SET name = #{name},
+            product_id = #{productId},
+            parts_id = #{partsId},
+            icon_url = #{iconUrl},
+            sub_images = #{subImages},
+            detail = #{detail},
+            spec_param = #{specParam},
+            price = #{price},
+            stock = #{stock},
+            status = #{status},
+            is_hot = #{isHot},
+            updated = NOW()
+        WHERE id = #{id}
+    </update>
 </mapper>
