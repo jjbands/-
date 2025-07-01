@@ -129,7 +129,6 @@
             margin-right: 5px;
         }
 
-        /* 模态框样式 */
         .modal {
             display: none;
             position: fixed;
@@ -308,14 +307,12 @@
                 </tr>
                 </thead>
                 <tbody id="userTable">
-                <!-- 数据将通过JavaScript动态加载 -->
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-<!-- 修改用户模态框 -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -419,7 +416,7 @@
     function searchUsers() {
         const keyword = $('#searchInput').val().trim();
         if (keyword === '') {
-            loadUsers(); // 如果搜索框为空，加载所有用户
+            loadUsers();
             return;
         }
 
@@ -538,7 +535,6 @@
                 url: 'http://localhost:8080/api/admin/user/' + id,
                 type: 'DELETE',
                 beforeSend: function() {
-                    // 可以在这里添加加载指示器
                 },
                 success: function(response) {
                     if (response.status === 0) {
@@ -555,7 +551,6 @@
         }
     }
 
-    // 辅助函数：防止XSS攻击
     function escapeHtml(unsafe) {
         if (!unsafe) return unsafe;
         return unsafe.toString()
@@ -566,7 +561,6 @@
             .replace(/'/g, "&#039;");
     }
 
-    // 显示Toast通知
     function showToast(type, message) {
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;

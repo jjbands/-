@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>商品详情</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            background: #f5f6fa;
+            font-family: "微软雅黑", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 32px 40px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            margin-top: 40px;
+        }
+        .card img {
+            width: 220px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            background: #f0f0f0;
+        }
+        .card h2 {
+            margin: 10px 0 8px 0;
+            font-size: 1.6em;
+            color: #222;
+        }
+        .price {
+            color: #e74c3c;
+            font-size: 1.4em;
+            margin: 10px 0;
+        }
+        .stock {
+            color: #888;
+            margin-bottom: 12px;
+        }
+        .desc {
+            color: #444;
+            font-size: 1em;
+            margin-bottom: 18px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 18px;
+            color: #3498db;
+            text-decoration: none;
+            font-size: 1em;
+            transition: color 0.2s;
+        }
+        .back-link:hover {
+            color: #217dbb;
+        }
+    </style>
+    <script src="js/jquery.min.js"></script>
+
+</head>
+<body>
+<div class="container">
+    <div class="card" id="product-detail">
+        <!-- 商品详情内容将通过JS渲染 -->
+    </div>
+    <a href="index.html" class="back-link">返回首页</a>
+</div>
+<script>
+    $(document).ready(function() {
+        // 获取 URL 参数
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                // 使用严格相等比较
+                if (pair[0] === variable) {
+                    return pair[1];
+                }
+            }
+            return false;
+        }
+
+        var productId = getQueryVariable("id");
+
+        if (productId) {
+            $.ajax({
+                url: "http://localhost:8080/api/products/" + productId,
+                method: "GET",
+                dataType: "json",
+                success: function(data) {
+                    var imageUrl = data.image || 'https://via.placeholder.com/220x180?text=暂无图片';
+                    var name = data.name;
+                    var price = data.price;
+                    var stock = data.stock;
+                    var description = data.description || '暂无描述';
+
+                    var productHtml = '<img src="' + imageUrl + '" alt="' + name + '">';
+                    productHtml += '<h2>' + name + '</h2>';
+                    productHtml += '<div class="price">￥' + price + '</div>';
+                    productHtml += '<div class="stock">库存：' + stock + ' 件</div>';
+                    productHtml += '<div class="desc">' + description + '</div>';
+
+                    $("#product-detail").html(productHtml);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error("请求失败: ", textStatus, errorThrown);
+                    $("#product-detail").html('<div style="color:#e74c3c;">未找到该商品或服务器错误: ' + errorThrown + '</div>');
+                }
+            });
+        } else {
+            $("#product-detail").html('<div style="color:#e74c3c;">未找到商品ID</div>');
+        }
+    });
+</script>
+</body>
+</html>
