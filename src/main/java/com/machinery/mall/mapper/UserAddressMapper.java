@@ -59,4 +59,21 @@ public interface UserAddressMapper {
      * 统计用户的地址数量
      */
     int countByUserId(@Param("userId") Integer userId);
+
+    
+    /**
+     * 查询已删除地址
+     */
+    List<UserAddress> selectDeletedByUserId(@Param("userId") Integer userId);
+    
+    /**
+     * 恢复地址
+     */
+    int restoreById(@Param("id") Integer id);
+    
+    /**
+     * 物理删除
+     */
+    int permanentDeleteById(@Param("id") Integer id);
+
 } 

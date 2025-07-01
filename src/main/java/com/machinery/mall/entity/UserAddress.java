@@ -28,8 +28,10 @@ public class UserAddress {
     public UserAddress() {}
 
     public UserAddress(Integer id, Integer userId, String name, String phone, String mobile,
-                       String province, String city, String district, String addr, String zip,
-                       Integer dfault, Integer isDel, Date created, Date updated) {
+
+                      String province, String city, String district, String addr, String zip,
+                      Integer dfault, Integer isDel, Date created, Date updated) {
+
         this.id = id;
         this.userId = userId;
         this.name = name;

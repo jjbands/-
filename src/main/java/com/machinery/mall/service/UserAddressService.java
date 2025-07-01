@@ -51,4 +51,20 @@ public interface UserAddressService {
      * 统计用户地址数量
      */
     int countAddressesByUserId(Integer userId);
+
+    /**
+     * 查询已删除地址
+     */
+    List<UserAddress> getDeletedAddressesByUserId(Integer userId);
+    
+    /**
+     * 恢复地址
+     */
+    boolean restoreAddress(Integer id);
+    
+    /**
+     * 物理删除
+     */
+    boolean permanentDeleteAddress(Integer id);
+
 } 

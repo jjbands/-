@@ -661,54 +661,46 @@
 
         // 加载地区数据
         function loadRegions() {
-            $.ajax({
-                url: 'http://localhost:8080/api/regions',
-                type: 'GET',
-                dataType: 'json',
-                success: function(regions) {
-                    // 填充省份
-                    regions.forEach(province => {
-                        $('#delivery-province').append(`<option value="${province.id}">${province.name}</option>`);
-                    });
+            $.getJSON('/pcas-code.json', function(regions) {
+                // 填充省份
+                regions.forEach(province => {
+                    $('#delivery-province').append(`<option value="${province.name}">${province.name}</option>`);
+                });
 
-                    // 省份变化时加载城市
-                    $('#delivery-province').change(function() {
-                        const provinceId = $(this).val();
-                        if (!provinceId) return;
+                // 省份变化时加载城市
+                $('#delivery-province').change(function() {
+                    const provinceName = $(this).val();
+                    if (!provinceName) return;
 
-                        $('#delivery-city').html('<option value="">请选择城市</option>');
-                        $('#delivery-district').html('<option value="">请选择区县</option>');
+                    $('#delivery-city').html('<option value="">请选择城市</option>');
+                    $('#delivery-district').html('<option value="">请选择区县</option>');
 
-                        const province = regions.find(p => p.id == provinceId);
-                        if (province && province.children) {
-                            province.children.forEach(city => {
-                                $('#delivery-city').append(`<option value="${city.id}">${city.name}</option>`);
+                    const province = regions.find(p => p.name === provinceName);
+                    if (province && province.children) {
+                        province.children.forEach(city => {
+                            $('#delivery-city').append(`<option value="${city.name}">${city.name}</option>`);
+                        });
+                    }
+                });
+
+                // 城市变化时加载区县
+                $('#delivery-city').change(function() {
+                    const provinceName = $('#delivery-province').val();
+                    const cityName = $(this).val();
+                    if (!provinceName || !cityName) return;
+
+                    $('#delivery-district').html('<option value="">请选择区县</option>');
+
+                    const province = regions.find(p => p.name === provinceName);
+                    if (province && province.children) {
+                        const city = province.children.find(c => c.name === cityName);
+                        if (city && city.children) {
+                            city.children.forEach(district => {
+                                $('#delivery-district').append(`<option value="${district.name}">${district.name}</option>`);
                             });
                         }
-                    });
-
-                    // 城市变化时加载区县
-                    $('#delivery-city').change(function() {
-                        const provinceId = $('#delivery-province').val();
-                        const cityId = $(this).val();
-                        if (!provinceId || !cityId) return;
-
-                        $('#delivery-district').html('<option value="">请选择区县</option>');
-
-                        const province = regions.find(p => p.id == provinceId);
-                        if (province && province.children) {
-                            const city = province.children.find(c => c.id == cityId);
-                            if (city && city.children) {
-                                city.children.forEach(district => {
-                                    $('#delivery-district').append(`<option value="${district.id}">${district.name}</option>`);
-                                });
-                            }
-                        }
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.error('加载地区数据失败:', error);
-                }
+                    }
+                });
             });
         }
 

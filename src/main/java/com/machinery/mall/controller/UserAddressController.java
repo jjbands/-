@@ -334,4 +334,63 @@ public class UserAddressController {
         
         return response;
     }
+
+
+    @PostMapping("/deletedList")
+    public Map<String, Object> getDeletedAddressList(@RequestBody Map<String, String> request) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String account = request.get("account");
+            if (account == null || account.isEmpty()) {
+                response.put("status", 1);
+                response.put("msg", "账号参数缺失");
+                return response;
+            }
+            User user = userService.getUserByAccount(account);
+            if (user == null) {
+                response.put("status", 2);
+                response.put("msg", "用户不存在");
+                return response;
+            }
+            List<UserAddress> addresses = userAddressService.getDeletedAddressesByUserId(user.getId());
+            response.put("status", 0);
+            response.put("msg", "获取成功");
+            response.put("data", addresses);
+        } catch (Exception e) {
+            response.put("status", 3);
+            response.put("msg", "系统错误: " + e.getMessage());
+        }
+        return response;
+    }
+
+    @PostMapping("/restore")
+    public Map<String, Object> restoreAddress(@RequestBody Map<String, Object> request) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Integer addressId = Integer.parseInt(request.get("id").toString());
+            boolean success = userAddressService.restoreAddress(addressId);
+            response.put("status", success ? 0 : 1);
+            response.put("msg", success ? "恢复成功" : "恢复失败");
+        } catch (Exception e) {
+            response.put("status", 2);
+            response.put("msg", "系统错误: " + e.getMessage());
+        }
+        return response;
+    }
+
+    @PostMapping("/permanentDelete")
+    public Map<String, Object> permanentDeleteAddress(@RequestBody Map<String, Object> request) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Integer addressId = Integer.parseInt(request.get("id").toString());
+            boolean success = userAddressService.permanentDeleteAddress(addressId);
+            response.put("status", success ? 0 : 1);
+            response.put("msg", success ? "永久删除成功" : "永久删除失败");
+        } catch (Exception e) {
+            response.put("status", 2);
+            response.put("msg", "系统错误: " + e.getMessage());
+        }
+        return response;
+    }
+
 } 

@@ -96,4 +96,23 @@
         WHERE user_id = #{userId} AND isDel = 0
     </select>
 
+
+    <!-- 查询已删除地址 -->
+    <select id="selectDeletedByUserId" resultMap="BaseResultMap">
+        SELECT * FROM shipping_address
+        WHERE user_id = #{userId} AND isDel = 1
+        ORDER BY updated DESC
+    </select>
+
+    <!-- 恢复地址 -->
+    <update id="restoreById">
+        UPDATE shipping_address SET isDel = 0, updated = NOW() WHERE id = #{id}
+    </update>
+
+    <!-- 物理删除 -->
+    <delete id="permanentDeleteById">
+        DELETE FROM shipping_address WHERE id = #{id}
+    </delete>
+
+
 </mapper> 

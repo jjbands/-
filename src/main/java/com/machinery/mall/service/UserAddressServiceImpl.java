@@ -91,4 +91,21 @@ public class UserAddressServiceImpl implements UserAddressService {
     public int countAddressesByUserId(Integer userId) {
         return userAddressMapper.countByUserId(userId);
     }
+
+
+    @Override
+    public List<UserAddress> getDeletedAddressesByUserId(Integer userId) {
+        return userAddressMapper.selectDeletedByUserId(userId);
+    }
+
+    @Override
+    public boolean restoreAddress(Integer id) {
+        return userAddressMapper.restoreById(id) > 0;
+    }
+
+    @Override
+    public boolean permanentDeleteAddress(Integer id) {
+        return userAddressMapper.permanentDeleteById(id) > 0;
+    }
+
 } 
