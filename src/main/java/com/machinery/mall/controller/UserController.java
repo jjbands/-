@@ -2,7 +2,6 @@ package com.machinery.mall.controller;
 
 import com.machinery.mall.entity.User;
 import com.machinery.mall.service.UserService;
-import com.machinery.mall.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +15,7 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    public UserController(UserServiceImpl userService) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
@@ -24,7 +23,6 @@ public class UserController {
     public Map<String, Object> register(@RequestBody User user) {
         Map<String, Object> response = new HashMap<>();
         int result = userService.register(user);
-
         if (result > 0) {
             response.put("status", 0);
             response.put("msg", "注册成功");
@@ -41,7 +39,6 @@ public class UserController {
             response.put("status", 4);
             response.put("msg", "注册失败");
         }
-
         return response;
     }
 
@@ -56,7 +53,13 @@ public class UserController {
         if (user != null) {
             response.put("status", 0);
             response.put("msg", "登录成功");
-            response.put("data", user);
+            // 将用户信息作为 data 字段返回，包含角色信息
+            Map<String, Object> userData = new HashMap<>();
+            userData.put("id", user.getId());
+            userData.put("account", user.getAccount());
+            userData.put("username", user.getName());
+            userData.put("role", user.getRole());
+            response.put("data", userData);
         } else {
             response.put("status", 1);
             response.put("msg", "用户名/手机号或密码错误");
@@ -124,6 +127,59 @@ public class UserController {
             response.put("msg", "密码重置失败");
         }
 
+        return response;
+    }
+
+    @PostMapping("/profile")
+    public Map<String, Object> getUserProfile(@RequestBody Map<String, String> request) {
+        Map<String, Object> response = new HashMap<>();
+        String account = request.get("account");
+
+        if (account == null || account.isEmpty()) {
+            response.put("status", 1);
+            response.put("msg", "账号参数缺失");
+            return response;
+        }
+        User user = userService.getUserByAccount(account);
+        if (user != null) {
+            response.put("status", 0);
+            response.put("msg", "成功");
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("account", user.getAccount());
+            data.put("name", user.getName());
+            data.put("sex", user.getSex());
+            data.put("phone", user.getPhone());
+            data.put("email", user.getEmail());
+            data.put("age", user.getAge());
+
+            response.put("data", data);
+        } else {
+            response.put("status", 2);
+            response.put("msg", "用户不存在");
+        }
+        return response;
+    }
+
+    @PostMapping("/updateProfile")
+    public Map<String, Object> updateUserProfile(@RequestBody User user) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            if (user.getAccount() == null || user.getAccount().isEmpty()) {
+                response.put("status", 1);
+                response.put("msg", "账号参数缺失");
+                return response;
+            }
+
+            boolean success = userService.updateUserProfile(user);
+            response.put("status", success ? 0 : 3);
+            response.put("msg", success ? "资料更新成功" : "资料更新失败");
+
+        } catch (Exception e) {
+            response.put("status", 1);
+            response.put("msg", "更新失败: " + e.getMessage());
+        }
         return response;
     }
 }

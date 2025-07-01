@@ -13,7 +13,9 @@ public interface ProductsService {
     int updateProduct(Products product);
     int deleteProduct(int id);
     List<Products> searchProductsByName(String name);
+    
     int addProduct(Products product);
     int countByCategoryId(Integer categoryId);
+
 
 }

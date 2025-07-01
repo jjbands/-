@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.machinery.mall.mapper.UserAddressMapper">
+
+    <resultMap id="BaseResultMap" type="com.machinery.mall.entity.UserAddress">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="mobile" property="mobile" jdbcType="VARCHAR"/>
+        <result column="province" property="province" jdbcType="VARCHAR"/>
+        <result column="city" property="city" jdbcType="VARCHAR"/>
+        <result column="district" property="district" jdbcType="VARCHAR"/>
+        <result column="addr" property="addr" jdbcType="VARCHAR"/>
+        <result column="zip" property="zip" jdbcType="VARCHAR"/>
+        <result column="dfault" property="dfault" jdbcType="INTEGER"/>
+        <result column="isDel" property="isDel" jdbcType="INTEGER"/>
+        <result column="created" property="created" jdbcType="TIMESTAMP"/>
+        <result column="updated" property="updated" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 插入新地址 -->
+    <insert id="insert" parameterType="com.machinery.mall.entity.UserAddress" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO shipping_address (
+            user_id, name, phone, mobile, province, city, district,
+            addr, zip, dfault, isDel, created, updated
+        ) VALUES (
+            #{userId}, #{name}, #{phone}, #{mobile}, #{province}, #{city}, #{district},
+            #{addr}, #{zip}, #{dfault}, #{isDel}, NOW(), NOW()
+        )
+    </insert>
+
+    <!-- 根据ID查询地址 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM shipping_address
+        WHERE id = #{id} AND isDel = 0
+    </select>
+
+    <!-- 根据用户ID查询所有地址 -->
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT * FROM shipping_address
+        WHERE user_id = #{userId} AND isDel = 0
+        ORDER BY dfault DESC, created DESC
+    </select>
+
+    <!-- 根据用户ID查询默认地址 -->
+    <select id="selectDefaultByUserId" resultMap="BaseResultMap">
+        SELECT * FROM shipping_address
+        WHERE user_id = #{userId} AND dfault = 1 AND isDel = 0
+        LIMIT 1
+    </select>
+
+    <!-- 更新地址信息 -->
+    <update id="update" parameterType="com.machinery.mall.entity.UserAddress">
+        UPDATE shipping_address SET
+            name = #{name},
+            phone = #{phone},
+            mobile = #{mobile},
+            province = #{province},
+            city = #{city},
+            district = #{district},
+            addr = #{addr},
+            zip = #{zip},
+            dfault = #{dfault},
+            updated = NOW()
+        WHERE id = #{id} AND isDel = 0
+    </update>
+
+    <!-- 删除地址（软删除） -->
+    <update id="deleteById">
+        UPDATE shipping_address SET
+            isDel = 1,
+            updated = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 将用户的所有地址设为非默认 -->
+    <update id="clearDefaultByUserId">
+        UPDATE shipping_address SET
+            dfault = 0,
+            updated = NOW()
+        WHERE user_id = #{userId} AND isDel = 0
+    </update>
+
+    <!-- 设置指定地址为默认地址 -->
+    <update id="setDefaultById">
+        UPDATE shipping_address SET
+            dfault = 1,
+            updated = NOW()
+        WHERE id = #{id} AND isDel = 0
+    </update>
+
+    <!-- 统计用户的地址数量 -->
+    <select id="countByUserId" resultType="int">
+        SELECT COUNT(1) FROM shipping_address
+        WHERE user_id = #{userId} AND isDel = 0
+    </select>
+
+
+    <!-- 查询已删除地址 -->
+    <select id="selectDeletedByUserId" resultMap="BaseResultMap">
+        SELECT * FROM shipping_address
+        WHERE user_id = #{userId} AND isDel = 1
+        ORDER BY updated DESC
+    </select>
+
+    <!-- 恢复地址 -->
+    <update id="restoreById">
+        UPDATE shipping_address SET isDel = 0, updated = NOW() WHERE id = #{id}
+    </update>
+
+    <!-- 物理删除 -->
+    <delete id="permanentDeleteById">
+        DELETE FROM shipping_address WHERE id = #{id}
+    </delete>
+
+
+</mapper> 

@@ -2,126 +2,935 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>商品详情</title>
+    <title>商品详情 - ACTION商城</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body {
-            background: #f5f6fa;
-            font-family: "微软雅黑", Arial, sans-serif;
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
+
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* 顶部导航栏样式 */
+        .header {
+            background: #fff;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
         .container {
-            min-height: 100vh;
+            width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .header .container {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0074d9;
+        }
+
+        .user-info {
+            font-size: 14px;
+        }
+
+        .phone {
+            font-size: 16px;
+            color: #333;
+            margin-left: 20px;
+        }
+
+        .nav {
+            background: #f8f8f8;
+            border-bottom: 1px solid #eee;
+        }
+
+        .nav .container {
+            display: flex;
+        }
+
+        .nav-menu {
+            display: flex;
+        }
+
+        .nav-menu a {
+            padding: 14px 24px;
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .nav-menu a.active, .nav-menu a:hover {
+            color: #0074d9;
+            border-bottom: 2px solid #0074d9;
+        }
+
+        /* 用户下拉菜单样式 */
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+            margin-left: 20px;
+        }
+
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #0074d9;
+            color: white;
+            display: inline-flex;
+            align-items: center;
             justify-content: center;
+            margin-right: 5px;
+            font-size: 14px;
+        }
+
+        .user-name {
+            cursor: pointer;
+            display: inline-flex;
             align-items: center;
         }
-        .card {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-            padding: 32px 40px;
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-            margin-top: 40px;
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            min-width: 120px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            z-index: 100;
         }
-        .card img {
-            width: 220px;
-            height: 180px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 18px;
-            background: #f0f0f0;
-        }
-        .card h2 {
-            margin: 10px 0 8px 0;
-            font-size: 1.6em;
-            color: #222;
-        }
-        .price {
-            color: #e74c3c;
-            font-size: 1.4em;
-            margin: 10px 0;
-        }
-        .stock {
-            color: #888;
-            margin-bottom: 12px;
-        }
-        .desc {
-            color: #444;
-            font-size: 1em;
-            margin-bottom: 18px;
-        }
-        .back-link {
-            display: inline-block;
-            margin-top: 18px;
-            color: #3498db;
+
+        .dropdown-menu a {
+            display: block;
+            padding: 8px 15px;
+            color: #333;
             text-decoration: none;
-            font-size: 1em;
-            transition: color 0.2s;
+            font-size: 14px;
         }
-        .back-link:hover {
-            color: #217dbb;
+
+        .dropdown-menu a:hover {
+            background: #f5f5f5;
         }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .logout-btn {
+            color: #e74c3c !important;
+            border-top: 1px solid #eee;
+        }
+
+        /* 商品详情页样式 */
+        .breadcrumb {
+            padding: 10px 0;
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
+        }
+
+        .breadcrumb a {
+            color: #666;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: #e4393c;
+        }
+
+        .breadcrumb span {
+            margin: 0 5px;
+            color: #ccc;
+        }
+
+        .product-container {
+            background: #fff;
+            padding: 20px;
+            margin-top: 10px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .product-title {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .favorite-btn {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 5px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .favorite-btn:hover {
+            background: #e4393c;
+            color: #fff;
+            border-color: #e4393c;
+        }
+
+        .product-content {
+            display: flex;
+            margin-top: 20px;
+        }
+
+        .product-gallery {
+            width: 400px;
+            margin-right: 30px;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #eee;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .main-image img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .thumbnails {
+            display: flex;
+            gap: 10px;
+        }
+
+        .thumbnail {
+            width: 60px;
+            height: 60px;
+            border: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .thumbnail img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .price-section {
+            background: #f5f5f5;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .current-price {
+            color: #e4393c;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .delivery-info {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .delivery-row {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .delivery-label {
+            width: 80px;
+            color: #999;
+        }
+
+        .delivery-content {
+            flex: 1;
+        }
+
+        .delivery-select {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            width: 200px;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .quantity-label {
+            width: 80px;
+            color: #999;
+        }
+
+        .quantity-input {
+            width: 60px;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .payment-methods {
+            margin-bottom: 20px;
+        }
+
+        .payment-method {
+            display: inline-block;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+
+        .payment-method input {
+            margin-right: 5px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 25px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 16px;
+            border: none;
+        }
+
+        .btn-primary {
+            background: #e4393c;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #c91623;
+        }
+
+        .btn-secondary {
+            background: #ff9500;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #e68600;
+        }
+
+        .service-promise {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 3px;
+        }
+
+        .service-item {
+            display: inline-block;
+            margin-right: 15px;
+            color: #666;
+        }
+
+        .recommendations {
+            margin-top: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .recommend-list {
+            display: flex;
+            gap: 15px;
+        }
+
+        .recommend-item {
+            width: 150px;
+            text-align: center;
+        }
+
+        .recommend-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border: 1px solid #eee;
+            margin-bottom: 10px;
+        }
+
+        .recommend-price {
+            color: #e4393c;
+            font-weight: bold;
+        }
+
+        .address-section { margin: 20px 0; }
+        .address-item {
+            border: 1px solid #eee; border-radius: 4px; padding: 4px 8px; margin-right: 8px; cursor: pointer; display: inline-block;
+        }
+        .address-item.selected { border-color: #e4393c; background: #fff7f5; }
+
+        .product-detail-panel { display: flex; }
+        .product-main { width: 400px; margin-right: 30px; }
+        .product-info { flex: 1; }
+        .delivery-row { display: flex; align-items: center; margin-bottom: 15px; }
+        .delivery-label { width: 80px; color: #999; }
+        .delivery-content { flex: 1; }
+        #order-total { font-size: 20px; }
+        .action-buttons { margin-top: 20px; }
+        .btn-primary { background: #e4393c; color: #fff; border: none; padding: 10px 25px; border-radius: 3px; margin-right: 10px; }
+        .btn-secondary { background: #ff9500; color: #fff; border: none; padding: 10px 25px; border-radius: 3px; }
     </style>
+
     <script src="js/jquery.min.js"></script>
+
 
 </head>
 <body>
-<div class="container">
-    <div class="card" id="product-detail">
-        <!-- 商品详情内容将通过JS渲染 -->
+<!-- 顶部导航栏 -->
+<div class="header">
+    <div class="container">
+        <div class="logo">机械配件商城</div>
+        <div class="user-info">
+            <!-- 登录/用户信息区域 -->
+            <div id="authArea">
+                <!-- 默认显示登录/注册 -->
+                <span id="loginText">访问<a href="login.html" style="color:#0074d9;margin:0 5px;">登录</a>|<a href="register.html" style="color:#0074d9;margin:0 5px;">注册</a></span>
+
+                <!-- 登录后显示的内容 -->
+                <div class="user-dropdown" id="userDropdown" style="display:none;">
+                    <div class="user-name">
+                        <span class="user-avatar" id="userAvatar">U</span>
+                        <span id="usernameDisplay">用户名</span>
+                    </div>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="myaccount.html">我的账户</a>
+                        <a href="myorders.html">我的订单</a>
+                        <a href="myfavorites.html">我的关注</a>
+                        <a href="#" class="logout-btn" id="logoutBtn">退出登录</a>
+                    </div>
+                </div>
+            </div>
+            <span class="phone">4000-XXX-XXX</span>
+        </div>
     </div>
-    <a href="index.html" class="back-link">返回首页</a>
 </div>
+
+<!-- 主导航菜单 -->
+<div class="nav">
+    <div class="container">
+        <div class="nav-menu">
+            <a href="index.html" class="active">配件商城</a>
+            <a href="#">金融服务</a>
+            <a href="#">销售/服务网络</a>
+            <a href="#">积分商城</a>
+        </div>
+    </div>
+</div>
+
+<!-- 商品详情内容 -->
+<div class="container">
+    <div class="breadcrumb" id="breadcrumb">
+        <a href="index.html">首页</a>
+        <span>&gt;</span>
+        <span>商品详情</span>
+    </div>
+
+    <div class="product-container">
+        <div class="product-header">
+            <h1 class="product-title" id="product-title">商品名称</h1>
+            <button class="favorite-btn" id="favorite-btn">❤ 关注</button>
+        </div>
+
+        <div class="product-content">
+            <div class="product-detail-panel" style="display:flex;">
+                <div class="product-main" style="width:400px;margin-right:30px;">
+                    <div class="main-image" id="main-image">
+                        <img src="https://via.placeholder.com/400x400?text=商品图片" alt="商品主图" id="main-image-img">
+                    </div>
+                </div>
+                <div class="product-info" style="flex:1;">
+                    <h1 class="product-title" id="product-title">商品名称</h1>
+                    <div class="current-price" id="current-price" style="font-size:24px;color:#e4393c;font-weight:bold;">现价：¥3500.00</div>
+                    <div class="delivery-row">
+                        <div class="delivery-label">发货地：</div>
+                        <div class="delivery-content" id="delivery-from">北京市</div>
+                    </div>
+                    <div class="delivery-row">
+                        <div class="delivery-label">配送方式：</div>
+                        <div class="delivery-content">
+                            <label><input type="radio" name="delivery-method" value="1" checked> 到付</label>
+                            <label><input type="radio" name="delivery-method" value="2"> 在线支付</label>
+                        </div>
+                    </div>
+                    <div class="delivery-row">
+                        <div class="delivery-label">配送至：</div>
+                        <div class="delivery-content">
+                            <span id="address-list"></span>
+                        </div>
+                    </div>
+                    <div class="delivery-row">
+                        <div class="delivery-label">数量：</div>
+                        <div class="delivery-content">
+                            <input type="number" id="quantity" value="1" min="1" style="width:60px;">&nbsp;
+                            <span id="stock-info">库存：<span id="stock-num">100</span> 件</span>
+                        </div>
+                    </div>
+                    <div class="delivery-row">
+                        <div class="delivery-label">支付方式：</div>
+                        <div class="delivery-content">
+                            <label><input type="radio" name="payment-method" value="1" checked> 全额支付</label>
+                        </div>
+                    </div>
+                    <div class="delivery-row">
+                        <div class="delivery-label">订单总价：</div>
+                        <div class="delivery-content">
+                            <span id="order-total" style="color:#e4393c;font-weight:bold;font-size:20px;">¥3500.00</span>
+                        </div>
+                    </div>
+                    <div class="action-buttons" style="margin-top:20px;">
+                        <button class="btn btn-primary" id="buy-now">立刻购买</button>
+                        <button class="btn btn-secondary" id="add-to-cart">加入购物车</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-container recommendations">
+        <h3 class="section-title">推荐套装</h3>
+        <div class="recommend-list" id="recommend-list">
+            <!-- 推荐商品将通过JS动态生成 -->
+        </div>
+    </div>
+
+    <div class="address-section">
+        <label>选择配送地址：</label>
+        <div id="address-list"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 <script>
     $(document).ready(function() {
-        // 获取 URL 参数
-        function getQueryVariable(variable) {
-            var query = window.location.search.substring(1);
-            var vars = query.split("&");
-            for (var i = 0; i < vars.length; i++) {
-                var pair = vars[i].split("=");
-                // 使用严格相等比较
-                if (pair[0] === variable) {
-                    return pair[1];
-                }
+
+        // 检查登录状态
+        function checkLoginStatus() {
+            const account = localStorage.getItem('account');
+            const username = localStorage.getItem('username');
+
+            if (account && username) {
+                // 用户已登录，显示用户信息
+                $('#loginText').hide();
+                $('#userDropdown').show();
+                $('#usernameDisplay').text(username);
+
+                // 设置用户头像首字母
+                const firstLetter = username.charAt(0).toUpperCase();
+                $('#userAvatar').text(firstLetter);
+            } else {
+                // 用户未登录，显示登录/注册
+                $('#loginText').show();
+                $('#userDropdown').hide();
             }
-            return false;
         }
 
-        var productId = getQueryVariable("id");
+        // 初始化检查登录状态
+        checkLoginStatus();
 
-        if (productId) {
+        // 用户信息下拉菜单
+        $('.user-name').on('click', function() {
+            $('#dropdownMenu').toggleClass('show');
+        });
+
+        // 点击其他地方关闭下拉菜单
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.user-dropdown').length) {
+                $('#dropdownMenu').removeClass('show');
+            }
+        });
+
+        // 退出登录
+        $('#logoutBtn').on('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('account');
+            localStorage.removeItem('username');
+            localStorage.removeItem('token');
+            window.location.href = 'index.html';
+        });
+
+        // 获取商品ID
+        function getProductId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        // 加载商品数据
+        function loadProductData(productId) {
             $.ajax({
-                url: "http://localhost:8080/api/products/" + productId,
-                method: "GET",
-                dataType: "json",
-                success: function(data) {
-                    var imageUrl = data.image || 'https://via.placeholder.com/220x180?text=暂无图片';
-                    var name = data.name;
-                    var price = data.price;
-                    var stock = data.stock;
-                    var description = data.description || '暂无描述';
+                url: `http://localhost:8080/api/products/${productId}`,
+                type: 'GET',
+                dataType: 'json',
+                success: function(product) {
+                    // 更新页面数据
+                    $('#product-title').text(product.name);
+                    $('#current-price').text(`现价：¥${product.price.toFixed(2)}`);
 
-                    var productHtml = '<img src="' + imageUrl + '" alt="' + name + '">';
-                    productHtml += '<h2>' + name + '</h2>';
-                    productHtml += '<div class="price">￥' + price + '</div>';
-                    productHtml += '<div class="stock">库存：' + stock + ' 件</div>';
-                    productHtml += '<div class="desc">' + description + '</div>';
+                    // 更新面包屑导航
+                    updateBreadcrumb(product.categoryPath);
 
-                    $("#product-detail").html(productHtml);
+                    // 更新图片
+                    updateProductImages(product.iconUrl, product.subImages);
+
+                    // 更新发货地
+                    if (product.deliveryFrom) {
+                        $('#delivery-from').text(product.deliveryFrom);
+                    }
                 },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.error("请求失败: ", textStatus, errorThrown);
-                    $("#product-detail").html('<div style="color:#e74c3c;">未找到该商品或服务器错误: ' + errorThrown + '</div>');
+                error: function(xhr, status, error) {
+                    console.error('加载商品数据失败:', error);
                 }
             });
+        }
+
+        // 更新面包屑导航
+        function updateBreadcrumb(categoryPath) {
+            if (!categoryPath || categoryPath.length === 0) return;
+
+            let breadcrumbHtml = '<a href="index.html">首页</a>';
+
+            categoryPath.forEach(category => {
+                breadcrumbHtml += `<span>&gt;</span><a href="category.html?id=${category.id}">${category.name}</a>`;
+            });
+
+            $('#breadcrumb').html(breadcrumbHtml);
+        }
+
+        // 更新商品图片
+        function updateProductImages(mainImage, subImages) {
+            if (mainImage) {
+                $('#main-image img').attr('src', mainImage).attr('alt', $('#product-title').text());
+            }
+
+            if (subImages && subImages.length > 0) {
+                let thumbnailsHtml = '';
+                subImages.forEach((image, index) => {
+                    thumbnailsHtml += `
+                            <div class="thumbnail" data-image="${image}">
+                                <img src="${image}" alt="商品图片${index + 1}">
+                            </div>
+                        `;
+                });
+                $('#thumbnails').html(thumbnailsHtml);
+
+                // 添加缩略图点击事件
+                $('.thumbnail').click(function() {
+                    const imageUrl = $(this).data('image');
+                    $('#main-image img').attr('src', imageUrl);
+                });
+            }
+        }
+
+        // 加载地区数据
+        function loadRegions() {
+            $.getJSON('/pcas-code.json', function(regions) {
+                // 填充省份
+                regions.forEach(province => {
+                    $('#delivery-province').append(`<option value="${province.name}">${province.name}</option>`);
+                });
+
+                // 省份变化时加载城市
+                $('#delivery-province').change(function() {
+                    const provinceName = $(this).val();
+                    if (!provinceName) return;
+
+                    $('#delivery-city').html('<option value="">请选择城市</option>');
+                    $('#delivery-district').html('<option value="">请选择区县</option>');
+
+                    const province = regions.find(p => p.name === provinceName);
+                    if (province && province.children) {
+                        province.children.forEach(city => {
+                            $('#delivery-city').append(`<option value="${city.name}">${city.name}</option>`);
+                        });
+                    }
+                });
+
+                // 城市变化时加载区县
+                $('#delivery-city').change(function() {
+                    const provinceName = $('#delivery-province').val();
+                    const cityName = $(this).val();
+                    if (!provinceName || !cityName) return;
+
+                    $('#delivery-district').html('<option value="">请选择区县</option>');
+
+                    const province = regions.find(p => p.name === provinceName);
+                    if (province && province.children) {
+                        const city = province.children.find(c => c.name === cityName);
+                        if (city && city.children) {
+                            city.children.forEach(district => {
+                                $('#delivery-district').append(`<option value="${district.name}">${district.name}</option>`);
+                            });
+                        }
+                    }
+                });
+            });
+        }
+
+        // 加载推荐商品
+        function loadRecommendations(productId) {
+            $.ajax({
+                url: `http://localhost:8080/api/products/${productId}/recommendations`,
+                type: 'GET',
+                dataType: 'json',
+                success: function(recommendations) {
+                    if (recommendations && recommendations.length > 0) {
+                        let html = '';
+                        recommendations.forEach(product => {
+                            html += `
+                                    <div class="recommend-item">
+                                        <img src="${product.iconUrl || 'https://via.placeholder.com/150x150?text=商品图片'}" alt="${product.name}">
+                                        <div>${product.name}</div>
+                                        <div class="recommend-price">¥${product.price.toFixed(2)}</div>
+                                    </div>
+                                `;
+                        });
+                        $('#recommend-list').html(html);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('加载推荐商品失败:', error);
+                }
+            });
+        }
+
+        // 添加到购物车
+        $('#add-to-cart').click(function() {
+            const productId = getProductId();
+            const quantity = $('#quantity').val();
+
+            $.ajax({
+                url: 'http://localhost:8080/api/cart',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    productId: productId,
+                    quantity: quantity
+                }),
+                success: function() {
+                    alert('商品已成功添加到购物车');
+                },
+                error: function(xhr, status, error) {
+                    if (xhr.status === 401) {
+                        alert('请先登录');
+                        window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+                    } else {
+                        alert('添加到购物车失败: ' + (xhr.responseJSON?.message || error));
+                    }
+                }
+            });
+        });
+
+        // 页面加载时获取并渲染用户地址（与UserAddressController对接）
+        loadUserAddresses();
+
+        function loadUserAddresses() {
+            const account = localStorage.getItem('account');
+            if (!account) return;
+            $.ajax({
+                url: 'http://localhost:8080/api/address/list',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ account: account }),
+                success: function(res) {
+                    if(res.status === 0 && res.data && res.data.length > 0) {
+                        renderAddressList(res.data);
+                    } else {
+                        $('#address-list').html('<span style="color:red;">暂无收货地址</span>');
+                    }
+                },
+                error: function() {
+                    $('#address-list').html('<span style="color:red;">加载地址失败</span>');
+                }
+            });
+        }
+        // 渲染地址列表，自动选中默认地址
+        window.renderAddressList = function(addresses) {
+            let html = '';
+            let defaultSelected = false;
+            addresses.forEach(addr => {
+                const isDefault = addr.dfault === 1;
+                html += `<span class="address-item${isDefault && !defaultSelected ? ' selected' : ''}"
+                            data-id="${addr.id}"
+                            onclick="selectAddress(this)">
+                            <b>${addr.name}</b> ${addr.mobile} <span>${addr.province}${addr.city}${addr.district || ''}${addr.addr || ''}</span>
+                            ${isDefault && !defaultSelected ? '<span style=\"color:orange;\">[默认]</span>' : ''}
+                        </span>&nbsp;`;
+                if (isDefault && !defaultSelected) defaultSelected = true;
+            });
+            $('#address-list').html(html);
+        }
+        // 切换选中地址
+        window.selectAddress = function(dom) {
+            $('.address-item').removeClass('selected');
+            $(dom).addClass('selected');
+        }
+
+        // 立即购买
+        $('#buy-now').click(function() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                alert('请先登录');
+                window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+                return;
+            }
+            const productId = getProductId();
+            const quantity = $('#quantity').val();
+            const paymentMethod = $('input[name="payment-method"]:checked').val();
+            const deliveryProvince = $('#delivery-province').val();
+            const deliveryCity = $('#delivery-city').val();
+            const deliveryDistrict = $('#delivery-district').val();
+            const addressId = $('.address-item.selected').data('id'); // 获取选中地址ID
+
+            if (!addressId) {
+                alert('请选择收货地址');
+                return;
+            }
+            if (!deliveryProvince || !deliveryCity || !deliveryDistrict) {
+                alert('请选择完整的收货地区');
+                return;
+            }
+            if (!quantity || quantity < 1) {
+                alert('请输入正确的购买数量');
+                return;
+            }
+
+            $.ajax({
+                url: 'http://localhost:8080/api/orders/quick',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    userId: userId,
+                    productId: productId,
+                    quantity: quantity,
+                    paymentMethod: paymentMethod,
+                    deliveryProvince: deliveryProvince,
+                    deliveryCity: deliveryCity,
+                    deliveryDistrict: deliveryDistrict,
+                    addressId: addressId
+                }),
+                success: function(response) {
+                    if (response && response.orderId) {
+                        window.location.href = `/order.html?id=${response.orderId}`;
+                    } else {
+                        alert('下单成功，但未返回订单号');
+                    }
+                },
+                error: function(xhr) {
+                    if (xhr.status === 401) {
+                        alert('请先登录');
+                        window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+                    } else {
+                        alert('创建订单失败: ' + (xhr.responseJSON?.message || '未知错误'));
+                    }
+                }
+            });
+        });
+
+        // 关注商品
+        $('#favorite-btn').click(function() {
+            const productId = getProductId();
+
+            $.ajax({
+                url: 'http://localhost:8080/api/favorites',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    productId: productId
+                }),
+                success: function() {
+                    const btn = $('#favorite-btn');
+                    if (btn.text().includes('已关注')) {
+                        btn.text('❤ 关注');
+                    } else {
+                        btn.text('✓ 已关注');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    if (xhr.status === 401) {
+                        alert('请先登录');
+                        window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+                    } else {
+                        alert('操作失败: ' + (xhr.responseJSON?.message || error));
+                    }
+                }
+            });
+        });
+
+        // 动态更新总价
+        function updateOrderTotal() {
+            const price = parseFloat($('#current-price').text().replace(/[^\d.]/g, ''));
+            const quantity = parseInt($('#quantity').val());
+            $('#order-total').text('¥' + (price * quantity).toFixed(2));
+        }
+        // 限制数量输入
+        $('#quantity').on('input', function() {
+            const max = parseInt($('#stock-num').text());
+            let val = parseInt($(this).val());
+            if (val < 1) val = 1;
+            if (val > max) val = max;
+            $(this).val(val);
+            updateOrderTotal();
+        });
+        // 页面加载时初始化库存和总价
+        $(function() {
+            updateOrderTotal();
+        });
+
+        // 初始化页面
+        const productId = getProductId();
+        if (productId) {
+            loadProductData(productId);
+            loadRegions();
+            loadRecommendations(productId);
         } else {
-            $("#product-detail").html('<div style="color:#e74c3c;">未找到商品ID</div>');
+            alert('无效的商品ID');
+            window.location.href = 'index.html';
+
         }
     });
 </script>

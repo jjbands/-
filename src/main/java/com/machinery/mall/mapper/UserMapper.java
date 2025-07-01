@@ -21,4 +21,6 @@ public interface UserMapper {
 
     int updatePasswordByPhone(@Param("phone") String phone,
                               @Param("password") String password);
+    User selectByAccount(@Param("account") String account);
+    int updateProfile(@Param("user") User user);
 }

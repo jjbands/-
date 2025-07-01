@@ -12,10 +12,17 @@ public interface ProductsMapper {
     List<Products> selectByCategoryId(Integer categoryId);
     List<Products> selectByName(String name);
     Products selectById(Integer id);
+
     int countByCategoryId(Integer categoryId);
+
     List<Products> getAllProducts();
     int updateProduct(Products product);
     int deleteProduct(@Param("id") int id);
     List<Products> searchProductsByName(@Param("name") String name);
+
     int addProduct(Products product);
+
+    List<Products> selectByCategoryIds(List<Integer> categoryIds);
+    int updateById(Products product);
+
 }
