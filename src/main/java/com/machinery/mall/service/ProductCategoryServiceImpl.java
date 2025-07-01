@@ -2,6 +2,7 @@ package com.machinery.mall.service;
 
 import com.machinery.mall.entity.ProductCategory;
 import com.machinery.mall.mapper.ProductCategoryMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
 @Service
 public class ProductCategoryServiceImpl implements ProductCategoryService {
     private ProductCategoryMapper categoryMapper;
+    @Autowired
     public ProductCategoryServiceImpl(ProductCategoryMapper categoryMapper) {
         this.categoryMapper = categoryMapper;
     }

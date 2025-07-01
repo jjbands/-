@@ -335,6 +335,7 @@ public class UserAddressController {
         return response;
     }
 
+
     @PostMapping("/deletedList")
     public Map<String, Object> getDeletedAddressList(@RequestBody Map<String, String> request) {
         Map<String, Object> response = new HashMap<>();
@@ -391,4 +392,5 @@ public class UserAddressController {
         }
         return response;
     }
+
 } 

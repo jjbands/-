@@ -59,6 +59,7 @@ public interface UserAddressMapper {
      * 统计用户的地址数量
      */
     int countByUserId(@Param("userId") Integer userId);
+
     
     /**
      * 查询已删除地址
@@ -74,4 +75,5 @@ public interface UserAddressMapper {
      * 物理删除
      */
     int permanentDeleteById(@Param("id") Integer id);
+
 } 

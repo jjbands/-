@@ -1,6 +1,7 @@
 package com.machinery.mall.service;
 
 import com.machinery.mall.entity.UserAddress;
+
 import java.util.List;
 
 /**
@@ -50,7 +51,7 @@ public interface UserAddressService {
      * 统计用户地址数量
      */
     int countAddressesByUserId(Integer userId);
-    
+
     /**
      * 查询已删除地址
      */
@@ -65,4 +66,5 @@ public interface UserAddressService {
      * 物理删除
      */
     boolean permanentDeleteAddress(Integer id);
+
 } 

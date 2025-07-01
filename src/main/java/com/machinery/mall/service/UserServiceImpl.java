@@ -7,6 +7,7 @@ package com.machinery.mall.service;
  */
 import com.machinery.mall.entity.User;
 import com.machinery.mall.mapper.UserMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -14,6 +15,7 @@ import org.springframework.util.DigestUtils;
 public class UserServiceImpl implements UserService {
 
     private UserMapper userMapper;
+    @Autowired
     public UserServiceImpl(UserMapper userMapper) {
         this.userMapper = userMapper;}
     @Override

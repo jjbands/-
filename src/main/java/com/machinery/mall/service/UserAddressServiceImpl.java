@@ -92,6 +92,7 @@ public class UserAddressServiceImpl implements UserAddressService {
         return userAddressMapper.countByUserId(userId);
     }
 
+
     @Override
     public List<UserAddress> getDeletedAddressesByUserId(Integer userId) {
         return userAddressMapper.selectDeletedByUserId(userId);
@@ -106,4 +107,5 @@ public class UserAddressServiceImpl implements UserAddressService {
     public boolean permanentDeleteAddress(Integer id) {
         return userAddressMapper.permanentDeleteById(id) > 0;
     }
+
 } 

@@ -28,7 +28,6 @@ public class UserController {
     public Map<String, Object> register(@RequestBody User user) {
         Map<String, Object> response = new HashMap<>();
         int result = userService.register(user);
-
         if (result > 0) {
             response.put("status", 0);
             response.put("msg", "注册成功");
@@ -45,7 +44,6 @@ public class UserController {
             response.put("status", 4);
             response.put("msg", "注册失败");
         }
-
         return response;
     }
 
@@ -149,7 +147,6 @@ public class UserController {
             response.put("msg", "账号参数缺失");
             return response;
         }
-
         User user = userService.getUserByAccount(account);
         if (user != null) {
             response.put("status", 0);
@@ -172,35 +169,23 @@ public class UserController {
     }
 
     @PostMapping("/updateProfile")
-    public Map<String, Object> updateUserProfile(@RequestBody Map<String, Object> request) {
+    public Map<String, Object> updateUserProfile(@RequestBody User user) {
         Map<String, Object> response = new HashMap<>();
-        String account = (String) request.get("account");
 
-        if (account == null || account.isEmpty()) {
+        try {
+            if (user.getAccount() == null || user.getAccount().isEmpty()) {
+                response.put("status", 1);
+                response.put("msg", "账号参数缺失");
+                return response;
+            }
+
+            boolean success = userService.updateUserProfile(user);
+            response.put("status", success ? 0 : 3);
+            response.put("msg", success ? "资料更新成功" : "资料更新失败");
+
+        } catch (Exception e) {
             response.put("status", 1);
-            response.put("msg", "账号参数缺失");
-            return response;
-        }
-
-        User user = new User();
-        user.setAccount(account);
-        user.setName((String) request.get("name"));
-        user.setSex(Integer.parseInt(request.get("sex").toString()));
-        user.setPhone((String) request.get("phone"));
-        user.setEmail((String) request.get("email"));
-
-        if (request.get("age") != null) {
-            user.setAge(Integer.parseInt(request.get("age").toString()));
-        }
-
-        boolean success = userService.updateUserProfile(user);
-
-        if (success) {
-            response.put("status", 0);
-            response.put("msg", "资料更新成功");
-        } else {
-            response.put("status", 3);
-            response.put("msg", "资料更新失败");
+            response.put("msg", "更新失败: " + e.getMessage());
         }
         return response;
     }
