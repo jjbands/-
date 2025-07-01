@@ -5,4 +5,14 @@
     <select id="selectAll" resultType="com.machinery.mall.entity.ProductCategory">
         SELECT * FROM product_category WHERE status = 1 ORDER BY sort_order ASC
     </select>
+    <select id="selectAllSubCategoryIds" resultType="int">
+        WITH RECURSIVE subcategories AS (
+            SELECT id FROM product_category WHERE id = #{parentId} AND status = 1
+            UNION ALL
+            SELECT pc.id FROM product_category pc
+            INNER JOIN subcategories sc ON pc.parent_id = sc.id
+            WHERE pc.status = 1
+        )
+        SELECT id FROM subcategories
+    </select>
 </mapper>

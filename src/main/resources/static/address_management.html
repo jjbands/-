@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>收货地址管理 - 机械电商平台</title>
+    <style>
+        .address-table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+        .address-table th, .address-table td { border: 1px solid #e0e0e0; padding: 10px; text-align: center; }
+        .address-table th { background: #f8f8f8; }
+        .address-table .default-badge { color: #fff; background: #67c23a; border-radius: 4px; padding: 2px 8px; font-size: 12px; }
+        .address-table button { margin: 0 2px; padding: 4px 10px; border: none; border-radius: 4px; background: #409eff; color: #fff; cursor: pointer; }
+        .address-table button.delete { background: #f56c6c; }
+        .address-table button.save { background: #67c23a; }
+        .address-table button.cancel { background: #909399; }
+        .address-table button.default { background: #e6a23c; }
+        .address-table input, .address-table select { padding: 4px 6px; border: 1px solid #dcdfe6; border-radius: 4px; }
+        .add-btn { margin: 20px 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-size: 16px; cursor: pointer; }
+        .debug-info { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h2 style="margin-top:30px;">管理地址</h2>
+    
+    <!-- 调试信息区域 -->
+    <div class="debug-info" id="debugInfo">
+        <strong>调试信息：</strong><br>
+        <span id="debugContent">正在加载...</span>
+    </div>
+    
+    <table class="address-table">
+        <thead>
+            <tr>
+                <th>收货人</th>
+                <th>联系方式</th>
+                <th>收货地址</th>
+                <th>详细地址</th>
+                <th>默认地址</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody id="addressTableBody"></tbody>
+    </table>
+    <button class="add-btn" onclick="addRow()">新增</button>
+
+    <script src="/js/jquery.min.js"></script>
+    <script>
+    let regionData = [];
+    let addressList = [];
+    let editingIndex = null;
+
+    // 调试函数
+    function updateDebugInfo(message) {
+        const debugContent = document.getElementById('debugContent');
+        const timestamp = new Date().toLocaleTimeString();
+        debugContent.innerHTML += `[${timestamp}] ${message}<br>`;
+        console.log(`[${timestamp}] ${message}`);
+    }
+
+    // 1. 加载省市区数据（使用本地数据）
+    $(document).ready(function() {
+        updateDebugInfo('页面加载完成，开始初始化...');
+        loadRegionData();
+        loadAddressList();
+    });
+
+    function loadRegionData() {
+        updateDebugInfo('加载省市区数据...');
+        // 简化的省市区数据
+        regionData = [
+            {
+                name: "北京市",
+                cities: [
+                    {
+                        name: "北京市",
+                        districts: ["东城区", "西城区", "朝阳区", "丰台区", "石景山区", "海淀区", "门头沟区", "房山区", "通州区", "顺义区", "昌平区", "大兴区", "怀柔区", "平谷区", "密云区", "延庆区"]
+                    }
+                ]
+            },
+            {
+                name: "上海市",
+                cities: [
+                    {
+                        name: "上海市",
+                        districts: ["黄浦区", "徐汇区", "长宁区", "静安区", "普陀区", "虹口区", "杨浦区", "闵行区", "宝山区", "嘉定区", "浦东新区", "金山区", "松江区", "青浦区", "奉贤区", "崇明区"]
+                    }
+                ]
+            },
+            {
+                name: "广东省",
+                cities: [
+                    {
+                        name: "广州市",
+                        districts: ["荔湾区", "越秀区", "海珠区", "天河区", "白云区", "黄埔区", "番禺区", "花都区", "南沙区", "从化区", "增城区"]
+                    },
+                    {
+                        name: "深圳市",
+                        districts: ["罗湖区", "福田区", "南山区", "宝安区", "龙岗区", "盐田区", "龙华区", "坪山区", "光明区"]
+                    }
+                ]
+            }
+        ];
+        updateDebugInfo('省市区数据加载完成');
+    }
+
+    // 2. 加载后端地址数据
+    function loadAddressList() {
+        // 从localStorage获取当前用户账号
+        const account = localStorage.getItem('account');
+        updateDebugInfo(`当前用户账号: ${account}`);
+        
+        if (!account) {
+            updateDebugInfo('未检测到登录信息，跳转到登录页面');
+            alert('请先登录');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        updateDebugInfo('开始请求地址列表...');
+        $.ajax({
+            url: '/api/address/list',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ account: account }),
+            success: function(res) {
+                updateDebugInfo(`API响应: ${JSON.stringify(res)}`);
+                if (res.status === 0) {
+                    addressList = res.data || [];
+                    updateDebugInfo(`获取到 ${addressList.length} 个地址`);
+                } else {
+                    addressList = [];
+                    updateDebugInfo(`API返回错误: ${res.msg}`);
+                    alert(res.msg);
+                }
+                renderTable();
+            },
+            error: function(xhr, status, error) {
+                updateDebugInfo(`请求失败: ${status} - ${error}`);
+                updateDebugInfo(`响应内容: ${xhr.responseText}`);
+                alert('加载地址失败');
+            }
+        });
+    }
+
+    function renderTable() {
+        updateDebugInfo(`渲染表格，地址数量: ${addressList.length}`);
+        let html = '';
+        addressList.forEach((addr, idx) => {
+            if (editingIndex === idx) {
+                html += renderEditRow(addr, idx);
+            } else {
+                html += renderViewRow(addr, idx);
+            }
+        });
+        $('#addressTableBody').html(html);
+        
+        // 如果是编辑状态，渲染省市区选择器
+        if (editingIndex !== null) {
+            renderRegionSelect(editingIndex, addressList[editingIndex]);
+        }
+        
+        updateDebugInfo('表格渲染完成');
+    }
+
+    function renderViewRow(addr, idx) {
+        return `<tr>
+            <td>${addr.name||''}</td>
+            <td>${addr.mobile||addr.phone||''}</td>
+            <td>${addr.province||''} / ${addr.city||''} / ${addr.district||''}</td>
+            <td>${addr.addr||''}</td>
+            <td>${addr.dfault ? '<span class="default-badge">默认</span>' : ''}</td>
+            <td>
+                <button onclick="editRow(${idx})">编辑</button>
+                <button class="delete" onclick="deleteRow(${idx})">删除</button>
+                ${!addr.dfault ? `<button class="default" onclick="setDefault(${idx})">设为默认</button>` : ''}
+            </td>
+        </tr>`;
+    }
+
+    function renderEditRow(addr, idx) {
+        return `<tr>
+            <td><input type="text" id="name_${idx}" value="${addr.name||''}"></td>
+            <td><input type="text" id="mobile_${idx}" value="${addr.mobile||addr.phone||''}"></td>
+            <td>
+                <select id="province_${idx}" onchange="onProvinceChange(${idx})"></select>
+                <select id="city_${idx}" onchange="onCityChange(${idx})"></select>
+                <select id="district_${idx}"></select>
+            </td>
+            <td><input type="text" id="addr_${idx}" value="${addr.addr||''}"></td>
+            <td><input type="checkbox" id="dfault_${idx}" ${addr.dfault ? 'checked' : ''}></td>
+            <td>
+                <button class="save" onclick="saveRow(${idx})">保存</button>
+                <button class="cancel" onclick="cancelEdit()">取消</button>
+            </td>
+        </tr>`;
+    }
+
+    function addRow() {
+        updateDebugInfo('添加新地址行');
+        addressList.push({name:'', mobile:'', province:'', city:'', district:'', addr:'', dfault:0});
+        editingIndex = addressList.length - 1;
+        renderTable();
+    }
+
+    function editRow(idx) {
+        updateDebugInfo(`编辑地址行: ${idx}`);
+        editingIndex = idx;
+        renderTable();
+    }
+
+    function deleteRow(idx) {
+        if (!addressList[idx].id) {
+            updateDebugInfo('删除本地地址行');
+            addressList.splice(idx, 1);
+            editingIndex = null;
+            renderTable();
+            return;
+        }
+        if (confirm('确定删除？')) {
+            updateDebugInfo(`删除地址ID: ${addressList[idx].id}`);
+            $.ajax({
+                url: '/api/address/delete',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ id: addressList[idx].id }),
+                success: function(res) {
+                    updateDebugInfo(`删除响应: ${JSON.stringify(res)}`);
+                    if (res.status === 0) {
+                        addressList.splice(idx, 1);
+                        editingIndex = null;
+                        renderTable();
+                    } else {
+                        alert(res.msg);
+                    }
+                }
+            });
+        }
+    }
+
+    function saveRow(idx) {
+        updateDebugInfo(`保存地址行: ${idx}`);
+        let addr = addressList[idx];
+        addr.name = $(`#name_${idx}`).val();
+        addr.mobile = $(`#mobile_${idx}`).val();
+        addr.province = $(`#province_${idx}`).val();
+        addr.city = $(`#city_${idx}`).val();
+        addr.district = $(`#district_${idx}`).val();
+        addr.addr = $(`#addr_${idx}`).val();
+        addr.dfault = $(`#dfault_${idx}`).is(':checked') ? 1 : 0;
+        addr.account = localStorage.getItem('account');
+
+        let url, data;
+        if (addr.id) {
+            url = '/api/address/update';
+            data = {
+                id: addr.id,
+                account: addr.account,
+                receiverName: addr.name,
+                receiverPhone: addr.mobile,
+                province: addr.province,
+                city: addr.city,
+                district: addr.district,
+                detailAddress: addr.addr,
+                isDefault: addr.dfault
+            };
+        } else {
+            url = '/api/address/add';
+            data = {
+                account: addr.account,
+                receiverName: addr.name,
+                receiverPhone: addr.mobile,
+                province: addr.province,
+                city: addr.city,
+                district: addr.district,
+                detailAddress: addr.addr,
+                isDefault: addr.dfault
+            };
+        }
+        
+        updateDebugInfo(`发送请求到: ${url}`);
+        updateDebugInfo(`请求数据: ${JSON.stringify(data)}`);
+        
+        $.ajax({
+            url: url,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(res) {
+                updateDebugInfo(`保存响应: ${JSON.stringify(res)}`);
+                if (res.status === 0) {
+                    loadAddressList();
+                } else {
+                    alert(res.msg);
+                }
+            }
+        });
+        editingIndex = null;
+    }
+
+    function cancelEdit() {
+        updateDebugInfo('取消编辑');
+        editingIndex = null;
+        renderTable();
+    }
+
+    function setDefault(idx) {
+        updateDebugInfo(`设置默认地址: ${addressList[idx].id}`);
+        $.ajax({
+            url: '/api/address/setDefault',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                account: localStorage.getItem('account'),
+                addressId: addressList[idx].id
+            }),
+            success: function(res) {
+                updateDebugInfo(`设置默认地址响应: ${JSON.stringify(res)}`);
+                if (res.status === 0) {
+                    loadAddressList();
+                } else {
+                    alert(res.msg);
+                }
+            }
+        });
+    }
+
+    // 省市区三级联动渲染
+    function renderRegionSelect(idx, addr = {}) {
+        let $province = $(`#province_${idx}`);
+        let $city = $(`#city_${idx}`);
+        let $district = $(`#district_${idx}`);
+        $province.html('<option value="">请选择</option>');
+        regionData.forEach(p => $province.append(`<option value="${p.name}">${p.name}</option>`));
+        if (addr.province) $province.val(addr.province);
+
+        $city.html('<option value="">请选择</option>');
+        if (addr.province) {
+            let cities = regionData.find(p => p.name === addr.province)?.cities || [];
+            cities.forEach(c => $city.append(`<option value="${c.name}">${c.name}</option>`));
+            if (addr.city) $city.val(addr.city);
+        }
+
+        $district.html('<option value="">请选择</option>');
+        if (addr.province && addr.city) {
+            let cities = regionData.find(p => p.name === addr.province)?.cities || [];
+            let districts = cities.find(c => c.name === addr.city)?.districts || [];
+            districts.forEach(d => $district.append(`<option value="${d}">${d}</option>`));
+            if (addr.district) $district.val(addr.district);
+        }
+    }
+
+    function onProvinceChange(idx) {
+        let province = $(`#province_${idx}`).val();
+        let $city = $(`#city_${idx}`);
+        $city.html('<option value="">请选择</option>');
+        let cities = regionData.find(p => p.name === province)?.cities || [];
+        cities.forEach(c => $city.append(`<option value="${c.name}">${c.name}</option>`));
+        $(`#district_${idx}`).html('<option value="">请选择</option>');
+    }
+
+    function onCityChange(idx) {
+        let province = $(`#province_${idx}`).val();
+        let city = $(`#city_${idx}`).val();
+        let $district = $(`#district_${idx}`);
+        $district.html('<option value="">请选择</option>');
+        let cities = regionData.find(p => p.name === province)?.cities || [];
+        let districts = cities.find(c => c.name === city)?.districts || [];
+        districts.forEach(d => $district.append(`<option value="${d}">${d}</option>`));
+    }
+    </script>
+</body>
+</html>

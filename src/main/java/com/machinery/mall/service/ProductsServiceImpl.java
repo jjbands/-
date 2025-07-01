@@ -1,8 +1,10 @@
 package com.machinery.mall.service;
 
 import com.machinery.mall.entity.Products;
+import com.machinery.mall.mapper.ProductCategoryMapper;
 import com.machinery.mall.mapper.ProductsMapper;
 import com.machinery.mall.mapper.UserMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,12 +17,20 @@ import java.util.List;
 @Service
 public class ProductsServiceImpl implements ProductsService {
     private ProductsMapper productsMapper;
-    public ProductsServiceImpl(ProductsMapper productsMapper) {
-        this.productsMapper = productsMapper;}
+    private ProductCategoryMapper productcategoryMapper;
+    @Autowired
+    public ProductsServiceImpl(ProductsMapper productsMapper, ProductCategoryMapper productcategoryMapper) {
+        this.productsMapper = productsMapper;
+        this.productcategoryMapper = productcategoryMapper;
+    }
+
     @Override
-        public List<Products> getProductsByCategory(Integer categoryId) {
-            return productsMapper.selectByCategoryId(categoryId);
-        }
+    public List<Products> getProductsByCategory(Integer categoryId) {
+        // 递归查找所有子分类ID
+        List<Integer> categoryIds = productcategoryMapper.selectAllSubCategoryIds(categoryId);
+        return productsMapper.selectByCategoryIds(categoryIds);
+    }
+
     @Override
     public List<Products> getProductsByName(String name) {
         return productsMapper.selectByName(name);

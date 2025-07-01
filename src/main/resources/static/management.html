@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>后台管理 - 用户管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* 样式部分保持不变，与您提供的相同 */
         :root {
             --primary-color: #4361ee;
             --secondary-color: #3f37c9;
@@ -201,7 +201,8 @@
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
+            position: relative;
         }
 
         .form-group label {
@@ -231,6 +232,23 @@
             justify-content: flex-end;
             gap: 10px;
             margin-top: 20px;
+        }
+
+        /* 新增错误状态样式 */
+        .is-invalid {
+            border-color: var(--danger-color) !important;
+        }
+
+        .invalid-feedback {
+            color: var(--danger-color);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .is-invalid + .invalid-feedback,
+        .is-invalid ~ .invalid-feedback {
+            display: block;
         }
 
         .status-badge {
@@ -312,19 +330,20 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 12px 20px;
+            padding: 15px 20px;
             border-radius: 4px;
             color: white;
             font-weight: 500;
             box-shadow: var(--shadow);
-            transform: translateX(100%);
             opacity: 0;
-            transition: all 0.3s ease;
+            transition: opacity 0.3s ease;
             z-index: 1100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .toast.show {
-            transform: translateX(0);
             opacity: 1;
         }
 
@@ -338,10 +357,6 @@
 
         .toast-warning {
             background-color: #f59e0b;
-        }
-
-        .toast i {
-            margin-right: 8px;
         }
 
         /* 加载动画 */
@@ -442,18 +457,22 @@
             <div class="form-group">
                 <label for="editAccount"><i class="fas fa-user"></i> 用户名</label>
                 <input type="text" id="editAccount" class="form-control" required>
+                <div class="invalid-feedback">用户名不能为空且至少3个字符</div>
             </div>
             <div class="form-group">
                 <label for="editName"><i class="fas fa-id-card"></i> 姓名</label>
                 <input type="text" id="editName" class="form-control" required>
+                <div class="invalid-feedback">请输入至少2个字符的姓名</div>
             </div>
             <div class="form-group">
                 <label for="editPhone"><i class="fas fa-phone"></i> 手机号</label>
-                <input type="text" id="editPhone" class="form-control">
+                <input type="text" id="editPhone" class="form-control" required>
+                <div class="invalid-feedback">请输入有效的手机号码</div>
             </div>
             <div class="form-group">
                 <label for="editEmail"><i class="fas fa-envelope"></i> 邮箱</label>
                 <input type="email" id="editEmail" class="form-control">
+                <div class="invalid-feedback">请输入有效的电子邮箱</div>
             </div>
             <div class="form-group">
                 <label for="editSex"><i class="fas fa-venus-mars"></i> 性别</label>
@@ -464,7 +483,8 @@
             </div>
             <div class="form-group">
                 <label for="editAge"><i class="fas fa-birthday-cake"></i> 年龄</label>
-                <input type="number" id="editAge" class="form-control">
+                <input type="number" id="editAge" class="form-control" min="1" max="120">
+                <div class="invalid-feedback">请输入1-120之间的有效年龄</div>
             </div>
             <div class="form-group">
                 <label for="editRole"><i class="fas fa-user-tag"></i> 角色</label>
@@ -506,7 +526,7 @@
     </div>
 </div>
 
-<script src="js/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     let currentEditId = null;
     let currentDeleteId = null;
@@ -515,6 +535,32 @@
 
     $(document).ready(function() {
         loadUsers();
+
+        // 实时验证
+        $('#editName').on('input', function() {
+            if ($(this).val().trim().length >= 2) {
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        $('#editPhone').on('input', function() {
+            if (/^1[3-9]\d{9}$/.test($(this).val())) {
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        $('#editEmail').on('input', function() {
+            if (/^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/.test($(this).val()) || $(this).val() === '') {
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        $('#editAge').on('input', function() {
+            const age = parseInt($(this).val());
+            if ((age >= 1 && age <= 120) || $(this).val() === '') {
+                $(this).removeClass('is-invalid');
+            }
+        });
     });
 
     function switchTab(tab) {
@@ -659,24 +705,67 @@
         }, 300);
     }
 
+    function validateUserForm(user) {
+        let isValid = true;
+
+        // 验证用户名
+        if (!user.account || user.account.length < 3) {
+            $('#editAccount').addClass('is-invalid');
+            isValid = false;
+        }
+
+        // 验证姓名
+        if (!user.name || user.name.length < 2) {
+            $('#editName').addClass('is-invalid');
+            isValid = false;
+        }
+
+        // 验证手机号
+        if (!user.phone || !/^1[3-9]\d{9}$/.test(user.phone)) {
+            $('#editPhone').addClass('is-invalid');
+            isValid = false;
+        }
+
+        // 验证邮箱
+        if (user.email && !/^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/.test(user.email)) {
+            $('#editEmail').addClass('is-invalid');
+            isValid = false;
+        }
+
+        // 验证年龄
+        if (user.age && (user.age < 1 || user.age > 120)) {
+            $('#editAge').addClass('is-invalid');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
     function submitEdit() {
         const user = {
             id: currentEditId,
-            account: $('#editAccount').val(),
-            name: $('#editName').val(),
-            phone: $('#editPhone').val(),
-            email: $('#editEmail').val(),
+            account: $('#editAccount').val().trim(),
+            name: $('#editName').val().trim(),
+            phone: $('#editPhone').val().trim(),
+            email: $('#editEmail').val().trim(),
             sex: parseInt($('#editSex').val()),
-            age: parseInt($('#editAge').val()) || null,
+            age: $('#editAge').val() ? parseInt($('#editAge').val()) : null,
             role: parseInt($('#editRole').val()) || 1
         };
 
-        if (!user.account || !user.name) {
-            showError('用户名和姓名不能为空');
+        // 重置错误状态
+        $('.form-control').removeClass('is-invalid');
+
+        // 验证表单
+        if (!validateUserForm(user)) {
+            showError('请检查表单中的错误');
             return;
         }
 
-        showLoading('#editModal .modal-content');
+        // 显示加载状态
+        const $btn = $('#editModal .btn-primary');
+        const btnText = $btn.text();
+        $btn.prop('disabled', true).text('保存中...');
 
         $.ajax({
             url: 'http://localhost:8080/api/admin/user',
@@ -685,18 +774,22 @@
             data: JSON.stringify(user),
             success: function(response) {
                 if (response.status === 0) {
-                    showSuccess('修改成功');
+                    showSuccess('用户信息更新成功');
                     closeModal();
                     loadUsers();
                 } else {
-                    showError('修改失败: ' + response.msg);
+                    showError(response.msg || '更新失败');
                 }
             },
-            error: function(xhr, status, error) {
-                showError('请求失败: ' + error);
+            error: function(xhr) {
+                let errorMsg = '请求失败';
+                if (xhr.responseJSON && xhr.responseJSON.msg) {
+                    errorMsg = xhr.responseJSON.msg;
+                }
+                showError(errorMsg);
             },
             complete: function() {
-                hideLoading();
+                $btn.prop('disabled', false).text(btnText);
             }
         });
     }
@@ -819,10 +912,21 @@
     }
 
     // 显示Toast通知
-    function showToast(type, message) {
+    function showToast(type, message, duration = 3000) {
+        const iconMap = {
+            success: 'check-circle',
+            error: 'exclamation-circle',
+            warning: 'exclamation-triangle',
+            info: 'info-circle'
+        };
+
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
-        toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+        toast.innerHTML = `
+            <i class="fas fa-${iconMap[type] || 'info-circle'}"></i>
+            <span>${message}</span>
+        `;
+
         document.body.appendChild(toast);
 
         setTimeout(() => {
@@ -832,7 +936,7 @@
                 setTimeout(() => {
                     document.body.removeChild(toast);
                 }, 300);
-            }, 3000);
+            }, duration);
         }, 100);
     }
 </script>

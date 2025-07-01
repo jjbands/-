@@ -17,4 +17,18 @@
         SET quantity = #{quantity}, updated = NOW()
         WHERE id = #{id}
     </update>
+    <select id="selectCartCountByUserId" resultType="int">
+        SELECT SUM(quantity) FROM shopping_cart WHERE user_id = #{userId}
+    </select>
+
+    <select id="selectCartListByUserId" resultType="com.machinery.mall.entity.ShoppingCart">
+        SELECT sc.*, p.name as product_name, p.icon_url, p.price
+        FROM shopping_cart sc
+                 JOIN products p ON sc.product_id = p.id
+        WHERE sc.user_id = #{userId}
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM shopping_cart WHERE id = #{id}
+    </delete>
 </mapper>
