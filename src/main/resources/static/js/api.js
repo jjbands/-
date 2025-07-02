@@ -44,6 +44,44 @@ class ApiService {
     static async searchProductsByName(name) {
         return await this.get(`${API_BASE_URL}/products/searchByCategory`, { name });
     }
+
+    // 新增商品
+    static async addProduct(product) {
+        const response = await fetch('http://localhost:8080/api/product/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(product)
+        });
+        return await response.json();
+    }
+
+    // 新增分类
+    static async addCategory(category) {
+        const response = await fetch('http://localhost:8080/api/categories/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(category)
+        });
+        return await response.json();
+    }
+
+    // 编辑分类
+    static async updateCategory(category) {
+        const response = await fetch('http://localhost:8080/api/categories/update', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(category)
+        });
+        return await response.json();
+    }
+
+    // 删除分类
+    static async deleteCategory(id) {
+        const response = await fetch(`http://localhost:8080/api/categories/${id}`, {
+            method: 'DELETE'
+        });
+        return await response.json();
+    }
 }
 
 // 产品展示模块
@@ -246,6 +284,9 @@ $(document).ready(function() {
     productDisplay = new ProductDisplay();
     productDisplay.init();
 });
+
+window.ApiService = ApiService;
+
 function viewDetail(productId) {
     window.location.href = `product_detail.html?id=${productId}`;
 }

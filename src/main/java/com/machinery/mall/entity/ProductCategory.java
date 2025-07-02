@@ -6,6 +6,7 @@ package com.machinery.mall.entity;
  * @date: 2025/06/26  14:55
  */
 import java.util.Date;
+import java.util.List;
 
 public class ProductCategory {
     private Integer id;
@@ -16,6 +17,7 @@ public class ProductCategory {
     private Integer level;
     private Date created;
     private Date updated;
+    private List<ProductCategory> children;
 
     public ProductCategory(Integer id, Integer parentId, String name, Integer sortOrder, Integer status, Integer level, Date created, Date updated) {
         this.id = id;
@@ -93,5 +95,13 @@ public class ProductCategory {
 
     public void setUpdated(Date updated) {
         this.updated = updated;
+    }
+
+    public List<ProductCategory> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<ProductCategory> children) {
+        this.children = children;
     }
 }

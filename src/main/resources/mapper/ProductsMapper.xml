@@ -40,7 +40,7 @@
     </delete>
 
     <select id="searchProductsByName" resultType="com.machinery.mall.entity.Products">
-        SELECT id, name, price, status, is_hot
+        SELECT id, name, product_id, parts_id, icon_url, sub_images, detail, spec_param, price, stock, status, is_hot, created, updated
         FROM products
         WHERE name LIKE CONCAT('%', #{name}, '%')
     </select>
@@ -71,4 +71,9 @@
             updated = NOW()
         WHERE id = #{id}
     </update>
+
+    <insert id="addProduct" parameterType="com.machinery.mall.entity.Products">
+        INSERT INTO products (name, price, stock, product_id, detail, parts_id)
+        VALUES (#{name}, #{price}, #{stock}, #{productId}, #{detail}, #{partsId})
+    </insert>
 </mapper>

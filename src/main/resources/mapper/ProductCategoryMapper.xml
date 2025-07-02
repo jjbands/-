@@ -16,4 +16,8 @@
         )
         SELECT id FROM subcategories
     </select>
+
+    <select id="selectByParentId" resultType="com.machinery.mall.entity.ProductCategory">
+        SELECT * FROM product_category WHERE parent_id = #{parentId} AND status = 1 ORDER BY sort_order ASC
+    </select>
 </mapper>

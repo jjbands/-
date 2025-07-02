@@ -38,4 +38,14 @@ public class CategoryController {
     public List<Products> searchProductsByName(@RequestParam String name) {
         return productsService.getProductsByName(name);
     }
+
+    @GetMapping("/categories/parent/{parentId}")
+    public List<ProductCategory> getCategoriesByParentId(@PathVariable Integer parentId) {
+        return categoryService.getCategoriesByParentId(parentId);
+    }
+
+    @GetMapping("/categories/tree")
+    public List<ProductCategory> getCategoryTree() {
+        return categoryService.getCategoryTree();
+    }
 }
