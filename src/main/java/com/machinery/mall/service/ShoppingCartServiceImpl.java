@@ -2,11 +2,11 @@ package com.machinery.mall.service;
 
 import com.machinery.mall.entity.ShoppingCart;
 import com.machinery.mall.mapper.ShoppingCartMapper;
-import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author 你的名字
@@ -36,12 +36,13 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public int getCartCount(Integer userId) {
-        return shoppingCartMapper.selectCartCountByUserId(userId);
+    public Integer getCartCount(Integer userId) {
+        Integer count = shoppingCartMapper.selectCartCountByUserId(userId);
+        return count != null ? count : 0;
     }
 
     @Override
-    public List<ShoppingCart> getCartList(Integer userId) {
+    public List<Map<String, Object>> getCartList(Integer userId) {
         return shoppingCartMapper.selectCartListByUserId(userId);
     }
 

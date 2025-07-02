@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author 你的名字
@@ -16,7 +17,7 @@ public interface ShoppingCartMapper {
     int insert(ShoppingCart shoppingCart);
     ShoppingCart selectByUserIdAndProductId(@Param("userId") Integer userId, @Param("productId") Integer productId);
     int updateQuantity(@Param("id") Integer id, @Param("quantity") Integer quantity);
-    int selectCartCountByUserId(@Param("userId") Integer userId);
-    List<ShoppingCart> selectCartListByUserId(@Param("userId") Integer userId);
+    Integer selectCartCountByUserId(@Param("userId") Integer userId);
+    List<Map<String, Object>> selectCartListByUserId(@Param("userId") Integer userId);
     int deleteById(@Param("id") Integer id);
 }

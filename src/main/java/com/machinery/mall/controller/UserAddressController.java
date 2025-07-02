@@ -37,7 +37,7 @@ public class UserAddressController {
     @PostMapping("/add")
     public Map<String, Object> addAddress(@RequestBody Map<String, Object> request) {
         Map<String, Object> response = new HashMap<>();
-        
+
         try {
             String account = (String) request.get("account");
             if (account == null || account.isEmpty()) {
@@ -46,7 +46,6 @@ public class UserAddressController {
                 return response;
             }
 
-            // 根据账号获取用户ID
             User user = userService.getUserByAccount(account);
             if (user == null) {
                 response.put("status", 2);
@@ -58,20 +57,19 @@ public class UserAddressController {
             address.setUserId(user.getId());
             address.setName((String) request.get("receiverName"));
             address.setPhone((String) request.get("receiverPhone"));
-            address.setMobile((String) request.get("receiverPhone")); // 手机号同时设置到mobile字段
+            address.setMobile((String) request.get("receiverPhone"));
             address.setProvince((String) request.get("province"));
             address.setCity((String) request.get("city"));
             address.setDistrict((String) request.get("district"));
             address.setAddr((String) request.get("detailAddress"));
-            address.setZip((String) request.get("postCode"));
-            
-            // 处理是否默认地址
+            address.setZip((String) request.get("zipCode")); // 新增邮编字段
+
             if (request.get("isDefault") != null) {
                 address.setDfault(Integer.parseInt(request.get("isDefault").toString()));
             }
 
             boolean success = userAddressService.addAddress(address);
-            
+
             if (success) {
                 response.put("status", 0);
                 response.put("msg", "地址添加成功");
@@ -84,7 +82,7 @@ public class UserAddressController {
             response.put("status", 4);
             response.put("msg", "系统错误: " + e.getMessage());
         }
-        
+
         return response;
     }
 
@@ -189,7 +187,7 @@ public class UserAddressController {
             address.setCity((String) request.get("city"));
             address.setDistrict((String) request.get("district"));
             address.setAddr((String) request.get("detailAddress"));
-            address.setZip((String) request.get("postCode"));
+            address.setZip((String) request.get("zipCode"));
             
             // 处理是否默认地址
             if (request.get("isDefault") != null) {

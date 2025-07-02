@@ -8,11 +8,13 @@ package com.machinery.mall.service;
 import com.machinery.mall.entity.ShoppingCart;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ShoppingCartService {
     boolean addToCart(ShoppingCart shoppingCart);
-    int getCartCount(Integer userId);
-    List<ShoppingCart> getCartList(Integer userId);
+    Integer getCartCount(Integer userId);
+    List<Map<String, Object>> getCartList(Integer userId);
     boolean deleteCartItem(Integer id);
     boolean updateQuantity(Integer id, Integer quantity);
+
 }

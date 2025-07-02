@@ -389,7 +389,7 @@
                     }),
                     success: function(response) {
                         if(response && response.status === 0) {
-                            localStorage.setItem('userId', response.data.userId);
+                            localStorage.setItem('userId', response.data.id);
                             localStorage.setItem('account', response.data.account );
                             localStorage.setItem('username', response.data.username);
                             localStorage.setItem('token', response.data.token || 'generated-token');
@@ -398,7 +398,8 @@
                                 account: localStorage.getItem('account'),
                                 username: localStorage.getItem('username'),
                                 token: localStorage.getItem('token'),
-                                role:localStorage.getItem('role')
+                                role:localStorage.getItem('role'),
+                                userId: localStorage.getItem('userId')
                             });
                             const role = response.data.role; // 获取用户角色信息
                             if (role === 1) {
