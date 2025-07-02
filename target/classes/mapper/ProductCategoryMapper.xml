@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.machinery.mall.mapper.ProductCategoryMapper">
+    <select id="selectAll" resultType="com.machinery.mall.entity.ProductCategory">
+        SELECT * FROM product_category WHERE status = 1 ORDER BY sort_order ASC
+    </select>
+
+    <select id="selectAllSubCategoryIds" resultType="int">
+        WITH RECURSIVE subcategories AS (
+            SELECT id FROM product_category WHERE id = #{parentId} AND status = 1
+            UNION ALL
+            SELECT pc.id FROM product_category pc
+            INNER JOIN subcategories sc ON pc.parent_id = sc.id
+            WHERE pc.status = 1
+        )
+        SELECT id FROM subcategories
+    </select>
+
+    <select id="selectByParentId" resultType="com.machinery.mall.entity.ProductCategory">
+        SELECT * FROM product_category WHERE parent_id = #{parentId} AND status = 1 ORDER BY sort_order ASC
+    </select>
+
+    <insert id="insertCategory" parameterType="com.machinery.mall.entity.ProductCategory">
+        INSERT INTO product_category (parent_id, name, sort_order, status, level, created, updated)
+        VALUES (#{parentId}, #{name}, #{sortOrder}, #{status}, #{level}, NOW(), NOW())
+    </insert>
+
+    <update id="updateCategory" parameterType="com.machinery.mall.entity.ProductCategory">
+        UPDATE product_category
+        SET parent_id=#{parentId}, name=#{name}, sort_order=#{sortOrder}, status=#{status}, level=#{level}, updated=NOW()
+        WHERE id=#{id}
+    </update>
+
+    <delete id="deleteCategory" parameterType="int">
+        DELETE FROM product_category WHERE id=#{id}
+    </delete>
+</mapper>

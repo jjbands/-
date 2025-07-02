@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.machinery.mall.mapper.ProductsMapper">
+    <select id="selectByCategoryId" resultType="com.machinery.mall.entity.Products">
+        SELECT * FROM products
+        WHERE parts_id = #{categoryId}
+          AND status = 2
+        ORDER BY created DESC
+    </select>
+    <select id="selectByName" resultType="com.machinery.mall.entity.Products">
+        SELECT * FROM products
+        WHERE name LIKE CONCAT('%', #{name}, '%')
+        ORDER BY created DESC
+    </select>
+
+    <select id="selectById" resultType="com.machinery.mall.entity.Products">
+        SELECT * FROM products WHERE id = #{id}
+    </select>
+    <select id="getAllProducts" resultType="com.machinery.mall.entity.Products">
+        SELECT id, name, product_id as productId, parts_id as partsId,
+               icon_url as iconUrl, sub_images as subImages, detail,
+               spec_param as specParam, price, stock, status, is_hot as isHot,
+               created, updated
+        FROM products
+    </select>
+
+    <update id="updateProduct">
+        UPDATE products
+        SET name = #{name},
+            price = #{price},
+            status = #{status},
+            is_hot = #{isHot}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteProduct">
+        DELETE FROM products
+        WHERE id = #{id}
+    </delete>
+
+    <select id="searchProductsByName" resultType="com.machinery.mall.entity.Products">
+        SELECT id, name, product_id, parts_id, icon_url, sub_images, detail, spec_param, price, stock, status, is_hot, created, updated
+        FROM products
+        WHERE name LIKE CONCAT('%', #{name}, '%')
+    </select>
+
+    <select id="selectByCategoryIds" resultType="com.machinery.mall.entity.Products">
+        SELECT * FROM products
+        WHERE parts_id IN
+        <foreach collection="categoryIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND status = 2
+        ORDER BY created DESC
+    </select>
+
+    <update id="updateById" parameterType="com.machinery.mall.entity.Products">
+        UPDATE products
+        SET name = #{name},
+            product_id = #{productId},
+            parts_id = #{partsId},
+            icon_url = #{iconUrl},
+            sub_images = #{subImages},
+            detail = #{detail},
+            spec_param = #{specParam},
+            price = #{price},
+            stock = #{stock},
+            status = #{status},
+            is_hot = #{isHot},
+            updated = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <insert id="addProduct" parameterType="com.machinery.mall.entity.Products">
+        INSERT INTO products (name, price, stock, product_id, detail, parts_id)
+        VALUES (#{name}, #{price}, #{stock}, #{productId}, #{detail}, #{partsId})
+    </insert>
+</mapper>

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>机械配件商城 - 找回密码</title>
+    <style>
+        :root {
+            --primary-color: #ff6b00;
+            --primary-hover: #e05e00;
+            --secondary-color: #2c3e50;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #7f8c8d;
+            --white: #ffffff;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background-color: var(--light-gray);
+            color: var(--secondary-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 头部样式 */
+        .header {
+            text-align: center;
+            margin: 40px 0;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .header p {
+            color: var(--dark-gray);
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        /* 找回密码框样式 */
+        .forgot-box {
+            background: var(--white);
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .forgot-box:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary-color);
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 2px solid var(--medium-gray);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.2);
+        }
+
+        /* 步骤提示 */
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--medium-gray);
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        .step-number {
+            position: relative;
+            z-index: 2;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--medium-gray);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .step-number.active {
+            background-color: var(--primary-color);
+        }
+
+        /* 按钮样式 */
+        .reset-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            letter-spacing: 1px;
+        }
+
+        .reset-btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .reset-btn:active {
+            transform: translateY(0);
+        }
+
+        .back-login {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.95rem;
+        }
+
+        .back-login a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .back-login a:hover {
+            text-decoration: underline;
+            color: var(--primary-hover);
+        }
+
+        /* 特色服务 */
+        .features {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 60px 0;
+            gap: 20px;
+        }
+
+        .feature {
+            flex: 1;
+            min-width: 200px;
+            background: var(--white);
+            padding: 30px 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .feature h3 {
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .feature p {
+            color: var(--dark-gray);
+            font-size: 0.95rem;
+        }
+
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            margin-top: 80px;
+            padding: 25px 0;
+            font-size: 0.85rem;
+            color: var(--dark-gray);
+            border-top: 1px solid var(--medium-gray);
+        }
+
+        /* 动画效果 */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .forgot-box {
+                padding: 30px;
+            }
+
+            .features {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .feature {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>机械配件商城</h1>
+        <p>一个账号，玩转商城所有服务！</p>
+        <p>购机端，购买二手设备，购配件，购模型，服务保障</p>
+    </div>
+
+    <div class="forgot-box">
+        <!-- 步骤指示器 -->
+        <div class="step-indicator">
+            <div class="step-number active" data-step="1">1</div>
+            <div class="step-number" data-step="2">2</div>
+            <div class="step-number" data-step="3">3</div>
+        </div>
+
+        <!-- 第一步：输入账号 -->
+        <div class="step active" id="step1">
+            <h3 class="mb-3">找回密码</h3>
+            <p class="mb-4 text-gray-600">请输入您的用户名或已验证的手机号码</p>
+            <div class="form-group">
+                <label for="forgotAccount">用户名/已验证的手机号码</label>
+                <input type="text" id="forgotAccount" name="account" placeholder="请输入用户名或手机号">
+            </div>
+            <button class="reset-btn" id="nextStep1">下一步</button>
+            <div class="back-login">
+                <a href="login.html">返回登录</a>
+            </div>
+        </div>
+
+        <!-- 第二步：验证问题 -->
+        <div class="step" id="step2">
+            <h3 class="mb-3">安全验证</h3>
+            <p class="mb-4 text-gray-600">请回答您的安全问题以验证身份</p>
+            <div class="form-group">
+                <label>密码问题</label>
+                <p id="securityQuestion" class="p-3 bg-gray-50 rounded border border-gray-200"></p>
+            </div>
+            <div class="form-group">
+                <label for="securityAnswer">问题答案</label>
+                <input type="text" id="securityAnswer" name="asw" placeholder="请输入问题答案">
+            </div>
+            <button class="reset-btn" id="nextStep2">下一步</button>
+            <div class="back-login">
+                <a href="login.html">返回登录</a>
+            </div>
+        </div>
+
+        <!-- 第三步：重置密码 -->
+        <div class="step" id="step3">
+            <h3 class="mb-3">重置密码</h3>
+            <p class="mb-4 text-gray-600">请设置您的新密码</p>
+            <div class="form-group">
+                <label for="newPassword">新密码</label>
+                <input type="password" id="newPassword" name="newPassword" placeholder="请输入新密码">
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">确认密码</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="请再次输入新密码">
+            </div>
+            <button class="reset-btn" id="resetPassword">重置密码</button>
+            <div class="back-login">
+                <a href="login.html">返回登录</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="features">
+        <div class="feature">
+            <div class="feature-icon">✓</div>
+            <h3>真实资源</h3>
+            <p>一手资源 真实存在</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">★</div>
+            <h3>品质保障</h3>
+            <p>垂直专业 优质厂商</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">⚙️</div>
+            <h3>服务保障</h3>
+            <p>专业服务团队</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">$</div>
+            <h3>交易透明</h3>
+            <p>买卖双方签收价格</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Copyright © 2018 XXXXX数字科技有限公司 版权所有 保留一切权利 鲁ICP备XXXXXXXX号-X</p>
+    </div>
+</div>
+
+<script src="js/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        let currentStep = 1;
+        let account = '';
+        let securityQuestion = '';
+
+        // 更新步骤指示器
+        function updateStepIndicator(step) {
+            $('.step-number').removeClass('active');
+            $(`.step-number[data-step="${step}"]`).addClass('active');
+        }
+
+        // 第一步：获取账号
+        $('#nextStep1').click(function() {
+            account = $('#forgotAccount').val().trim();
+            if(!account) {
+                alert('请输入用户名或手机号');
+                return;
+            }
+
+            // 显示加载状态
+            const $btn = $(this);
+            const btnText = $btn.text();
+            $btn.prop('disabled', true).text('验证中...');
+
+            // 调用API获取安全问题
+            $.ajax({
+                url: 'http://localhost:8080/api/user/security_question',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    loginKey: account  // 使用loginKey参数，可以是用户名或手机号
+                }),
+                success: function(response) {
+                    console.log('安全问题API响应:', response);
+
+                    if (response && response.status === 0) {
+                        // 兼容两种可能的响应格式
+                        if (response.data && response.data.question) {
+                            securityQuestion = response.data.question;
+                        } else if (response.question) {
+                            securityQuestion = response.question;
+                        } else {
+                            alert('服务器返回格式错误：缺少安全问题');
+                            return;
+                        }
+
+                        // 更新UI
+                        $('#securityQuestion').text(securityQuestion);
+                        $('#step1').removeClass('active');
+                        $('#step2').addClass('active');
+                        currentStep = 2;
+                        updateStepIndicator(currentStep);
+                    } else {
+                        const errorMsg = response && response.msg ? response.msg : '获取安全问题失败';
+                        alert(errorMsg);
+                    }
+                },
+                error: function(xhr) {
+                    console.error('AJAX错误:', xhr);
+                    let errorMsg = '服务器错误';
+
+                    if (xhr.responseJSON && xhr.responseJSON.msg) {
+                        errorMsg = xhr.responseJSON.msg;
+                    } else if (xhr.status === 0) {
+                        errorMsg = '无法连接到服务器';
+                    } else if (xhr.status === 404) {
+                        errorMsg = 'API路径不存在';
+                    } else if (xhr.status === 500) {
+                        errorMsg = '服务器内部错误';
+                    }
+
+                    alert('获取安全问题失败: ' + errorMsg);
+                },
+                complete: function() {
+                    $btn.prop('disabled', false).text(btnText);
+                }
+            });
+        });
+
+        // 第二步：验证答案
+        $('#nextStep2').click(function() {
+            const answer = $('#securityAnswer').val().trim();
+            if(!answer) {
+                alert('请输入问题答案');
+                return;
+            }
+
+            // 调用API验证答案
+            $.ajax({
+                url: 'http://localhost:8080/api/user/verify_answer',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    loginKey: account,  // 修改为loginKey
+                    question: securityQuestion,
+                    answer: answer
+                }),
+                success: function(response) {
+                    if (response && response.status === 0) {
+                        $('#step2').removeClass('active');
+                        $('#step3').addClass('active');
+                        currentStep = 3;
+                        updateStepIndicator(currentStep);
+                    } else {
+                        const errorMsg = response && response.msg ? response.msg : '验证失败';
+                        alert(errorMsg);
+                    }
+                },
+                error: function(xhr) {
+                    console.error('AJAX错误:', xhr);
+                    let errorMsg = '服务器错误';
+
+                    if (xhr.responseJSON && xhr.responseJSON.msg) {
+                        errorMsg = xhr.responseJSON.msg;
+                    } else if (xhr.status === 0) {
+                        errorMsg = '无法连接到服务器';
+                    } else if (xhr.status === 404) {
+                        errorMsg = 'API路径不存在';
+                    } else if (xhr.status === 500) {
+                        errorMsg = '服务器内部错误';
+                    }
+
+                    alert('验证失败: ' + errorMsg);
+                }
+            });
+        });
+
+        // 第三步：重置密码
+        $('#resetPassword').click(function() {
+            const newPassword = $('#newPassword').val();
+            const confirmPassword = $('#confirmPassword').val();
+
+            if(!newPassword || !confirmPassword) {
+                alert('请输入新密码和确认密码');
+                return;
+            }
+
+            if(newPassword !== confirmPassword) {
+                alert('两次输入的密码不一致');
+                return;
+            }
+
+            // 验证密码强度（示例：至少8位，包含字母和数字）
+            const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+            if (!passwordRegex.test(newPassword)) {
+                alert('密码强度不足，至少8位并包含字母和数字');
+                return;
+            }
+
+            // 调用API重置密码
+            $.ajax({
+                url: 'http://localhost:8080/api/user/reset_password',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    loginKey: account,  // 修改为loginKey
+                    newPassword: newPassword
+                }),
+                success: function(response) {
+                    if (response && response.status === 0) {
+                        alert('密码重置成功，请使用新密码登录');
+                        window.location.href = 'login.html';
+                    } else {
+                        const errorMsg = response && response.msg ? response.msg : '重置密码失败';
+                        alert(errorMsg);
+                    }
+                },
+                error: function(xhr) {
+                    console.error('AJAX错误:', xhr);
+                    let errorMsg = '服务器错误';
+
+                    if (xhr.responseJSON && xhr.responseJSON.msg) {
+                        errorMsg = xhr.responseJSON.msg;
+                    } else if (xhr.status === 0) {
+                        errorMsg = '无法连接到服务器';
+                    } else if (xhr.status === 404) {
+                        errorMsg = 'API路径不存在';
+                    } else if (xhr.status === 500) {
+                        errorMsg = '服务器内部错误';
+                    }
+
+                    alert('重置密码失败: ' + errorMsg);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>商品分类管理</title>
+    <style>
+        body { font-family: 'Microsoft YaHei', Arial, sans-serif; background: #f5f7fa; margin: 0; }
+        .container { display: flex; max-width: 1100px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+        .tree-panel { width: 320px; border-right: 1px solid #eee; padding: 30px 20px 30px 30px; background: #fafbfc; }
+        .tree-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .tree-header h2 { font-size: 20px; color: #4361ee; margin: 0; }
+        .tree-header button { background: #4361ee; color: #fff; border: none; border-radius: 4px; padding: 6px 14px; cursor: pointer; font-size: 14px; }
+        .category-tree ul { list-style: none; padding-left: 18px; }
+        .category-tree li { margin: 4px 0; position: relative; }
+        .tree-node { display: flex; align-items: center; cursor: pointer; padding: 3px 0; border-radius: 3px; }
+        .tree-node.selected { background: #e9f0ff; color: #4361ee; }
+        .tree-node .expand-btn { width: 18px; text-align: center; cursor: pointer; color: #888; font-size: 14px; }
+        .tree-node .expand-btn.invisible { visibility: hidden; }
+        .tree-node .node-name { flex: 1; padding-left: 2px; }
+        .tree-node .add-btn { color: #4cc9f0; margin-left: 6px; font-size: 15px; cursor: pointer; }
+        .tree-node .del-btn { color: #f72585; margin-left: 6px; font-size: 15px; cursor: pointer; }
+        .detail-panel { flex: 1; padding: 40px 40px 40px 40px; }
+        .detail-title { font-size: 20px; color: #4361ee; margin-bottom: 18px; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 7px; color: #333; font-weight: 500; }
+        .form-group input, .form-group select { width: 100%; padding: 8px 10px; border: 1px solid #dbeafe; border-radius: 4px; font-size: 15px; }
+        .form-actions { margin-top: 25px; }
+        .form-actions button { padding: 8px 22px; border: none; border-radius: 4px; font-size: 15px; margin-right: 12px; cursor: pointer; }
+        .form-actions .save-btn { background: #4361ee; color: #fff; }
+        .form-actions .cancel-btn { background: #eee; color: #333; }
+        .form-actions .del-btn { background: #f72585; color: #fff; }
+        .empty-tip { color: #aaa; text-align: center; margin-top: 60px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="tree-panel">
+        <div class="tree-header">
+            <h2>商品分类</h2>
+            <button onclick="addCategory(null)">新增一级分类</button>
+        </div>
+        <div class="category-tree" id="categoryTree"></div>
+    </div>
+    <div class="detail-panel">
+        <div class="detail-title" id="detailTitle">请选择左侧分类或新增</div>
+        <form id="categoryForm" style="display:none;">
+            <input type="hidden" id="categoryId">
+            <input type="hidden" id="categoryParentId">
+            <div class="form-group">
+                <label>分类名称</label>
+                <input type="text" id="categoryName" required>
+            </div>
+            <div class="form-group">
+                <label>排序序号</label>
+                <input type="number" id="categoryOrder" min="0" value="0">
+            </div>
+            <div class="form-group">
+                <label>状态</label>
+                <select id="categoryStatus">
+                    <option value="1">启用</option>
+                    <option value="0">禁用</option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="save-btn" onclick="saveCategory()">保存</button>
+                <button type="button" class="cancel-btn" onclick="cancelEdit()">取消</button>
+                <button type="button" class="del-btn" id="deleteBtn" style="display:none;" onclick="deleteCategory()">删除</button>
+            </div>
+        </form>
+        <div class="empty-tip" id="emptyTip">暂无分类，请点击左侧新增</div>
+    </div>
+</div>
+<script src="js/jquery.min.js"></script>
+<script>
+let categoryList = [];
+let selectedNode = null;
+let expandedIds = new Set();
+
+function fetchCategoryTree() {
+    $.get('/api/categories/tree', function(data) {
+        categoryList = data;
+        renderCategoryTree();
+        if (selectedNode) {
+            selectNode(selectedNode.id);
+        }
+    });
+}
+function renderCategoryTree() {
+    const $tree = $('#categoryTree');
+    $tree.empty();
+    if (!categoryList || categoryList.length === 0) {
+        $tree.html('<div class="empty-tip">暂无分类</div>');
+        return;
+    }
+    $tree.append(buildTreeHtml(categoryList, 0));
+}
+function buildTreeHtml(tree, level) {
+    let html = '<ul style="margin-left:' + (level*18) + 'px">';
+    tree.forEach(cat => {
+        const hasChildren = cat.children && cat.children.length > 0;
+        const expanded = expandedIds.has(cat.id);
+        html += `<li>
+            <div class="tree-node${selectedNode&&selectedNode.id===cat.id?' selected':''}">
+                <span class="expand-btn${hasChildren?'':' invisible'}" onclick="toggleExpand(${cat.id}, event)">${hasChildren?(expanded?'▼':'▶'):''}</span>
+                <span class="node-name" onclick="selectNode(${cat.id})">${cat.name}</span>
+                <span class="add-btn" title="新增子分类" onclick="addCategory(${cat.id}, event)">＋</span>
+                <span class="del-btn" title="删除" onclick="deleteCategoryConfirm(${cat.id}, event)">🗑</span>
+            </div>`;
+        if (hasChildren && expanded) {
+            html += buildTreeHtml(cat.children, level+1);
+        }
+        html += '</li>';
+    });
+    html += '</ul>';
+    return html;
+}
+function toggleExpand(id, e) {
+    e.stopPropagation();
+    if (expandedIds.has(id)) expandedIds.delete(id); else expandedIds.add(id);
+    renderCategoryTree();
+}
+function findNodeById(tree, id) {
+    for (let node of tree) {
+        if (node.id === id) return node;
+        if (node.children && node.children.length > 0) {
+            const found = findNodeById(node.children, id);
+            if (found) return found;
+        }
+    }
+    return null;
+}
+function selectNode(id) {
+    selectedNode = findNodeById(categoryList, id);
+    if (!selectedNode) {
+        alert('未找到该分类节点');
+        return;
+    }
+    $('#categoryId').val(selectedNode.id);
+    $('#categoryParentId').val(selectedNode.parentId);
+    $('#categoryName').val(selectedNode.name);
+    $('#categoryOrder').val(selectedNode.sortOrder||0);
+    $('#categoryStatus').val(selectedNode.status);
+    $('#categoryForm').show();
+    $('#deleteBtn').show();
+    $('#emptyTip').hide();
+    $('#detailTitle').text('编辑分类');
+    renderCategoryTree();
+    autoExpandToNode(id);
+}
+function autoExpandToNode(id) {
+    let node = categoryList.find(cat => cat.id === id);
+    while (node && node.parentId && node.parentId !== 0) {
+        expandedIds.add(node.parentId);
+        node = categoryList.find(cat => cat.id === node.parentId);
+    }
+}
+function addCategory(parentId, e) {
+    if (e) e.stopPropagation();
+    selectedNode = null;
+    $('#categoryId').val('');
+    $('#categoryParentId').val(parentId||0);
+    $('#categoryName').val('');
+    $('#categoryOrder').val(0);
+    $('#categoryStatus').val(1);
+    $('#categoryForm').show();
+    $('#deleteBtn').hide();
+    $('#emptyTip').hide();
+    $('#detailTitle').text(parentId?'新增子分类':'新增一级分类');
+    if (parentId) expandedIds.add(parentId);
+    renderCategoryTree();
+}
+function saveCategory() {
+    const id = $('#categoryId').val();
+    const parentId = parseInt($('#categoryParentId').val())||0;
+    const name = $('#categoryName').val().trim();
+    const sortOrder = parseInt($('#categoryOrder').val())||0;
+    const status = parseInt($('#categoryStatus').val())||1;
+    if (!name) { alert('分类名称不能为空'); return; }
+    const data = { id, parentId, name, sortOrder, status };
+    const url = '/api/categories';
+    const method = id ? 'PUT' : 'POST';
+    $.ajax({ url, type: method, contentType:'application/json', data: JSON.stringify(data), success: function(res) {
+        if (res.status === 0 || res.code === 0) {
+            fetchCategoryTree();
+            $('#categoryForm').hide();
+            $('#emptyTip').show();
+            $('#detailTitle').text('请选择左侧分类或新增');
+        } else {
+            alert(res.msg||'保存失败');
+        }
+    }});
+}
+function deleteCategoryConfirm(id, e) {
+    e.stopPropagation();
+    if (!confirm('确定要删除该分类？（有子分类时请先删除子分类）')) return;
+    deleteCategory(id);
+}
+function deleteCategory(id) {
+    $.ajax({ url: '/api/categories/' + id, type: 'DELETE', success: function(res) {
+        if (res.status === 0 || res.code === 0) {
+            fetchCategoryTree();
+            $('#categoryForm').hide();
+            $('#emptyTip').show();
+            $('#detailTitle').text('请选择左侧分类或新增');
+        } else {
+            alert(res.msg||'删除失败');
+        }
+    }});
+}
+function cancelEdit() {
+    $('#categoryForm').hide();
+    $('#emptyTip').show();
+    $('#detailTitle').text('请选择左侧分类或新增');
+    selectedNode = null;
+    renderCategoryTree();
+}
+$(function(){
+    fetchCategoryTree();
+    // 阻止表单默认提交，回车或保存都调用saveCategory
+    $('#categoryForm').on('submit', function(e) {
+        e.preventDefault();
+        saveCategory();
+    });
+});
+</script>
+</body>
+</html> 

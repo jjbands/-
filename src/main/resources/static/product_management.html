@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>后台管理 - 商品管理</title>
+
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --border-color: #dee2e6;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--light-color);
+            font-weight: 500;
+            color: var(--dark-color);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        .btn i {
+            margin-right: 5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show {
+            display: block;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 25px;
+            border-radius: 8px;
+            width: 50%;
+            max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(-50px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: var(--dark-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-inactive {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .search-btn {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .search-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 4px;
+            color: white;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1100;
+        }
+
+        .toast-success {
+            background-color: var(--success-color);
+        }
+
+        .toast-error {
+            background-color: var(--danger-color);
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 90%;
+                margin: 10% auto;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1><i class="fas fa-boxes"></i> 商品管理</h1>
+        <h1>
+        <a href="management.html" style="text-decoration: none; color: inherit;">
+            <i class="fas fa-box-open"></i> 用户管理
+        </a>
+        </h1>
+        <div class="search-bar">
+            <input type="text" class="search-input" id="searchInput" placeholder="搜索商品...">
+            <button class="search-btn" onclick="searchProducts()"><i class="fas fa-search"></i> 搜索</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="table-container">
+            <table>
+                <thead>
+                <tr>
+                    <th>编号</th>
+                    <th>商品名称</th>
+                    <th>价格</th>
+                    <th>状态</th>
+                    <th>是否热销</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="productTable">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-box-open"></i> 修改商品信息</h2>
+            <span class="close" onclick="closeModal()">&times;</span>
+        </div>
+        <form id="editForm">
+            <input type="hidden" id="editId">
+            <div class="form-group">
+                <label for="editName"><i class="fas fa-boxes"></i> 商品名称</label>
+                <input type="text" id="editName" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="editPrice"><i class="fas fa-tag"></i> 价格</label>
+                <input type="number" id="editPrice" class="form-control" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="editStatus"><i class="fas fa-circle"></i> 状态</label>
+                <select id="editStatus" class="form-control" required>
+                    <option value="2">在售</option>
+                    <option value="1">下架</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="editIsHot"><i class="fas fa-fire"></i> 是否热销</label>
+                <select id="editIsHot" class="form-control" required>
+                    <option value="1">是</option>
+                    <option value="0">否</option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-primary" onclick="submitEdit()">
+                    <i class="fas fa-save"></i> 保存
+                </button>
+                <button type="button" class="btn" onclick="closeModal()" style="background-color: var(--light-color);">
+                    <i class="fas fa-times"></i> 取消
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 新增商品按钮 -->
+<button id="addProductBtn" class="btn btn-primary" style="margin-bottom:20px;">+ 新增商品</button>
+
+<!-- 新增商品弹窗（多级分类选择，仿写版） -->
+<div id="addProductModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>新增商品</h2>
+      <span class="close" id="closeAddModal">&times;</span>
+    </div>
+    <form id="addProductForm">
+      <div class="form-group">
+        <label>商品名称</label>
+        <input type="text" id="addProductName" required>
+      </div>
+      <div class="form-group">
+        <label>商品价格</label>
+        <input type="number" id="addProductPrice" required>
+      </div>
+      <div class="form-group">
+        <label>商品库存</label>
+        <input type="number" id="addProductStock" required>
+      </div>
+      <div class="form-group">
+        <label>商品分类</label>
+        <div class="category-selector"></div>
+        <input type="hidden" id="selectedCategoryId" name="categoryId">
+        <div class="form-group">
+            <label>已选分类：<span id="categoryPathV2" class="category-path">未选择</span></label>
+        </div>
+        <button type="button" class="btn btn-sm btn-link" onclick="window.open('product_category_management.html','_blank')">
+            管理分类
+        </button>
+      </div>
+      <div class="form-group">
+        <label>商品详情</label>
+        <textarea id="addProductDetail"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">保存</button>
+    </form>
+  </div>
+</div>
+
+<script src="js/jquery.min.js"></script>
+<script src="js/api.js"></script>
+<script src="js/script.js"></script>
+<script>
+    let currentEditId = null;
+
+    $(document).ready(function() {
+        loadProducts();
+    });
+
+    function loadProducts() {
+        $.ajax({
+            url: 'http://localhost:8080/api/products/all',
+            type: 'GET',
+            dataType: 'json',
+            beforeSend: function() {
+                $('#productTable').html('<tr><td colspan="6" style="text-align: center;"><i class="fas fa-spinner fa-spin"></i> 加载中...</td></tr>');
+            },
+            success: function(response) {
+                if (response.status === 0 && response.data && response.data.length > 0) {
+                    let html = '';
+                    $.each(response.data, function(i, product) {
+                        html += `<tr>
+                                <td>${product.id}</td>
+                                <td>${escapeHtml(product.name) || '-'}</td>
+                                <td>${product.price ? product.price.toFixed(2) : '0.00'}</td>
+                                <td>${product.status === 2 ? '<span class="status-badge status-active">在售</span>' :
+                            '<span class="status-badge status-inactive">下架</span>'}</td>
+                                <td>${product.isHot === 1 ? '<span class="status-badge status-active">是</span>' :
+                            '<span class="status-badge status-inactive">否</span>'}</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" onclick="openEditModal(${product.id}, '${escapeHtml(product.name)}', ${product.price}, ${product.status}, ${product.isHot})">
+                                        <i class="fas fa-edit"></i> 修改
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">
+                                        <i class="fas fa-trash"></i> 删除
+                                    </button>
+                                </td>
+                            </tr>`;
+                    });
+                    $('#productTable').html(html);
+                } else if (response.status === 0) {
+                    $('#productTable').html('<tr><td colspan="6" style="text-align: center;">暂无商品数据</td></tr>');
+                } else {
+                    console.error('获取商品数据失败:', response.msg);
+                    $('#productTable').html('<tr><td colspan="6" style="text-align: center; color: var(--danger-color);">加载商品数据失败: ' + escapeHtml(response.msg) + '</td></tr>');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('请求失败:', error);
+                $('#productTable').html('<tr><td colspan="6" style="text-align: center; color: var(--danger-color);">请求失败: ' + escapeHtml(error) + '</td></tr>');
+            }
+        });
+    }
+
+    function searchProducts() {
+        const keyword = $('#searchInput').val().trim();
+        if (keyword === '') {
+            loadProducts();
+            return;
+        }
+
+        $.ajax({
+            url: 'http://localhost:8080/api/products/search',
+            type: 'GET',
+            dataType: 'json',
+            data: { name: keyword },
+            beforeSend: function() {
+                $('#productTable').html('<tr><td colspan="6" style="text-align: center;"><i class="fas fa-spinner fa-spin"></i> 加载中...</td></tr>');
+            },
+            success: function(response) {
+                if (response.status === 0 && response.data && response.data.length > 0) {
+                    let html = '';
+                    $.each(response.data, function(i, product) {
+                        html += `<tr>
+                                <td>${product.id}</td>
+                                <td>${escapeHtml(product.name) || '-'}</td>
+                                <td>${product.price ? product.price.toFixed(2) : '0.00'}</td>
+                                <td>${product.status === 2 ? '<span class="status-badge status-active">在售</span>' :
+                            '<span class="status-badge status-inactive">下架</span>'}</td>
+                                <td>${product.isHot === 1 ? '<span class="status-badge status-active">是</span>' :
+                            '<span class="status-badge status-inactive">否</span>'}</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" onclick="openEditModal(${product.id}, '${escapeHtml(product.name)}', ${product.price}, ${product.status}, ${product.isHot})">
+                                        <i class="fas fa-edit"></i> 修改
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">
+                                        <i class="fas fa-trash"></i> 删除
+                                    </button>
+                                </td>
+                            </tr>`;
+                    });
+                    $('#productTable').html(html);
+                } else if (response.status === 0) {
+                    $('#productTable').html('<tr><td colspan="6" style="text-align: center;">暂无匹配的商品数据</td></tr>');
+                } else {
+                    console.error('搜索商品失败:', response.msg);
+                    $('#productTable').html('<tr><td colspan="6" style="text-align: center; color: var(--danger-color);">搜索商品失败: ' + escapeHtml(response.msg) + '</td></tr>');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('请求失败:', error);
+                $('#productTable').html('<tr><td colspan="6" style="text-align: center; color: var(--danger-color);">请求失败: ' + escapeHtml(error) + '</td></tr>');
+            }
+        });
+    }
+
+    function openEditModal(id, name, price, status, isHot) {
+        currentEditId = id;
+        $('#editId').val(id);
+        $('#editName').val(name || '');
+        $('#editPrice').val(price || '');
+        $('#editStatus').val(status || '2');
+        $('#editIsHot').val(isHot || '0');
+
+        $('#editModal').addClass('show').show();
+        $('body').css('overflow', 'hidden');
+    }
+
+    function closeModal() {
+        $('#editModal').removeClass('show');
+        setTimeout(() => {
+            $('#editModal').hide();
+            $('body').css('overflow', 'auto');
+        }, 300);
+    }
+
+    function submitEdit() {
+        const product = {
+            id: currentEditId,
+            name: $('#editName').val().trim(),
+            price: parseFloat($('#editPrice').val()),
+            status: parseInt($('#editStatus').val()),
+            isHot: parseInt($('#editIsHot').val())
+        };
+
+        // 验证输入
+        if (!product.name) {
+            showToast('error', '商品名称不能为空');
+            return;
+        }
+
+        if (isNaN(product.price)){
+            showToast('error', '请输入有效的价格');
+            return;
+        }
+
+        if (isNaN(product.status)) {
+            showToast('error', '请选择商品状态');
+            return;
+        }
+
+        if (isNaN(product.isHot)) {
+            showToast('error', '请选择是否热销');
+            return;
+        }
+
+        $.ajax({
+            url: 'http://localhost:8080/api/product',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(product),
+            beforeSend: function() {
+                $('.modal-content').append('<div class="loading-overlay"><i class="fas fa-spinner fa-spin"></i> 保存中...</div>');
+            },
+            success: function(response) {
+                if (response.status === 0) {
+                    showToast('success', '修改成功');
+                    closeModal();
+                    loadProducts();
+                } else {
+                    showToast('error', '修改失败: ' + response.msg);
+                }
+            },
+            error: function(xhr, status, error) {
+                showToast('error', '请求失败: ' + error);
+            },
+            complete: function() {
+                $('.loading-overlay').remove();
+            }
+        });
+    }
+
+    function deleteProduct(id) {
+        if (confirm('确定要删除此商品吗？此操作不可撤销！')) {
+            $.ajax({
+                url: 'http://localhost:8080/api/product/' + id,
+                type: 'DELETE',
+                beforeSend: function() {
+                    $('.container').append('<div class="loading-overlay"><i class="fas fa-spinner fa-spin"></i> 删除中...</div>');
+                },
+                success: function(response) {
+                    if (response.status === 0) {
+                        showToast('success', '删除成功');
+                        loadProducts();
+                    } else {
+                        showToast('error', '删除失败: ' + response.msg);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showToast('error', '请求失败: ' + error);
+                },
+                complete: function() {
+                    $('.loading-overlay').remove();
+                }
+            });
+        }
+    }
+
+    function escapeHtml(unsafe) {
+        if (!unsafe) return unsafe;
+        return unsafe.toString()
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function showToast(type, message) {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type === 'success' ? 'success' : 'error'}`;
+        toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }, 100);
+    }
+
+    // 递归加载分类下拉
+    function loadCategoryLevel(parentId, level) {
+        $.get('/api/categories/parent/' + parentId, function(res) {
+            // 移除当前level及之后的所有下拉框
+            $('.category-selector select').each(function(idx) {
+                if (idx + 1 >= level) $(this).remove();
+            });
+            if (res && res.length > 0) {
+                // 创建新下拉框
+                let $select = $('<select class="form-control"></select>');
+                $select.append('<option value="">请选择</option>');
+                res.forEach(cat => {
+                    $select.append(`<option value="${cat.id}">${cat.name}</option>`);
+                });
+                $select.on('change', function() {
+                    let selectedId = $(this).val();
+                    updateCategoryPathV2();
+                    if (selectedId) {
+                        $('#selectedCategoryId').val(selectedId);
+                        loadCategoryLevel(selectedId, level + 1);
+                    } else {
+                        $('#selectedCategoryId').val('');
+                    }
+                });
+                $('.category-selector').append($select);
+            }
+            updateCategoryPathV2();
+        });
+    }
+    // 递归显示已选路径
+    function updateCategoryPathV2() {
+        let path = [];
+        $('.category-selector select').each(function() {
+            let txt = $(this).find('option:selected').text();
+            if (txt && txt !== '请选择') path.push(txt);
+        });
+        $('#categoryPathV2').text(path.length ? path.join(' > ') : '未选择');
+    }
+    // 初始化递归分类选择
+    $(function() {
+        loadCategoryLevel(0, 1);
+    });
+
+    // 初始化多级分类选择器
+    $(document).ready(function() {
+        $('#addProductBtn').on('click', function() {
+            $('#addProductModal').addClass('show');
+            loadCategoryLevel(0, 1);
+        });
+        $('#closeAddModal').on('click', function() {
+            $('#addProductModal').removeClass('show');
+        });
+        $('#addProductForm').on('submit', function(e) {
+            e.preventDefault();
+            const product = {
+                name: $('#addProductName').val(),
+                price: $('#addProductPrice').val(),
+                stock: $('#addProductStock').val(),
+                productId: $('#selectedCategoryId').val(),
+                detail: $('#addProductDetail').val()
+            };
+            if (!product.name || !product.price || !product.stock || !product.productId) {
+                alert('请填写完整信息');
+                return;
+            }
+            ApiService.addProduct(product).then(res => {
+                if (res.status === 0) {
+                    alert('添加成功');
+                    $('#addProductModal').removeClass('show');
+                    loadProducts();
+                } else {
+                    alert(res.msg || '添加失败');
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
+</html>
