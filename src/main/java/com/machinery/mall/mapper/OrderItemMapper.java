@@ -10,5 +10,5 @@ import java.util.List;
 public interface OrderItemMapper {
     int insertOrderItem(OrderItem item);
     List<OrderItem> selectItemsByOrderId(@Param("orderId") Integer orderId);
-    // 可根据需要添加更多方法
+    int deleteByOrderId(@Param("orderId") Integer orderId);
 } 

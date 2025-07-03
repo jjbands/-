@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>我的订单 - 机械配件商城</title>
+    <style>
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .order-list {
+            margin-top: 20px;
+        }
+        .order-card {
+            border: 1px solid #eee;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .order-id {
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        .order-status {
+            color: #e4393c;
+            margin-right: 15px;
+        }
+        .order-time {
+            color: #666;
+        }
+        .order-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .item-image {
+            width: 60px;
+            height: 60px;
+            margin-right: 15px;
+            object-fit: cover;
+            border: 1px solid #eee;
+        }
+        .item-detail {
+            flex: 1;
+        }
+        .price {
+            color: #e4393c;
+            font-weight: bold;
+        }
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            align-items: center;
+        }
+        .delete-btn {
+            background-color: #ff4d4f;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .delete-btn:hover {
+            background-color: #ff7875;
+        }
+        .empty-orders {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>我的订单</h1>
+    <div class="order-list" id="orderList">
+        <div class="empty-orders">加载中...</div>
+    </div>
+</div>
+
+<script src="js/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // 获取当前登录用户ID
+        function getUserId() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                alert('请先登录');
+                window.location.href = 'login.html';
+                return null;
+            }
+            return userId;
+        }
+
+        // 获取订单状态文本
+        function getStatusText(status) {
+            const statusMap = {
+                1: '待付款',
+                2: '待发货',
+                3: '待收货',
+                4: '已完成',
+                5: '已取消',
+                6: '已退款'
+            };
+            return statusMap[status] || '未知状态';
+        }
+
+        // 格式化日期
+        function formatDate(timestamp) {
+            if (!timestamp) return '未知时间';
+            try {
+                const date = new Date(timestamp);
+                return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+            } catch (e) {
+                return '未知时间';
+            }
+        }
+
+        // 创建单个订单卡片
+        function createOrderCard(order) {
+            if (!order || !order.orderNo) {
+                console.error('无效的订单数据:', order);
+                return null;
+            }
+
+            // 生成商品项HTML
+            let itemsHtml = '';
+            if (order.items && order.items.length > 0) {
+                order.items.forEach(function(item) {
+                    if (!item) return;
+
+                    itemsHtml += `
+                        <div class="order-item">
+                            <img src="${item.iconUrl || 'default-product.png'}" class="item-image"
+                                 onerror="this.src='default-product.png'">
+                            <div class="item-detail">
+                                <h4>${item.goodsName || '未命名商品'}</h4>
+                                <p>单价: <span class="price">¥${(item.price || 0).toFixed(2)}</span></p>
+                                <p>数量: ${item.quantity || 1}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                itemsHtml = '<div class="order-item"><p>此订单无商品信息</p></div>';
+            }
+
+            // 返回完整的订单卡片HTML
+            return `
+                <div class="order-card" data-orderid="${order.id}">
+                    <div class="order-header">
+                        <span class="order-id">订单号: ${order.orderNo}</span>
+                        <span class="order-status">${getStatusText(order.status)}</span>
+                        <span class="order-time">下单时间: ${formatDate(order.createTime)}</span>
+                    </div>
+                    ${itemsHtml}
+                    <div class="order-footer">
+                        <span>实付款: <span class="price">¥${(order.amount || 0).toFixed(2)}</span></span>
+                        ${order.status === 1 || order.status === 5 ?
+                `<button class="delete-btn" data-orderid="${order.id}">删除订单</button>` :
+                ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 渲染订单列表
+        function renderOrderList(orders) {
+            const $orderList = $('#orderList');
+            $orderList.empty();
+
+            if (!orders || orders.length === 0) {
+                $orderList.html('<div class="empty-orders">您还没有任何订单</div>');
+                return;
+            }
+
+            orders.forEach(function(order) {
+                const orderCard = createOrderCard(order);
+                if (orderCard) {
+                    $orderList.append(orderCard);
+                }
+            });
+        }
+
+        // 删除订单
+        function deleteOrder(orderId, callback) {
+            if (!confirm('确定要删除此订单吗？')) return;
+
+            $.ajax({
+                url: 'http://localhost:8080/api/orders/' + orderId,
+                type: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                success: function(response) {
+                    if (response && response.status === "success") {
+                        callback(true);
+                    } else {
+                        alert(response?.message || '删除订单失败');
+                        callback(false);
+                    }
+                },
+                error: function(xhr) {
+                    alert('删除订单时出错: ' + (xhr.responseJSON?.message || '服务器错误'));
+                    callback(false);
+                }
+            });
+        }
+
+        // 初始化页面
+        const userId = getUserId();
+        if (userId) {
+            // 获取订单数据
+            $.ajax({
+                url: 'http://localhost:8080/api/orders/user/' + userId,
+                type: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                dataType: 'json',
+                success: function(response) {
+                    console.log('订单数据:', response);
+                    if (response && response.status === "success" && response.data) {
+                        renderOrderList(response.data);
+                    } else {
+                        $('#orderList').html('<div class="empty-orders">获取订单失败: ' +
+                            (response?.message || '服务器错误') + '</div>');
+                    }
+                },
+                error: function(xhr) {
+                    console.error('获取订单错误:', xhr);
+                    $('#orderList').html('<div class="empty-orders">获取订单时出错: ' +
+                        xhr.statusText + '</div>');
+                }
+            });
+        }
+
+        // 绑定删除按钮事件
+        $(document).on('click', '.delete-btn', function() {
+            const orderId = $(this).data('orderid');
+            const $card = $(this).closest('.order-card');
+
+            deleteOrder(orderId, function(success) {
+                if (success) {
+                    $card.fadeOut(300, function() {
+                        $(this).remove();
+                        if ($('#orderList').children().length === 0) {
+                            $('#orderList').html('<div class="empty-orders">您还没有任何订单</div>');
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

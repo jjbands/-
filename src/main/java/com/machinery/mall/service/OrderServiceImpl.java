@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -69,12 +70,49 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order getOrderById(Integer orderId) {
-        return orderMapper.selectOrderById(orderId);
+    public Order getOrderById(Integer id) {
+        Order order = orderMapper.selectOrderById(id);
+        if (order != null) {
+            List<OrderItem> items = orderItemMapper.selectItemsByOrderId(id);
+            order.setItems(items);
+        }
+        return order;
     }
-
     @Override
-    public Order getOrderByOrderNo(Long orderNo) {
-        return orderMapper.selectOrderByOrderNo(orderNo);
+    public List<Order> getOrdersByUserId(Integer userId) {
+        List<Order> orders = orderMapper.selectOrdersByUserId(userId);
+        if (orders != null) {
+            orders.forEach(order -> {
+                List<OrderItem> items = orderItemMapper.selectItemsByOrderId(order.getId());
+                order.setItems(items);
+            });
+        }
+        return orders;
+    }
+    @Override
+    @Transactional
+    public void deleteOrder(Integer orderId) {
+        // 1. 先查询订单是否存在
+        Order order = orderMapper.selectOrderById(orderId);
+        if (order == null) {
+            throw new RuntimeException("订单不存在");
+        }
+
+        // 2. 恢复库存（可选）
+        if (order.getItems() != null) {
+            for (OrderItem item : order.getItems()) {
+                Products product = productsMapper.selectById(item.getGoodsId());
+                if (product != null) {
+                    product.setStock(product.getStock() + item.getQuantity());
+                    productsMapper.updateById(product);
+                }
+            }
+        }
+
+        // 3. 删除订单项
+        orderItemMapper.deleteByOrderId(orderId);
+
+        // 4. 删除订单
+        orderMapper.deleteOrder(orderId);
     }
 }

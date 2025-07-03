@@ -76,7 +76,7 @@ $(document).ready(function() {
                 menuHtml += '<a href="user_management.html">用户管理</a>';
             } else {
                 menuHtml += '<a href="myaccount.html">我的账户</a>';
-                menuHtml += '<a href="myorders.html">我的订单</a>';
+                menuHtml += '<a href="order_list.html">我的订单</a>';
                 menuHtml += '<a href="myfavorites.html">我的关注</a>';
                 menuHtml += '<a href="address_management.html">地址管理</a>';
             }

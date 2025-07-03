@@ -12,5 +12,6 @@ public interface OrderMapper {
     Order selectOrderById(@Param("id") Integer id);
     List<Order> selectOrdersByUserId(@Param("uid") Integer uid);
     Order selectOrderByOrderNo(@Param("orderNo") Long orderNo);
+    int deleteOrder(@Param("id") Integer id);
     // 可根据需要添加更多方法
 } 
