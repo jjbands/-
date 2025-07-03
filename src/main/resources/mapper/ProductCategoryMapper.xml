@@ -16,4 +16,22 @@
         )
         SELECT id FROM subcategories
     </select>
+    <select id="selectByParentId" resultType="com.machinery.mall.entity.ProductCategory">
+        SELECT * FROM product_category WHERE parent_id = #{parentId} AND status = 1 ORDER BY sort_order ASC
+    </select>
+
+    <insert id="insertCategory" parameterType="com.machinery.mall.entity.ProductCategory">
+        INSERT INTO product_category (parent_id, name, sort_order, status, level, created, updated)
+        VALUES (#{parentId}, #{name}, #{sortOrder}, #{status}, #{level}, NOW(), NOW())
+    </insert>
+
+    <update id="updateCategory" parameterType="com.machinery.mall.entity.ProductCategory">
+        UPDATE product_category
+        SET parent_id=#{parentId}, name=#{name}, sort_order=#{sortOrder}, status=#{status}, level=#{level}, updated=NOW()
+        WHERE id=#{id}
+    </update>
+
+    <delete id="deleteCategory" parameterType="int">
+        DELETE FROM product_category WHERE id=#{id}
+    </delete>
 </mapper>

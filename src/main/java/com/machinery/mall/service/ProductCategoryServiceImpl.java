@@ -5,6 +5,7 @@ import com.machinery.mall.mapper.ProductCategoryMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,5 +23,42 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     @Override
     public List<ProductCategory> getAllCategories() {
         return categoryMapper.selectAll();
+    }
+    @Override
+    public List<ProductCategory> getCategoriesByParentId(Integer parentId) {
+        return categoryMapper.selectByParentId(parentId);
+    }
+    @Override
+    public List<ProductCategory> getCategoryTree() {
+        List<ProductCategory> all = categoryMapper.selectAll();
+        return buildTreeWithChildren(all, 0);
+    }
+    private List<ProductCategory> buildTreeWithChildren(List<ProductCategory> all, Integer parentId) {
+        List<ProductCategory> tree = new ArrayList<>();
+        for (ProductCategory cat : all) {
+            if (cat.getParentId() != null && cat.getParentId().equals(parentId)) {
+                List<ProductCategory> children = buildTreeWithChildren(all, cat.getId());
+                try {
+                    java.lang.reflect.Method setChildren = cat.getClass().getMethod("setChildren", List.class);
+                    setChildren.invoke(cat, children);
+                } catch (Exception e) {
+                    // 忽略异常
+                }
+                tree.add(cat);
+            }
+        }
+        return tree;
+    }
+     @Override
+    public int addCategory(ProductCategory category) {
+        return categoryMapper.insertCategory(category);
+    }
+     @Override
+    public int updateCategory(ProductCategory category) {
+        return categoryMapper.updateCategory(category);
+    }
+     @Override
+    public int deleteCategory(Integer id) {
+        return categoryMapper.deleteCategory(id);
     }
 }

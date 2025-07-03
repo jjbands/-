@@ -3,12 +3,6 @@ package com.machinery.mall.service;
 import com.machinery.mall.entity.Products;
 import com.machinery.mall.mapper.ProductCategoryMapper;
 import com.machinery.mall.mapper.ProductsMapper;
-import com.machinery.mall.mapper.UserMapper;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.machinery.mall.mapper.ProductCategoryMapper;
-
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -61,4 +55,9 @@ public class ProductsServiceImpl implements ProductsService {
     public List<Products> searchProductsByName(String name) {
         return productsMapper.searchProductsByName(name);
     }
+    @Override
+    public int addProduct(Products product) {
+        return productsMapper.addProduct(product);
     }
+    }
+

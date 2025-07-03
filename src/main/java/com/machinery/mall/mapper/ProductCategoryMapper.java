@@ -14,4 +14,8 @@ import java.util.List;
 public interface ProductCategoryMapper {
     List<ProductCategory> selectAll();
     List<Integer> selectAllSubCategoryIds(Integer parentId);
+    List<ProductCategory> selectByParentId(Integer parentId);
+    int insertCategory(ProductCategory category);
+    int updateCategory(ProductCategory category);
+    int deleteCategory(Integer id);
 }
