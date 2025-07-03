@@ -5,37 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a068307c-a387-4bcd-b74e-66c0e6621919" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/order.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/order_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/machinery/mall/controller/OrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/machinery/mall/controller/OrderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/machinery/mall/controller/PageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/machinery/mall/controller/PageController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/machinery/mall/entity/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/machinery/mall/entity/Order.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/machinery/mall/entity/UserAddress.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/machinery/mall/entity/UserAddress.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/machinery/mall/mapper/OrderItemMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/machinery/mall/mapper/OrderItemMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/machinery/mall/mapper/OrderMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/machinery/mall/mapper/OrderMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/machinery/mall/service/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/machinery/mall/service/OrderService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/machinery/mall/service/OrderServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/machinery/mall/service/OrderServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/mapper/OrderItemMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/mapper/OrderItemMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/mapper/OrderMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/mapper/OrderMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/script.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/myaccount.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/myaccount.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/product_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/product_detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/controller/OrderController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/controller/OrderController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/controller/PageController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/controller/PageController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/entity/Order.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/entity/Order.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/entity/UserAddress.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/entity/UserAddress.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/mapper/OrderItemMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/mapper/OrderItemMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/mapper/OrderMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/mapper/OrderMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/OrderService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/OrderService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/OrderServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/OrderServiceImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/mapper/OrderItemMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/mapper/OrderItemMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/mapper/OrderMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/mapper/OrderMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/js/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/js/script.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/myaccount.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/myaccount.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/static/product_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/product_detail.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -71,7 +42,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "Spring Boot.MachineryMallApplication.executor": "Run",
-    "git-widget-placeholder": "Merging main",
+    "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/25952/Desktop/Mechanical e-commerce platform/hulianwangkaifa",
     "node.js.detected.package.eslint": "true",
@@ -116,7 +87,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1751461428399</updated>
-      <workItem from="1751461429491" duration="14431000" />
+      <workItem from="1751461429491" duration="16869000" />
     </task>
     <servers />
   </component>
