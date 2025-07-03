@@ -56,4 +56,15 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public boolean updateQuantity(Integer id, Integer quantity) {
         return shoppingCartMapper.updateQuantity(id, quantity) > 0;
     }
+
+    @Override
+    public List<ShoppingCart> getCartItemsByIds(List<Integer> ids) {
+        if (ids == null || ids.isEmpty()) return java.util.Collections.emptyList();
+        return shoppingCartMapper.selectCartItemsByIds(ids);
+    }
+
+    @Override
+    public ShoppingCart getCartItemById(Integer id) {
+        return shoppingCartMapper.selectById(id);
+    }
 }

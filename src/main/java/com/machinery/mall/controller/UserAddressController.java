@@ -93,34 +93,44 @@ public class UserAddressController {
     @PostMapping("/list")
     public Map<String, Object> getAddressList(@RequestBody Map<String, String> request) {
         Map<String, Object> response = new HashMap<>();
-        
         try {
+            // 兼容 userId 和 account 字段
+            String userId = request.get("userId");
             String account = request.get("account");
-            if (account == null || account.isEmpty()) {
+            if ((userId == null || userId.isEmpty()) && (account == null || account.isEmpty())) {
                 response.put("status", 1);
-                response.put("msg", "账号参数缺失");
+                response.put("msg", "用户ID或账号参数缺失");
                 return response;
             }
-
-            // 根据账号获取用户ID
-            User user = userService.getUserByAccount(account);
-            if (user == null) {
-                response.put("status", 2);
-                response.put("msg", "用户不存在");
-                return response;
+            Integer realUserId = null;
+            if (userId != null && !userId.isEmpty()) {
+                try {
+                    realUserId = Integer.parseInt(userId);
+                } catch (NumberFormatException e) {
+                    response.put("status", 1);
+                    response.put("msg", "用户ID格式错误");
+                    return response;
+                }
+            } else if (account != null && !account.isEmpty()) {
+                // 根据账号查用户ID
+                User user = userService.getUserByAccount(account);
+                if (user == null) {
+                    response.put("status", 1);
+                    response.put("msg", "账号不存在");
+                    return response;
+                }
+                realUserId = user.getId();
             }
-
-            List<UserAddress> addresses = userAddressService.getAddressesByUserId(user.getId());
-            
+            // 用 realUserId 查询地址
+            List<UserAddress> addressList = userAddressService.getAddressesByUserId(realUserId);
             response.put("status", 0);
-            response.put("msg", "获取成功");
-            response.put("data", addresses);
+            response.put("data", addressList);
+            return response;
         } catch (Exception e) {
-            response.put("status", 3);
-            response.put("msg", "系统错误: " + e.getMessage());
+            response.put("status", 1);
+            response.put("msg", "获取地址列表异常: " + e.getMessage());
+            return response;
         }
-        
-        return response;
     }
 
     /**

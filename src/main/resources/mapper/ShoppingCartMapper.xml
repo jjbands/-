@@ -42,4 +42,18 @@
     <delete id="deleteById">
         DELETE FROM shopping_cart WHERE id = #{id}
     </delete>
+
+    <select id="selectCartItemsByIds" resultType="com.machinery.mall.entity.ShoppingCart">
+        SELECT id, user_id as userId, product_id as productId, quantity, created, updated
+        FROM shopping_cart WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectById" resultType="com.machinery.mall.entity.ShoppingCart">
+        SELECT id, user_id as userId, product_id as productId, quantity, created, updated
+        FROM shopping_cart
+        WHERE id = #{id}
+    </select>
 </mapper>

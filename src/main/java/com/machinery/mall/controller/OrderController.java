@@ -1,7 +1,6 @@
 package com.machinery.mall.controller;
 
 import com.machinery.mall.entity.Order;
-import com.machinery.mall.entity.OrderItem;
 import com.machinery.mall.entity.UserAddress;
 import com.machinery.mall.service.OrderService;
 import com.machinery.mall.service.UserAddressService;
@@ -183,6 +182,24 @@ public class OrderController {
             log.error("获取用户订单列表失败", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("status", "error", "message", "获取订单列表失败"));
+        }
+    }
+
+    @PostMapping("/checkout")
+    @ResponseBody
+    public Map<String, Object> checkout(@RequestBody Map<String, Object> params) {
+        try {
+            int userId = parseNumber(params.get("userId"), "用户ID").intValue();
+            Integer addressId = params.get("addressId") != null ?
+                    parseNumber(params.get("addressId"), "地址ID").intValue() : null;
+            List<Map<String, Object>> items = (List<Map<String, Object>>) params.get("items");
+            if (items == null || items.isEmpty()) {
+                throw new IllegalArgumentException("请选择要结算的商品");
+            }
+            Order order = orderService.createOrder(userId, addressId, items);
+            return Map.of("status", "success", "orderId", order.getId());
+        } catch (Exception e) {
+            return Map.of("status", "error", "msg", e.getMessage());
         }
     }
 

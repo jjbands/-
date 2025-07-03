@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -22,6 +23,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderItemMapper orderItemMapper;
     @Autowired
     private ProductsMapper productsMapper;
+    @Autowired
+    private ShoppingCartService shoppingCartService;
 
     public void setOrderMapper(OrderMapper orderMapper, OrderItemMapper orderItemMapper, ProductsMapper productsMapper) {
         this.orderMapper = orderMapper;
@@ -131,5 +134,65 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(status);
         order.setUpdated(new Date());
         orderMapper.updateOrderStatus(order);
+    }
+
+    @Override
+    @Transactional
+    public Order createOrder(Integer userId, Integer addressId, List<Map<String, Object>> items) {
+        Order order = new Order();
+        order.setUid(userId);
+        order.setAddrId(addressId);
+        // 生成唯一订单号
+        long orderNo = System.currentTimeMillis() + userId;
+        order.setOrderNo(orderNo);
+        order.setType(1); // 默认类型，1-普通订单/支付方式
+        order.setStatus(1); // 待付款
+        order.setCreated(new java.util.Date());
+        order.setUpdated(new java.util.Date());
+        order.setFreight(0); // 默认运费为0
+        // 计算订单总金额
+        java.math.BigDecimal totalAmount = java.math.BigDecimal.ZERO;
+        for (Map<String, Object> item : items) {
+            Integer cartId = Integer.parseInt(item.get("productId").toString()); // 实际为购物车id
+            Integer quantity = Integer.parseInt(item.get("quantity").toString());
+            com.machinery.mall.entity.ShoppingCart cart = shoppingCartService.getCartItemById(cartId);
+            if (cart == null) {
+                throw new RuntimeException("购物车项ID " + cartId + " 不存在");
+            }
+            Integer productId = cart.getProductId();
+            com.machinery.mall.entity.Products product = productsMapper.selectById(productId);
+            if (product == null) {
+                throw new RuntimeException("商品ID " + productId + " 不存在或已下架");
+            }
+            totalAmount = totalAmount.add(product.getPrice().multiply(java.math.BigDecimal.valueOf(quantity)));
+        }
+        order.setAmount(totalAmount);
+        orderMapper.insertOrder(order);
+        for (Map<String, Object> item : items) {
+            Integer cartId = Integer.parseInt(item.get("productId").toString()); // 实际为购物车id
+            Integer quantity = Integer.parseInt(item.get("quantity").toString());
+            com.machinery.mall.entity.ShoppingCart cart = shoppingCartService.getCartItemById(cartId);
+            if (cart == null) {
+                throw new RuntimeException("购物车项ID " + cartId + " 不存在");
+            }
+            Integer productId = cart.getProductId();
+            com.machinery.mall.entity.Products product = productsMapper.selectById(productId);
+            if (product == null) {
+                throw new RuntimeException("商品ID " + productId + " 不存在或已下架");
+            }
+            OrderItem orderItem = new OrderItem();
+            orderItem.setUid(userId);
+            orderItem.setOrderId(order.getId());
+            orderItem.setGoodsId(productId);
+            orderItem.setGoodsName(product.getName());
+            orderItem.setIconUrl(product.getIconUrl());
+            orderItem.setPrice(product.getPrice());
+            orderItem.setQuantity(quantity);
+            orderItem.setTotalPrice(product.getPrice().multiply(java.math.BigDecimal.valueOf(quantity)));
+            orderItem.setCreated(new java.util.Date());
+            orderItem.setUpdated(new java.util.Date());
+            orderItemMapper.insertOrderItem(orderItem);
+        }
+        return order;
     }
 }

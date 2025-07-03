@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>确认订单 - 机械配件商城</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: "Microsoft YaHei", Arial, sans-serif; background: #f5f5f5; }
+        .container { width: 800px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #eee; padding: 30px; }
+        .title { font-size: 22px; font-weight: bold; margin-bottom: 20px; }
+        .section { margin-bottom: 25px; }
+        .address-list { margin-bottom: 10px; }
+        .address-item { display: inline-block; border: 1px solid #eee; border-radius: 4px; padding: 4px 8px; margin-right: 8px; cursor: pointer; }
+        .address-item.selected { border-color: #e4393c; background: #fff7f5; }
+        .product-list table { width: 100%; border-collapse: collapse; }
+        .product-list th, .product-list td { border: 1px solid #eee; padding: 10px; text-align: center; }
+        .order-total { font-size: 20px; color: #e4393c; font-weight: bold; margin-top: 20px; }
+        .btn { padding: 10px 30px; border: none; border-radius: 4px; background: #e4393c; color: #fff; font-size: 16px; cursor: pointer; }
+        .btn:hover { background: #c91623; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="title">确认订单</div>
+    <div class="section">
+        <strong>收货地址：</strong>
+        <div id="address-list" class="address-list"></div>
+        <button class="btn" id="add-address-btn" style="background:#888;">管理地址</button>
+    </div>
+    <div class="section product-list">
+        <strong>商品清单：</strong>
+        <table>
+            <thead>
+                <tr>
+                    <th>商品图片</th>
+                    <th>商品名称</th>
+                    <th>单价</th>
+                    <th>数量</th>
+                    <th>小计</th>
+                </tr>
+            </thead>
+            <tbody id="product-table"></tbody>
+        </table>
+    </div>
+    <div class="order-total">
+        总金额：<span id="order-amount">¥0.00</span>
+    </div>
+    <div style="margin-top:30px;">
+        <button class="btn" id="submit-order-btn">提交订单</button>
+    </div>
+</div>
+<script src="js/jquery.min.js"></script>
+<script>
+let products = [];
+let selectedAddressId = null;
+
+$(function() {
+    // 1. 加载收货地址
+    loadAddresses();
+    // 2. 加载商品信息
+    loadProducts();
+
+    // 地址管理跳转
+    $('#add-address-btn').click(function() {
+        window.open('address_management.html', '_blank');
+    });
+
+    // 提交订单
+    $('#submit-order-btn').click(function() {
+        if (!selectedAddressId) {
+            alert('请选择收货地址');
+            return;
+        }
+        if (products.length === 0) {
+            alert('无商品可结算');
+            return;
+        }
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            alert('请先登录');
+            window.location.href = 'login.html';
+            return;
+        }
+        const items = products.map(p => ({ productId: p.id, quantity: p.quantity }));
+        $.ajax({
+            url: '/api/orders/checkout',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                userId: userId,
+                addressId: selectedAddressId,
+                items: items
+            }),
+            success: function(res) {
+                if (res.status === 'success') {
+                    alert('下单成功！');
+                    window.location.href = 'order.html?id=' + res.orderId;
+                } else {
+                    alert(res.msg || '下单失败');
+                }
+            },
+            error: function() {
+                alert('提交订单失败，请稍后重试');
+            }
+        });
+    });
+});
+
+function loadAddresses() {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+    $.ajax({
+        url: '/api/address/list',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ userId: userId }),
+        success: function(res) {
+            if (res.status === 0 && res.data && res.data.length > 0) {
+                renderAddressList(res.data);
+            } else {
+                $('#address-list').html('<span style="color:red;">暂无收货地址</span>');
+            }
+        },
+        error: function() {
+            $('#address-list').html('<span style="color:red;">加载地址失败</span>');
+        }
+    });
+}
+function renderAddressList(addresses) {
+    let html = '';
+    addresses.forEach(addr => {
+        html += `<span class="address-item${selectedAddressId === addr.id ? ' selected' : ''}" data-id="${addr.id}">
+            <b>${addr.name}</b> ${addr.mobile} <span>${addr.province}${addr.city}${addr.district || ''}${addr.addr || ''}</span>
+        </span>`;
+    });
+    $('#address-list').html(html);
+    // 默认选中第一个
+    if (!selectedAddressId && addresses.length > 0) {
+        selectedAddressId = addresses[0].id;
+        $('.address-item').first().addClass('selected');
+    }
+    // 绑定点击事件
+    $('.address-item').click(function() {
+        $('.address-item').removeClass('selected');
+        $(this).addClass('selected');
+        selectedAddressId = $(this).data('id');
+    });
+}
+function loadProducts() {
+    const checkoutItems = JSON.parse(localStorage.getItem('checkoutItems') || '[]');
+    if (!checkoutItems.length) {
+        $('#product-table').html('<tr><td colspan="5">无商品</td></tr>');
+        $('#order-amount').text('¥0.00');
+        return;
+    }
+    // 拉取商品详情
+    $.ajax({
+        url: '/api/cart/items',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ ids: checkoutItems }),
+        success: function(res) {
+            if (res.status === 0 && res.data && res.data.length > 0) {
+                products = res.data;
+                renderProductTable(products);
+            } else {
+                $('#product-table').html('<tr><td colspan="5">加载商品失败</td></tr>');
+            }
+        },
+        error: function() {
+            $('#product-table').html('<tr><td colspan="5">加载商品失败</td></tr>');
+        }
+    });
+}
+function renderProductTable(products) {
+    let html = '';
+    let total = 0;
+    products.forEach(p => {
+        const subtotal = p.price * p.quantity;
+        total += subtotal;
+        html += `<tr>
+            <td><img src="${p.iconUrl || 'image/OIP-C.webp'}" style="width:60px;height:60px;"></td>
+            <td>${p.name}</td>
+            <td>¥${p.price}</td>
+            <td>${p.quantity}</td>
+            <td>¥${subtotal}</td>
+        </tr>`;
+    });
+    $('#product-table').html(html);
+    $('#order-amount').text('¥' + total.toFixed(2));
+}
+</script>
+</body>
+</html> 

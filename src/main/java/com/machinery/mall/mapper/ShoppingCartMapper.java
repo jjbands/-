@@ -20,4 +20,6 @@ public interface ShoppingCartMapper {
     Integer selectCartCountByUserId(@Param("userId") Integer userId);
     List<Map<String, Object>> selectCartListByUserId(@Param("userId") Integer userId);
     int deleteById(@Param("id") Integer id);
+    List<ShoppingCart> selectCartItemsByIds(@Param("ids") List<Integer> ids);
+    ShoppingCart selectById(Integer id);
 }

@@ -26,4 +26,8 @@
     <!--mappers>
         <mapper resource="com/ssm/studentmvcrest/mapper/StudentMapper.xml"></mapper>
     </mappers-->
+
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
 </configuration>

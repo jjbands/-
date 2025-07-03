@@ -7,12 +7,15 @@ package com.machinery.mall.controller;
  */
 import com.machinery.mall.entity.ShoppingCart;
 import com.machinery.mall.service.ShoppingCartService;
+import com.machinery.mall.service.ProductsService;
+import com.machinery.mall.entity.Products;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/cart")
@@ -21,9 +24,11 @@ public class ShoppingCartController {
 
 
     private ShoppingCartService shoppingCartService;
+    private ProductsService productsService;
     @Autowired
-    public ShoppingCartController(ShoppingCartService shoppingCartService) {
+    public ShoppingCartController(ShoppingCartService shoppingCartService, ProductsService productsService) {
         this.shoppingCartService = shoppingCartService;
+        this.productsService = productsService;
     }
 
     @PostMapping
@@ -84,5 +89,34 @@ public class ShoppingCartController {
             response.put("msg", "数量更新失败");
         }
         return response;
+    }
+
+    @PostMapping("/items")
+    @ResponseBody
+    public Map<String, Object> getCartItems(@RequestBody Map<String, Object> params) {
+        List<Integer> ids = (List<Integer>) params.get("ids");
+        if (ids == null || ids.isEmpty()) {
+            return Map.of("status", 1, "msg", "无效的商品ID");
+        }
+        List<ShoppingCart> cartItems = shoppingCartService.getCartItemsByIds(ids);
+        List<Map<String, Object>> result = cartItems.stream().map(cart -> {
+            System.out.println("cart.getProductId() = " + cart.getProductId());
+            Products product = productsService.getProductById(cart.getProductId());
+            System.out.println("查到的 product = " + product);
+            Map<String, Object> item = new java.util.HashMap<>();
+            item.put("id", cart.getId());
+            if (product != null) {
+                item.put("name", product.getName());
+                item.put("iconUrl", product.getIconUrl());
+                item.put("price", product.getPrice());
+            } else {
+                item.put("name", "商品已下架");
+                item.put("iconUrl", "");
+                item.put("price", 0);
+            }
+            item.put("quantity", cart.getQuantity());
+            return item;
+        }).collect(java.util.stream.Collectors.toList());
+        return Map.of("status", 0, "data", result);
     }
 }

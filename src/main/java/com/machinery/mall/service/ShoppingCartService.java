@@ -18,5 +18,6 @@ public interface ShoppingCartService {
     List<Map<String, Object>> getCartList(Integer userId);
     boolean deleteCartItem(Integer id);
     boolean updateQuantity(Integer id, Integer quantity);
-
+    List<ShoppingCart> getCartItemsByIds(List<Integer> ids);
+    ShoppingCart getCartItemById(Integer id);
 }

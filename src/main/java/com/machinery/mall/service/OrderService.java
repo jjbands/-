@@ -3,6 +3,7 @@ package com.machinery.mall.service;
 import com.machinery.mall.entity.Order;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OrderService {
     /**
@@ -19,4 +20,6 @@ public interface OrderService {
     void deleteOrder(Integer orderId);
     // 可根据需要添加更多方法
     void updateOrderStatus(Integer orderId, Integer status);
+
+    Order createOrder(Integer userId, Integer addressId, List<Map<String, Object>> items);
 } 
