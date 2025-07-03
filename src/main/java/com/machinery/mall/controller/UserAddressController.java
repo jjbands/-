@@ -46,7 +46,6 @@ public class UserAddressController {
                 return response;
             }
 
-            // 根据账号获取用户ID
             User user = userService.getUserByAccount(account);
             if (user == null) {
                 response.put("status", 2);
@@ -64,7 +63,7 @@ public class UserAddressController {
             address.setDistrict((String) request.get("district"));
             address.setAddr((String) request.get("detailAddress"));
             address.setZip((String) request.get("postCode"));
-            
+
             // 处理是否默认地址
             if (request.get("isDefault") != null) {
                 address.setDfault(Integer.parseInt(request.get("isDefault").toString()));
@@ -190,7 +189,7 @@ public class UserAddressController {
             address.setDistrict((String) request.get("district"));
             address.setAddr((String) request.get("detailAddress"));
             address.setZip((String) request.get("postCode"));
-            
+
             // 处理是否默认地址
             if (request.get("isDefault") != null) {
                 address.setDfault(Integer.parseInt(request.get("isDefault").toString()));

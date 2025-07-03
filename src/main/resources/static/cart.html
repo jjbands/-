@@ -107,6 +107,32 @@
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-input:focus {
+            border-color: #0074d9;
+            outline: none;
+        }
+
+        .quantity-input.loading {
+            background-color: #f5f5f5;
+            color: transparent;
+            position: relative;
+        }
+
+        .quantity-input.loading::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            margin: -8px 0 0 -8px;
+            border: 2px solid #ddd;
+            border-top-color: #0074d9;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
 
         .cart-total {
@@ -122,22 +148,43 @@
             text-align: right;
         }
 
-        .btn-checkout {
-            padding: 12px 30px;
-            background: #e74c3c;
-            color: white;
+        .btn-checkout, .btn-delete-selected {
+            padding: 12px 20px;
+            margin-left: 10px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 14px;
             transition: all 0.3s ease;
+        }
+
+        .btn-checkout {
+            background: #e74c3c;
+            color: white;
+            font-weight: bold;
         }
 
         .btn-checkout:hover {
             background: #c0392b;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-checkout:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-delete-selected {
+            background: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-delete-selected:hover {
+            background: #e0e0e0;
         }
 
         .empty-cart {
@@ -245,6 +292,16 @@
             .quantity-input {
                 width: 50px;
             }
+
+            .cart-actions {
+                text-align: center;
+            }
+
+            .btn-checkout, .btn-delete-selected {
+                display: block;
+                width: 100%;
+                margin: 10px 0;
+            }
         }
     </style>
 </head>
@@ -275,9 +332,14 @@
     <div id="cartContent">
         <div class="loading">正在加载购物车...</div>
     </div>
+    <div class="cart-actions">
+        <input type="checkbox" id="selectAll"> 全选
+        <button class="btn-delete-selected" onclick="deleteSelectedItems()">删除选中商品</button>
+        <button class="btn-checkout" onclick="checkout()" disabled>去结算</button>
+    </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="js/jquery.min.js"></script>
 <script>
     $(function() {
         // 初始化检查登录状态
@@ -285,6 +347,13 @@
 
         // 加载购物车内容
         loadCart();
+
+        // 全选功能
+        $('#selectAll').on('change', function() {
+            const isChecked = $(this).prop('checked');
+            $('.cart-item-checkbox').prop('checked', isChecked);
+            calculateTotalPrice();
+        });
     });
 
     // 检查登录状态
@@ -327,7 +396,7 @@
         $('#cartContent').html('<div class="loading">正在加载购物车...</div>');
 
         $.ajax({
-            url: 'http://localhost:8080/api/cart/list',
+            url: `http://localhost:8080/api/cart/list?userId=${userId}`,
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + token
@@ -357,85 +426,99 @@
     function renderCart(cartItems) {
         if (!cartItems || cartItems.length === 0) {
             $('#cartContent').html('<div class="empty-cart">购物车是空的，快去选购商品吧！</div>');
+            $('.btn-checkout').prop('disabled', true);
+            $('.cart-actions').hide();
             return;
         }
 
+        $('.cart-actions').show();
+
         let html = `
-        <table class="cart-table">
-            <thead>
-                <tr>
-                    <th>商品信息</th>
-                    <th>单价</th>
-                    <th>数量</th>
-                    <th>小计</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-            <tbody>`;
+    <table class="cart-table">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAllHeader"></th>
+                <th>商品信息</th>
+                <th>单价</th>
+                <th>数量</th>
+                <th>小计</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>`;
 
         let total = 0;
         cartItems.forEach(item => {
-            // 确保所有ID和价格都是数字
-            const cartItemId = parseInt(item.id);
             const price = parseFloat(item.price) || 0;
             const quantity = parseInt(item.quantity) || 1;
             const subtotal = price * quantity;
             total += subtotal;
 
             html += `
-            <tr data-id="${cartItemId}">
-                <td>
-                    <div class="cart-product">
-                        <img src="${item.iconUrl || 'https://placehold.co/80x60?text=产品图片'}" alt="${item.productName}">
-                        <div>
-                            <div class="product-name">${item.productName}</div>
-                            <div class="product-spec" style="color:#666;font-size:12px;">${item.spec || '暂无规格信息'}</div>
-                        </div>
+        <tr data-id="${item.id}" data-price="${price}">
+            <td><input type="checkbox" class="cart-item-checkbox" data-id="${item.id}"></td>
+            <td>
+                <div class="cart-product">
+                    <img src="${item.iconUrl || 'https://placehold.co/80x60?text=暂无图片'}"
+                         alt="${item.productName}"
+                         onerror="this.src='https://placehold.co/80x60?text=图片加载失败'">
+                    <div>
+                        <div class="product-name">${item.productName || '商品名称未知'}</div>
+                        <div class="product-spec" style="color:#666;font-size:12px;">${item.spec || '暂无规格'}</div>
                     </div>
-                </td>
-                <td>¥${price.toFixed(2)}</td>
-                <td>
-                    <input type="number" class="quantity-input" value="${quantity}" min="1"
-                           onchange="updateCartItemQuantity(${cartItemId}, this.value)">
-                </td>
-                <td>¥${subtotal.toFixed(2)}</td>
-                <td>
-                    <button class="action-btn" onclick="removeCartItem(${cartItemId})">删除</button>
-                </td>
-            </tr>`;
+                </div>
+            </td>
+            <td>¥${price.toFixed(2)}</td>
+            <td>
+                <input type="number" class="quantity-input"
+                       data-cart-item-id="${item.id}"
+                       value="${quantity}" min="1"
+                       data-old-value="${quantity}"
+                       onchange="updateCartItemQuantity(${item.id}, this.value)">
+            </td>
+            <td class="subtotal">¥${subtotal.toFixed(2)}</td>
+            <td>
+                <button class="action-btn" onclick="removeCartItem(${item.id})">删除</button>
+            </td>
+        </tr>`;
         });
 
         html += `</tbody></table>
-            <div class="cart-total">
-                <strong>总计: ¥${total.toFixed(2)}</strong>
-            </div>
-            <div class="cart-actions">
-                <button class="btn-checkout" onclick="checkout()">去结算</button>
-            </div>`;
+    <div class="cart-total">
+        <strong>总计: ¥${total.toFixed(2)}</strong>
+    </div>`;
 
         $('#cartContent').html(html);
+        calculateTotalPrice();
     }
 
     // 更新购物车商品数量
-    function updateCartItemQuantity(id, quantity) {
-        id = parseInt(id);
-        quantity = parseInt(quantity);
-        const $input = $(event.target);
-
-        if (isNaN(id) || id <= 0) {
-            showToast('商品ID无效', 'error');
-            loadCart();
-            return;
-        }
-
-        if (isNaN(quantity) || quantity < 1) {
-            showToast('数量必须大于0', 'error');
-            $input.val($input.data('old-value') || 1);
-            return;
-        }
-
-        const token = localStorage.getItem('token');
+    function updateCartItemQuantity(cartItemId, newQuantity) {
         const userId = parseInt(localStorage.getItem('userId'));
+        const token = localStorage.getItem('token');
+        const $input = $(`input[data-cart-item-id="${cartItemId}"]`);
+        const oldValue = $input.data('old-value') || $input.val();
+
+        // 验证输入
+        newQuantity = parseInt(newQuantity);
+        cartItemId = parseInt(cartItemId);
+
+        if (isNaN(newQuantity) || isNaN(cartItemId)) {
+            showToast('输入数据无效', 'error');
+            $input.val(oldValue);
+            return;
+        }
+
+        if (newQuantity < 1) {
+            showToast('数量不能小于1', 'error');
+            $input.val(oldValue);
+            return;
+        }
+
+        // 如果数量没变化，不做请求
+        if (parseInt(oldValue) === newQuantity) {
+            return;
+        }
 
         if (isNaN(userId) || userId <= 0 || !token) {
             showToast('请先登录', 'error');
@@ -443,47 +526,90 @@
             return;
         }
 
-        $input.prop('disabled', true);
+        // 显示加载状态
+        $input.prop('disabled', true).addClass('loading');
 
+        // 修改为使用URL参数而不是请求体
         $.ajax({
-            url: 'http://localhost:8080/api/cart/quantity',
+            url: `http://localhost:8080/api/cart/quantity?id=${cartItemId}&quantity=${newQuantity}`,
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + token
             },
-            data: JSON.stringify({
-                userId: userId,
-                id: id,
-                quantity: quantity
-            }),
             success: function(response) {
                 if (response && response.status === 0) {
                     showToast('数量更新成功');
-                    loadCart();
+                    updateCartItemUI(cartItemId, newQuantity);
                     updateCartCount();
                 } else {
-                    throw new Error(response.msg || '更新数量失败');
+                    showToast(response.msg || '更新数量失败', 'error');
+                    $input.val(oldValue);
                 }
             },
             error: function(xhr) {
-                if (xhr.status === 401) {
+                console.error('错误详情:', xhr.responseJSON);
+                if (xhr.status === 400) {
+                    showToast('请求数据错误: ' + (xhr.responseJSON?.msg || '请检查输入'), 'error');
+                } else if (xhr.status === 401) {
                     logout();
                 } else {
                     showToast(xhr.responseJSON?.msg || '更新数量失败', 'error');
-                    loadCart(); // 恢复原始值
                 }
+                $input.val(oldValue);
             },
             complete: function() {
-                $input.prop('disabled', false);
+                $input.prop('disabled', false).removeClass('loading');
+                $input.data('old-value', newQuantity);
             }
         });
+    }
+
+    // 更新单个商品UI而不重新加载整个购物车
+    function updateCartItemUI(cartItemId, newQuantity) {
+        const $row = $(`tr[data-id="${cartItemId}"]`);
+        const price = parseFloat($row.data('price'));
+        const subtotal = price * newQuantity;
+
+        $row.find('.quantity-input').val(newQuantity).data('old-value', newQuantity);
+        $row.find('.subtotal').text('¥' + subtotal.toFixed(2));
+        calculateTotalPrice();
+    }
+
+    // 计算选中商品总价
+    function calculateTotalPrice() {
+        let selectedTotal = 0;
+        let allChecked = true;
+        let hasCheckedItem = false;
+
+        $('.cart-item-checkbox').each(function() {
+            const $checkbox = $(this);
+            const $row = $checkbox.closest('tr');
+            const isChecked = $checkbox.prop('checked');
+
+            if (!isChecked) {
+                allChecked = false;
+            } else {
+                hasCheckedItem = true;
+                const subtotalText = $row.find('.subtotal').text().replace('¥', '');
+                const subtotal = parseFloat(subtotalText);
+                selectedTotal += isNaN(subtotal) ? 0 : subtotal;
+            }
+        });
+
+        // 更新全选状态
+        $('#selectAll, #selectAllHeader').prop('checked', allChecked);
+
+        // 更新总价显示
+        $('.cart-total strong').html(`总计: ¥${selectedTotal.toFixed(2)}`);
+
+        // 更新结算按钮状态
+        $('.btn-checkout').prop('disabled', !hasCheckedItem);
     }
 
     // 删除购物车商品
     function removeCartItem(id) {
         id = parseInt(id);
-        if (isNaN(id) {
+        if (isNaN(id)) {
             showToast('商品ID无效', 'error');
             return;
         }
@@ -503,7 +629,7 @@
         $btn.html('<span class="spinner"></span>删除中...').prop('disabled', true);
 
         $.ajax({
-            url: `http://localhost:8080/api/cart/${id}`,
+            url: `http://localhost:8080/api/cart/${id}?userId=${userId}`,
             method: 'DELETE',
             headers: {
                 'Authorization': 'Bearer ' + token
@@ -531,16 +657,81 @@
         });
     }
 
+    // 删除选中商品
+    function deleteSelectedItems() {
+        const selectedIds = $('.cart-item-checkbox:checked').map(function() {
+            return $(this).closest('tr').data('id');
+        }).get();
+
+        if (selectedIds.length === 0) {
+            showToast('请选择要删除的商品', 'error');
+            return;
+        }
+
+        if (!confirm(`确定要删除选中的 ${selectedIds.length} 件商品吗？`)) return;
+
+        const token = localStorage.getItem('token');
+        const userId = parseInt(localStorage.getItem('userId'));
+        let successCount = 0;
+        let failCount = 0;
+
+        // 显示全局加载状态
+        const $btn = $('.btn-delete-selected');
+        $btn.html('<span class="spinner"></span>删除中...').prop('disabled', true);
+
+        // 使用Promise.all处理多个删除请求
+        Promise.all(selectedIds.map(id => {
+            return new Promise((resolve) => {
+                $.ajax({
+                    url: `http://localhost:8080/api/cart/${id}`,
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    data: { userId: userId },
+                    success: function(response) {
+                        if (response && response.status === 0) {
+                            successCount++;
+                        } else {
+                            failCount++;
+                        }
+                        resolve();
+                    },
+                    error: function() {
+                        failCount++;
+                        resolve();
+                    }
+                });
+            });
+        })).then(() => {
+            if (successCount > 0) {
+                showToast(`成功删除 ${successCount} 件商品`);
+                loadCart();
+                updateCartCount();
+            }
+            if (failCount > 0) {
+                showToast(`${failCount} 件商品删除失败`, 'error');
+            }
+            $btn.html('删除选中商品').prop('disabled', false);
+        });
+    }
+
     // 结算
     function checkout() {
         if (!checkLoginStatus()) return;
 
-        // 检查购物车是否有商品
-        if ($('#cartContent').find('table').length === 0) {
-            showToast('购物车是空的，无法结算', 'error');
+        // 检查是否有选中的商品
+        const selectedIds = $('.cart-item-checkbox:checked').map(function() {
+            return $(this).closest('tr').data('id');
+        }).get();
+
+        if (selectedIds.length === 0) {
+            showToast('请选择要结算的商品', 'error');
             return;
         }
 
+        // 存储选中的商品ID，供结算页面使用
+        localStorage.setItem('checkoutItems', JSON.stringify(selectedIds));
         window.location.href = 'checkout.html';
     }
 
@@ -552,19 +743,21 @@
         if (isNaN(userId) || userId <= 0 || !token) return;
 
         $.ajax({
-            url: 'http://localhost:8080/api/cart/count',
+            url: `http://localhost:8080/api/cart/count?userId=${userId}`,
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + token
             },
-            data: { userId: userId },
             success: function(response) {
+                console.log('购物车数量响应:', response); // 调试日志
                 if (response && response.status === 0) {
-                    $('#cartCount').text(response.data.count || 0);
+                    // 根据后端实际返回结构调整
+                    const count = response.count || response.data?.count || 0;
+                    $('#cartCount').text(count);
                 }
             },
             error: function(xhr) {
-                console.error('更新购物车数量错误:', xhr.responseText);
+                console.error('更新购物车数量错误:', xhr.status, xhr.responseText);
             }
         });
     }

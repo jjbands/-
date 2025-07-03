@@ -24,16 +24,13 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     public List<ProductCategory> getAllCategories() {
         return categoryMapper.selectAll();
     }
-
     public List<ProductCategory> getCategoriesByParentId(Integer parentId) {
         return categoryMapper.selectByParentId(parentId);
     }
-
     public List<ProductCategory> getCategoryTree() {
         List<ProductCategory> all = categoryMapper.selectAll();
         return buildTreeWithChildren(all, 0);
     }
-
     private List<ProductCategory> buildTreeWithChildren(List<ProductCategory> all, Integer parentId) {
         List<ProductCategory> tree = new ArrayList<>();
         for (ProductCategory cat : all) {
@@ -50,15 +47,15 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         }
         return tree;
     }
-
+     @Override
     public int addCategory(ProductCategory category) {
         return categoryMapper.insertCategory(category);
     }
-
+     @Override
     public int updateCategory(ProductCategory category) {
         return categoryMapper.updateCategory(category);
     }
-
+     @Override
     public int deleteCategory(Integer id) {
         return categoryMapper.deleteCategory(id);
     }

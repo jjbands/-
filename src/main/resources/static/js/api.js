@@ -248,7 +248,64 @@ class ProductDisplay {
 
     // 加入购物车
     addToCart(productId) {
-        alert(`产品 ${productId} 已加入购物车\n功能开发中...`);
+        const userId = parseInt(localStorage.getItem('userId'));
+        const token = localStorage.getItem('token');
+
+        if (isNaN(userId) || userId <= 0 || !token) {
+            alert('请先登录');
+            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+            return;
+        }
+
+        // 检查商品库存
+        $.ajax({
+            url: `http://localhost:8080/api/products/${productId}/stock`,
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            success: function(response) {
+                if (response.status === 0 && response.data.stock > 0) {
+                    const shoppingCart = {
+                        userId: userId,
+                        productId: productId,
+                        quantity: 1 // 默认添加数量为 1
+                    };
+
+                    $.ajax({
+                        url: 'http://localhost:8080/api/cart',
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        contentType: 'application/json',
+                        data: JSON.stringify(shoppingCart),
+                        success: function(response) {
+                            if (response.status === 0) {
+                                alert('商品已成功添加到购物车');
+                                // 更新购物车数量显示
+                                updateCartCount();
+                            } else {
+                                alert(response.msg || '添加到购物车失败');
+                            }
+                        },
+                        error: function(xhr) {
+                            if (xhr.status === 401) {
+                                alert('登录已过期，请重新登录');
+                                window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+                            } else {
+                                alert('添加到购物车失败: ' + (xhr.responseJSON?.msg || '未知错误'));
+                            }
+                        }
+                    });
+                } else {
+                    alert('该商品库存不足，无法添加到购物车');
+                }
+            },
+            error: function(xhr) {
+                alert('检查商品库存失败，请稍后重试');
+            }
+        });
     }
 
     // 显示加载状态

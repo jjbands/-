@@ -22,6 +22,11 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private ProductsMapper productsMapper;
 
+    public void setOrderMapper(OrderMapper orderMapper, OrderItemMapper orderItemMapper, ProductsMapper productsMapper) {
+        this.orderMapper = orderMapper;
+        this.orderItemMapper=orderItemMapper;
+        this.productsMapper=productsMapper;
+    }
     @Override
     @Transactional
     public Order quickOrder(Integer userId, Integer productId, Integer quantity, Integer paymentType, Integer addressId, String province, String city, String district) {
@@ -67,4 +72,9 @@ public class OrderServiceImpl implements OrderService {
     public Order getOrderById(Integer orderId) {
         return orderMapper.selectOrderById(orderId);
     }
-} 
+
+    @Override
+    public Order getOrderByOrderNo(Long orderNo) {
+        return orderMapper.selectOrderByOrderNo(orderNo);
+    }
+}

@@ -21,11 +21,22 @@
         SELECT SUM(quantity) FROM shopping_cart WHERE user_id = #{userId}
     </select>
 
-    <select id="selectCartListByUserId" resultType="com.machinery.mall.entity.ShoppingCart">
-        SELECT sc.*, p.name as product_name, p.icon_url, p.price
-        FROM shopping_cart sc
-                 JOIN products p ON sc.product_id = p.id
-        WHERE sc.user_id = #{userId}
+    <select id="selectCartListByUserId" resultType="map">
+        SELECT
+            sc.id,
+            sc.user_id as userId,
+            sc.product_id as productId,
+            sc.quantity,
+            p.name as productName,
+            p.price,
+            p.icon_url as iconUrl,
+            p.spec_param as spec
+        FROM
+            shopping_cart sc
+                JOIN
+            products p ON sc.product_id = p.id
+        WHERE
+            sc.user_id = #{userId}
     </select>
 
     <delete id="deleteById">

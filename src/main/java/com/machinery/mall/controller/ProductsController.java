@@ -104,4 +104,19 @@ public class ProductsController {
         }
         return response;
     }
+    @GetMapping("api/products/{productId}/stock")
+    public Map<String, Object> getProductStock(@PathVariable Integer productId) {
+        Map<String, Object> response = new HashMap<>();
+        Products product = productsService.getProductById(productId);
+        if (product != null) {
+            response.put("status", 0);
+            Map<String, Integer> stockData = new HashMap<>();
+            stockData.put("stock", product.getStock());
+            response.put("data", stockData);
+        } else {
+            response.put("status", 1);
+            response.put("msg", "商品不存在");
+        }
+        return response;
+    }
 }

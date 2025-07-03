@@ -761,6 +761,56 @@
             $(this).val(val);
             updateOrderTotal();
         });
+        // 立即购买
+        $('#buy-now').click(function() {
+            const userId = localStorage.getItem('userId');
+            const productId = getProductId();
+            const quantity = $('#quantity').val();
+            const payType = $('input[name="payType"]:checked').val();
+            const addressId = $('.address-item.selected').data('id');
+            console.log({ userId, productId, quantity, payType, addressId });
+            if (!userId) {
+                alert('请先登录');
+                window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+                return;
+            }
+            if (!addressId) {
+                alert('请选择收货地址');
+                return;
+            }
+            if (!quantity || quantity < 1) {
+                alert('请输入正确的购买数量');
+                return;
+            }
+            $.ajax({
+                url: '/api/orders/buyNow',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    userId: userId,
+                    productId: productId,
+                    quantity: quantity,
+                    payType: payType,
+                    addrId: addressId
+                }),
+                success: function(res) {
+                    if (res.status === 0) {
+                        window.location.href = 'order_confirm.html?orderNo=' + res.data;
+                    } else {
+                        alert(res.msg || '下单失败');
+                    }
+                },
+                error: function(xhr) {
+                    if (xhr.status === 401) {
+                        alert('请先登录');
+                        window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+                    } else {
+                        alert('创建订单失败: ' + (xhr.responseJSON?.message || '未知错误'));
+                    }
+                }
+            });
+        });
+
         // 关注商品
         $('#favorite-btn').click(function() {
             const productId = getProductId();

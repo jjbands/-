@@ -51,7 +51,7 @@ public class ShoppingCartController {
     @GetMapping("/list")
     public Map<String, Object> getCartList(@RequestParam Integer userId) {
         Map<String, Object> response = new HashMap<>();
-        List<ShoppingCart> cartList = shoppingCartService.getCartList(userId);
+        List<Map<String, Object>> cartList = shoppingCartService.getCartList(userId);
         response.put("status", 0);
         response.put("data", cartList);
         return response;

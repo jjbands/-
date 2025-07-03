@@ -10,5 +10,10 @@ public interface OrderService {
 
     Order getOrderById(Integer orderId);
 
+    /**
+     * 根据订单号查询订单
+     */
+    Order getOrderByOrderNo(Long orderNo);
+
     // 可根据需要添加更多方法
 } 

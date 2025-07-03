@@ -6,13 +6,17 @@ package com.machinery.mall.service;
  * @date: 2025/06/27  10:37
  */
 import com.machinery.mall.entity.ShoppingCart;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
+@Service
 public interface ShoppingCartService {
     boolean addToCart(ShoppingCart shoppingCart);
-    int getCartCount(Integer userId);
-    List<ShoppingCart> getCartList(Integer userId);
+    Integer getCartCount(Integer userId);
+    List<Map<String, Object>> getCartList(Integer userId);
     boolean deleteCartItem(Integer id);
     boolean updateQuantity(Integer id, Integer quantity);
+
 }

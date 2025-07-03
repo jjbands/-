@@ -13,4 +13,8 @@
     <select id="selectOrdersByUserId" parameterType="int" resultType="com.machinery.mall.entity.Order">
         SELECT * FROM orders WHERE uid = #{uid} ORDER BY created DESC
     </select>
-</mapper> 
+
+    <select id="selectOrderByOrderNo" resultType="com.machinery.mall.entity.Order">
+        SELECT * FROM orders WHERE order_no = #{orderNo}
+    </select>
+</mapper>

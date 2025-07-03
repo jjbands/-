@@ -6,10 +6,11 @@ import com.machinery.mall.entity.UserAddress;
 import com.machinery.mall.service.OrderService;
 import com.machinery.mall.mapper.OrderItemMapper;
 import com.machinery.mall.mapper.UserAddressMapper;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +71,48 @@ public class OrderController {
             result.put("msg", e.getMessage());
         }
         return result;
+    }
+
+    @GetMapping("/detail")
+    public Map<String, Object> getOrderDetail(@RequestParam("orderNo") Long orderNo) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            Order order = orderService.getOrderByOrderNo(orderNo);
+            if (order == null) {
+                result.put("status", 1);
+                result.put("msg", "订单不存在");
+                return result;
+            }
+            List<OrderItem> items = orderItemMapper.selectItemsByOrderId(order.getId());
+            UserAddress address = userAddressMapper.selectById(order.getAddrId());
+            Map<String, Object> data = new HashMap<>();
+            data.put("orderNo", order.getOrderNo());
+            data.put("created", order.getCreated());
+            data.put("status", order.getStatus());
+            data.put("statusText", getStatusText(order.getStatus()));
+            data.put("amount", order.getAmount());
+            data.put("address", address);
+            data.put("items", items);
+            result.put("status", 0);
+            result.put("msg", "查询成功");
+            result.put("data", data);
+        } catch (Exception e) {
+            result.put("status", 1);
+            result.put("msg", "查询失败: " + e.getMessage());
+        }
+        return result;
+    }
+
+    private String getStatusText(Integer status) {
+        switch (status) {
+            case 1: return "未付款";
+            case 2: return "已付款";
+            case 3: return "已发货";
+            case 4: return "交易成功";
+            case 5: return "交易关闭";
+            case 6: return "已取消";
+            default: return "未知";
+        }
     }
 
     // 可根据需要添加订单查询等接口

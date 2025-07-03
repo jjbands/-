@@ -11,5 +11,6 @@ public interface OrderMapper {
     int insertOrder(Order order);
     Order selectOrderById(@Param("id") Integer id);
     List<Order> selectOrdersByUserId(@Param("uid") Integer uid);
+    Order selectOrderByOrderNo(@Param("orderNo") Long orderNo);
     // 可根据需要添加更多方法
 } 

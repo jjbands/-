@@ -49,7 +49,6 @@
     </table>
     
     <table class="address-table" id="addressTable">
-
         <thead>
             <tr>
                 <th>收货人</th>
@@ -65,11 +64,11 @@
     <button class="add-btn" onclick="addRow()">新增</button>
 
 
-    <div id="amap-container" style="width:0;height:0;display:none"></div>
+<div id="amap-container" style="width:0;height:0;display:none"></div>
 
 
-    <script src="/js/jquery.min.js"></script>
-    <script>
+<script src="/js/jquery.min.js"></script>
+<script>
     let regionData = [];
     let addressList = [];
     let editingIndex = null;
@@ -90,7 +89,7 @@
         const account = localStorage.getItem('account');
 
 
-        
+
         if (!account) {
 
             alert('请先登录');
@@ -183,29 +182,24 @@
     }
 
     function editRow(idx) {
-
-
         editingIndex = idx;
         renderTable();
     }
 
     function deleteRow(idx) {
         if (!addressList[idx].id) {
-
             addressList.splice(idx, 1);
             editingIndex = null;
             renderTable();
             return;
         }
         if (confirm('确定删除？')) {
-
             $.ajax({
                 url: '/api/address/delete',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ id: addressList[idx].id }),
                 success: function(res) {
-
                     if (res.status === 0) {
                         addressList.splice(idx, 1);
                         editingIndex = null;
@@ -219,7 +213,6 @@
     }
 
     function saveRow(idx) {
-
         let addr = addressList[idx];
         addr.name = $(`#name_${idx}`).val();
         addr.mobile = $(`#mobile_${idx}`).val();
@@ -257,7 +250,7 @@
                 isDefault: addr.dfault
             };
         }
-        
+
 
         $.ajax({
             url: url,
