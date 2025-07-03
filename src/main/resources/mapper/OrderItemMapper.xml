@@ -6,7 +6,10 @@
         VALUES (#{uid}, #{orderId}, #{goodsId}, #{goodsName}, #{iconUrl}, #{price}, #{quantity}, #{totalPrice}, #{created}, #{updated})
     </insert>
 
-    <select id="selectItemsByOrderId" resultType="com.machinery.mall.entity.OrderItem">
+    <select id="selectItemsByOrderId" parameterType="int" resultType="com.machinery.mall.entity.OrderItem">
         SELECT * FROM order_items WHERE order_id = #{orderId}
     </select>
+    <delete id="deleteByOrderId">
+        DELETE FROM order_items WHERE order_id = #{orderId}
+    </delete>
 </mapper> 

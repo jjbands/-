@@ -466,23 +466,32 @@
         <span>&gt;</span>
         <span>商品详情</span>
     </div>
+
     <div class="product-container">
         <div class="product-header">
+            <h1 class="product-title" id="product-title">商品名称</h1>
             <button class="favorite-btn" id="favorite-btn">❤ 关注</button>
         </div>
+
         <div class="product-content">
             <div class="product-detail-panel" style="display:flex;">
                 <div class="product-main" style="width:400px;margin-right:30px;">
                     <div class="main-image" id="main-image">
-                        <img src="image/OIP-C.webp" alt="商品主图" id="main-image-img">
+                        <img src="https://via.placeholder.com/400x400?text=商品图片" alt="商品主图" id="main-image-img">
                     </div>
                 </div>
                 <div class="product-info" style="flex:1;">
-                    <h1 class="product-title" id="product-title">商品名称</h1>
-                    <div class="current-price" id="current-price" style="font-size:24px;color:#e4393c;font-weight:bold;">现价：¥0.00</div>
+                    <div class="current-price" id="current-price" style="font-size:24px;color:#e4393c;font-weight:bold;">现价：¥3500.00</div>
                     <div class="delivery-row">
                         <div class="delivery-label">发货地：</div>
-                        <div class="delivery-content" id="delivery-from">-</div>
+                        <div class="delivery-content" id="delivery-from">北京市</div>
+                    </div>
+                    <div class="delivery-row">
+                        <div class="delivery-label">配送方式：</div>
+                        <div class="delivery-content">
+                            <label><input type="radio" name="delivery-method" value="1" checked> 到付</label>
+                            <label><input type="radio" name="delivery-method" value="2"> 在线支付</label>
+                        </div>
                     </div>
                     <div class="delivery-row">
                         <div class="delivery-label">配送至：</div>
@@ -494,24 +503,23 @@
                         <div class="delivery-label">数量：</div>
                         <div class="delivery-content">
                             <input type="number" id="quantity" value="1" min="1" style="width:60px;">&nbsp;
-                            <span id="stock-info">库存：<span id="stock-num">0</span> 件</span>
+                            <span id="stock-info">库存：<span id="stock-num">100</span> 件</span>
                         </div>
                     </div>
                     <div class="delivery-row">
                         <div class="delivery-label">支付方式：</div>
                         <div class="delivery-content">
-                            <label><input type="radio" name="payType" value="1" checked> 在线支付</label>
-                            <label><input type="radio" name="payType" value="2"> 到付</label>
+                            <label><input type="radio" name="payment-method" value="1" checked> 全额支付</label>
                         </div>
                     </div>
                     <div class="delivery-row">
                         <div class="delivery-label">订单总价：</div>
                         <div class="delivery-content">
-                            <span id="order-total" style="color:#e4393c;font-weight:bold;font-size:20px;">¥0.00</span>
+                            <span id="order-total" style="color:#e4393c;font-weight:bold;font-size:20px;">¥3500.00</span>
                         </div>
                     </div>
                     <div class="action-buttons" style="margin-top:20px;">
-                        <button class="btn btn-primary" id="buy-now">立即购买</button>
+                        <button class="btn btn-primary" id="buy-now">立刻购买</button>
                         <button class="btn btn-secondary" id="add-to-cart">加入购物车</button>
                     </div>
                 </div>
@@ -519,10 +527,14 @@
         </div>
     </div>
 
-    
+    <div class="product-container recommendations">
+        <h3 class="section-title">推荐套装</h3>
+        <div class="recommend-list" id="recommend-list">
+            <!-- 推荐商品将通过JS动态生成 -->
+        </div>
+    </div>
+
 </div>
-
-
 
 <script src="js/jquery.min.js"></script>
 <script>
@@ -531,8 +543,10 @@
         function checkLoginStatus() {
             const account = localStorage.getItem('account');
             const username = localStorage.getItem('username');
+            const userId = parseInt(localStorage.getItem('userId'));
+            const token = localStorage.getItem('token');
 
-            if (account && username) {
+            if (account && username && !isNaN(userId) && userId > 0 && token) {
                 // 用户已登录，显示用户信息
                 $('#loginText').hide();
                 $('#userDropdown').show();
@@ -541,10 +555,12 @@
                 // 设置用户头像首字母
                 const firstLetter = username.charAt(0).toUpperCase();
                 $('#userAvatar').text(firstLetter);
+                return true;
             } else {
                 // 用户未登录，显示登录/注册
                 $('#loginText').show();
                 $('#userDropdown').hide();
+                return false;
             }
         }
 
@@ -581,23 +597,67 @@
         // 加载商品数据
         function loadProductData(productId) {
             $.ajax({
-                url: `/api/products/${productId}`,
+                url: `http://localhost:8080/api/products/${productId}`,
                 type: 'GET',
                 dataType: 'json',
                 success: function(product) {
+                    // 更新页面数据
                     $('#product-title').text(product.name);
                     $('#current-price').text(`现价：¥${product.price.toFixed(2)}`);
-                    $('#main-image-img').attr('src', product.iconUrl || 'https://via.placeholder.com/400x400?text=商品图片');
-                    $('#stock-num').text(product.stock);
-                    $('#order-total').text('¥' + (product.price * 1).toFixed(2));
+
+                    // 更新面包屑导航
+                    updateBreadcrumb(product.categoryPath);
+
+                    // 更新图片
+                    updateProductImages(product.iconUrl, product.subImages);
+
+                    // 更新发货地
                     if (product.deliveryFrom) {
                         $('#delivery-from').text(product.deliveryFrom);
                     }
                 },
                 error: function(xhr, status, error) {
-                    alert('加载商品数据失败');
+                    console.error('加载商品数据失败:', error);
                 }
             });
+        }
+
+        // 更新面包屑导航
+        function updateBreadcrumb(categoryPath) {
+            if (!categoryPath || categoryPath.length === 0) return;
+
+            let breadcrumbHtml = '<a href="index.html">首页</a>';
+
+            categoryPath.forEach(category => {
+                breadcrumbHtml += `<span>&gt;</span><a href="category.html?id=${category.id}">${category.name}</a>`;
+            });
+
+            $('#breadcrumb').html(breadcrumbHtml);
+        }
+
+        // 更新商品图片
+        function updateProductImages(mainImage, subImages) {
+            if (mainImage) {
+                $('#main-image img').attr('src', mainImage).attr('alt', $('#product-title').text());
+            }
+
+            if (subImages && subImages.length > 0) {
+                let thumbnailsHtml = '';
+                subImages.forEach((image, index) => {
+                    thumbnailsHtml += `
+                            <div class="thumbnail" data-image="${image}">
+                                <img src="${image}" alt="商品图片${index + 1}">
+                            </div>
+                        `;
+                });
+                $('#thumbnails').html(thumbnailsHtml);
+
+                // 添加缩略图点击事件
+                $('.thumbnail').click(function() {
+                    const imageUrl = $(this).data('image');
+                    $('#main-image img').attr('src', imageUrl);
+                });
+            }
         }
 
         // 加载地区数据
@@ -699,20 +759,18 @@
             });
         });
 
-        // 加载用户地址
+        // 页面加载时获取并渲染用户地址（与UserAddressController对接）
+        loadUserAddresses();
+
         function loadUserAddresses() {
             const account = localStorage.getItem('account');
-            if (!account) {
-                $('#address-list').html('<span style="color:red;">请先登录</span>');
-                return;
-            }
+            if (!account) return;
             $.ajax({
-                url: '/api/address/list',
+                url: 'http://localhost:8080/api/address/list',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ account: account }),
                 success: function(res) {
-                    console.log('前端收到地址数据', res);
                     if(res.status === 0 && res.data && res.data.length > 0) {
                         renderAddressList(res.data);
                     } else {
@@ -720,12 +778,12 @@
                     }
                 },
                 error: function() {
-                    $('#address-list').html('<span style=\"color:red;\">加载地址失败</span>');
+                    $('#address-list').html('<span style="color:red;">加载地址失败</span>');
                 }
             });
         }
         // 渲染地址列表，自动选中默认地址
-        function renderAddressList(addresses) {
+        window.renderAddressList = function(addresses) {
             let html = '';
             let defaultSelected = false;
             addresses.forEach(addr => {
@@ -746,68 +804,78 @@
             $(dom).addClass('selected');
         }
 
-        // 动态更新总价
-        function updateOrderTotal() {
-            const price = parseFloat($('#current-price').text().replace(/[^0-9.]/g, ''));
-            const quantity = parseInt($('#quantity').val());
-            $('#order-total').text('¥' + (price * quantity).toFixed(2));
-        }
-        // 限制数量输入
-        $('#quantity').on('input', function() {
-            const max = parseInt($('#stock-num').text());
-            let val = parseInt($(this).val());
-            if (val < 1) val = 1;
-            if (val > max) val = max;
-            $(this).val(val);
-            updateOrderTotal();
-        });
-        // 立即购买
+        // 立即购买按钮点击事件
         $('#buy-now').click(function() {
-            const userId = localStorage.getItem('userId');
-            const productId = getProductId();
-            const quantity = $('#quantity').val();
-            const payType = $('input[name="payType"]:checked').val();
-            const addressId = $('.address-item.selected').data('id');
-            console.log({ userId, productId, quantity, payType, addressId });
+            const userId = parseInt(localStorage.getItem('userId'));
             if (!userId) {
                 alert('请先登录');
-                window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+                window.location.href = '/login.html';
                 return;
             }
-            if (!addressId) {
+
+            const productId = getProductId();
+            const quantity = parseInt($('#quantity').val());
+            const paymentMethod = $('input[name="payment-method"]:checked').val();
+            const selectedAddress = $('.address-item.selected');
+
+            // 验证地址
+            if (!selectedAddress.length) {
                 alert('请选择收货地址');
                 return;
             }
-            if (!quantity || quantity < 1) {
-                alert('请输入正确的购买数量');
+            const addressId = selectedAddress.data('id');
+
+            // 验证数量
+            const stock = parseInt($('#stock-num').text());
+            if (isNaN(quantity) || quantity < 1 || quantity > stock) {
+                alert('请输入有效的购买数量');
                 return;
             }
+
+            // 获取商品价格
+            const priceText = $('#current-price').text();
+            const price = parseFloat(priceText.replace(/[^\d.]/g, ''));
+            if (isNaN(price)) {
+                alert('商品价格信息错误');
+                return;
+            }
+
+            // 修改订单数据准备
+            const orderData = {
+                userId: Number(localStorage.getItem('userId')),
+                productId: Number(getProductId()),
+                quantity: Number($('#quantity').val()),
+                paymentMethod: Number($('input[name="payment-method"]:checked').val()),
+                addressId: $('.address-item.selected').length ?
+                    Number($('.address-item.selected').data('id')) : null,
+                amount: parseFloat($('#current-price').text().replace(/[^\d.]/g, '')) * Number($('#quantity').val())
+            };
+
+            // 发送请求
             $.ajax({
-                url: '/api/orders/buyNow',
+                url: 'http://localhost:8080/api/orders/quick',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({
-                    userId: userId,
-                    productId: productId,
-                    quantity: quantity,
-                    payType: payType,
-                    addrId: addressId
-                }),
-                success: function(res) {
-                    if (res.status === 0) {
-                        window.location.href = 'order_confirm.html?orderNo=' + res.data;
+                data: JSON.stringify(orderData),
+                success: function(response) {
+                    if (response && response.status === "success" && response.orderId) {
+                        // 跳转到订单详情页
+                        window.location.href = `/order.html?id=${response.orderId}`;
                     } else {
-                        alert(res.msg || '下单失败');
+                        alert('下单成功，但未返回订单号');
                     }
                 },
                 error: function(xhr) {
                     if (xhr.status === 401) {
                         alert('请先登录');
                         window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        alert('创建订单失败: ' + xhr.responseJSON.message);
                     } else {
-                        alert('创建订单失败: ' + (xhr.responseJSON?.message || '未知错误'));
+                        alert('创建订单失败，请稍后重试');
                     }
-                }
+                },
+                data: JSON.stringify(orderData)
             });
         });
 
@@ -841,13 +909,25 @@
             });
         });
 
+        // 动态更新总价
+        function updateOrderTotal() {
+            const price = parseFloat($('#current-price').text().replace(/[^\d.]/g, ''));
+            const quantity = parseInt($('#quantity').val());
+            $('#order-total').text('¥' + (price * quantity).toFixed(2));
+        }
+        // 限制数量输入
+        $('#quantity').on('input', function() {
+            const max = parseInt($('#stock-num').text());
+            let val = parseInt($(this).val());
+            if (val < 1) val = 1;
+            if (val > max) val = max;
+            $(this).val(val);
+            updateOrderTotal();
+        });
         // 页面加载时初始化库存和总价
         $(function() {
             updateOrderTotal();
         });
-
-        // 页面加载时自动加载用户地址
-        loadUserAddresses();
 
         // 初始化页面
         const productId = getProductId();

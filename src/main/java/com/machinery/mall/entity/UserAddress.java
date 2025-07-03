@@ -2,12 +2,7 @@ package com.machinery.mall.entity;
 
 import java.util.Date;
 
-/**
- * 用户收货地址实体类
- * @author 你的名字
- * @version 1.0.0
- * @date: 2025/01/27
- */
+
 public class UserAddress {
     private Integer id;
     private Integer userId;
@@ -29,8 +24,8 @@ public class UserAddress {
 
     public UserAddress(Integer id, Integer userId, String name, String phone, String mobile,
 
-                      String province, String city, String district, String addr, String zip,
-                      Integer dfault, Integer isDel, Date created, Date updated) {
+                       String province, String city, String district, String addr, String zip,
+                       Integer dfault, Integer isDel, Date created, Date updated) {
 
         this.id = id;
         this.userId = userId;

@@ -1,7 +1,7 @@
 package com.machinery.mall.entity;
-
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class Order {
     private Integer id;
@@ -18,11 +18,36 @@ public class Order {
     private Date closeTime;
     private Date created;
     private Date updated;
+    private List<OrderItem> items;
+    // 添加一个临时字段用于前端显示
+    private String address;
+
+    // getter 和 setter
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public List<OrderItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
+    }
 
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
-    public Long getOrderNo() { return orderNo; }
-    public void setOrderNo(Long orderNo) { this.orderNo = orderNo; }
+    public Long getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(Long orderNo) {
+        this.orderNo = orderNo;
+    }
     public Integer getUid() { return uid; }
     public void setUid(Integer uid) { this.uid = uid; }
     public Integer getAddrId() { return addrId; }
