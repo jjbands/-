@@ -115,4 +115,21 @@ public class OrderServiceImpl implements OrderService {
         // 4. 删除订单
         orderMapper.deleteOrder(orderId);
     }
+    @Override
+    @Transactional
+    public void updateOrderStatus(Integer orderId, Integer status) {
+        Order order = orderMapper.selectOrderById(orderId);
+        if (order == null) {
+            throw new RuntimeException("订单不存在");
+        }
+
+        // 只允许从未付款(1)状态更新为已付款(2)
+        if (order.getStatus() != 1 && status == 2) {
+            throw new RuntimeException("只有未付款订单可以更新为已付款状态");
+        }
+
+        order.setStatus(status);
+        order.setUpdated(new Date());
+        orderMapper.updateOrderStatus(order);
+    }
 }

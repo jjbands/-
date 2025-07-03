@@ -210,4 +210,27 @@ public class OrderController {
         Object value = params.get(key);
         return value != null ? value.toString() : null;
     }
+    @PutMapping("/{id}/status")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateOrderStatus(
+            @PathVariable Integer id,
+            @RequestBody Map<String, Object> params) {
+        try {
+            Integer status = parseNumber(params.get("status"), "订单状态").intValue();
+            orderService.updateOrderStatus(id, status);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "订单状态更新成功"
+            ));
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (Exception e) {
+            log.error("更新订单状态失败", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "status", "error",
+                            "message", e.getMessage()
+                    ));
+        }
+    }
 }

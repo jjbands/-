@@ -18,4 +18,5 @@ public interface OrderService {
     List<Order> getOrdersByUserId(Integer userId);
     void deleteOrder(Integer orderId);
     // 可根据需要添加更多方法
+    void updateOrderStatus(Integer orderId, Integer status);
 } 

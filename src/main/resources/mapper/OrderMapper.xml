@@ -26,4 +26,10 @@
     <select id="selectOrderByOrderNo" resultType="com.machinery.mall.entity.Order">
         SELECT * FROM orders WHERE order_no = #{orderNo}
     </select>
+    <update id="updateOrderStatus">
+        UPDATE orders
+        SET status = #{status},
+            updated = #{updated}
+        WHERE id = #{id}
+    </update>
 </mapper>

@@ -5,37 +5,45 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a068307c-a387-4bcd-b74e-66c0e6621919" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/order.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/order_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/machinery/mall/controller/OrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/machinery/mall/controller/OrderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/machinery/mall/controller/PageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/machinery/mall/controller/PageController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/machinery/mall/entity/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/machinery/mall/entity/Order.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/machinery/mall/entity/UserAddress.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/machinery/mall/entity/UserAddress.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/machinery/mall/mapper/OrderItemMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/machinery/mall/mapper/OrderItemMapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/machinery/mall/mapper/OrderMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/machinery/mall/mapper/OrderMapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/machinery/mall/service/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/machinery/mall/service/OrderService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/machinery/mall/service/OrderServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/machinery/mall/service/OrderServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/mapper/OrderItemMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/mapper/OrderItemMapper.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/mapper/OrderMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/mapper/OrderMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/script.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/myaccount.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/myaccount.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/order.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/order.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/order_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/order_list.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/product_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/product_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/MachineryMallApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/MachineryMallApplication.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/controller/AdminController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/controller/AdminController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/controller/CategoryController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/controller/CategoryController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/controller/OrderController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/controller/OrderController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/controller/PageController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/controller/PageController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/entity/Order.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/entity/Order.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/controller/Result.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/controller/Result.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/controller/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/controller/UserController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/entity/OrderItem.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/entity/OrderItem.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/entity/Products.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/entity/Products.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/entity/ShoppingCart.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/entity/ShoppingCart.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/entity/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/entity/User.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/entity/UserAddress.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/entity/UserAddress.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/mapper/OrderItemMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/mapper/OrderItemMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/mapper/AdminMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/mapper/AdminMapper.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/mapper/OrderMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/mapper/OrderMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/mapper/ProductCategoryMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/mapper/ProductCategoryMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/mapper/ProductsMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/mapper/ProductsMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/mapper/UserAddressMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/mapper/UserAddressMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/mapper/UserMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/mapper/UserMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/AdminService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/AdminService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/AdminServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/AdminServiceImpl.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/OrderService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/OrderService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/OrderServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/OrderServiceImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/mapper/OrderItemMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/mapper/OrderItemMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/ProductCategoryService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/ProductCategoryService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/ProductsService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/ProductsService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/UserAddressService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/UserAddressService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/UserAddressServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/UserAddressServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/UserService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/UserServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/machinery/mall/service/UserServiceImpl.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/mapper/OrderMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/mapper/OrderMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/js/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/js/script.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/myaccount.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/myaccount.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/static/product_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/product_detail.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -46,16 +54,12 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="MavenImportPreferences">
-    <option name="generalSettings">
-      <MavenGeneralSettings>
-        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
-      </MavenGeneralSettings>
-    </option>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 8
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="2zJuJthCRIGwYjvDLHNQLQ94d0l" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -68,12 +72,14 @@
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
     "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "Spring Boot.MachineryMallApplication.executor": "Run",
-    "git-widget-placeholder": "Merging main",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/25952/Desktop/Mechanical e-commerce platform/hulianwangkaifa",
+    "last_opened_file_path": "D:/QQ/Mechanical e-commerce platform/hulianwangkaifa",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -117,6 +123,7 @@
       <option name="presentableId" value="Default" />
       <updated>1751461428399</updated>
       <workItem from="1751461429491" duration="14431000" />
+      <workItem from="1751518807477" duration="4748000" />
     </task>
     <servers />
   </component>
