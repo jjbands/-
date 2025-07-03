@@ -503,7 +503,7 @@
                         <div class="delivery-label">数量：</div>
                         <div class="delivery-content">
                             <input type="number" id="quantity" value="1" min="1" style="width:60px;">&nbsp;
-                            <span id="stock-info">库存：<span id="stock-num">100</span> 件</span>
+
                         </div>
                     </div>
                     <div class="delivery-row">
@@ -927,7 +927,7 @@
                     } else if (xhr.responseJSON && xhr.responseJSON.message) {
                         alert('创建订单失败: ' + xhr.responseJSON.message);
                     } else {
-                        alert('创建订单失败，请稍后重试');
+                        alert('商品库存不足');
                     }
                 },
                 data: JSON.stringify(orderData)

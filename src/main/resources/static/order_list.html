@@ -43,9 +43,6 @@
             color: #e4393c;
             margin-right: 15px;
         }
-        .order-time {
-            color: #666;
-        }
         .order-item {
             display: flex;
             align-items: center;
@@ -118,24 +115,23 @@
         // 获取订单状态文本
         function getStatusText(status) {
             const statusMap = {
-                1: '待付款',
-                2: '待发货',
-                3: '待收货',
-                4: '已完成',
-                5: '已取消',
-                6: '已退款'
+                1: '未付款',
+                2: '已付款',
+                3: '已发货',
+                4: '交易成功',
+                5: '交易关闭',
+                6: '已取消'
             };
             return statusMap[status] || '未知状态';
         }
 
-        // 格式化日期
         function formatDate(timestamp) {
-            if (!timestamp) return '未知时间';
+            if (!timestamp) return '';
             try {
                 const date = new Date(timestamp);
                 return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
             } catch (e) {
-                return '未知时间';
+                return '';
             }
         }
 
@@ -153,40 +149,43 @@
                     if (!item) return;
 
                     itemsHtml += `
-                        <div class="order-item">
-                            <img src="${item.iconUrl || 'default-product.png'}" class="item-image"
-                                 onerror="this.src='default-product.png'">
-                            <div class="item-detail">
-                                <h4>${item.goodsName || '未命名商品'}</h4>
-                                <p>单价: <span class="price">¥${(item.price || 0).toFixed(2)}</span></p>
-                                <p>数量: ${item.quantity || 1}</p>
-                            </div>
-                        </div>
-                    `;
+                <div class="order-item">
+                    <img src="${item.iconUrl || 'default-product.png'}" class="item-image"
+                         onerror="this.src='default-product.png'">
+                    <div class="item-detail">
+                        <h4>${item.goodsName || '未命名商品'}</h4>
+                        <p>单价: <span class="price">¥${(item.price || 0).toFixed(2)}</span></p>
+                        <p>数量: ${item.quantity || 1}</p>
+                    </div>
+                </div>
+            `;
                 });
             } else {
                 itemsHtml = '<div class="order-item"><p>此订单无商品信息</p></div>';
             }
 
-            // 返回完整的订单卡片HTML
+            // 获取状态文本和对应的CSS类
+            const statusText = getStatusText(order.status);
+            const statusClass = `status-${order.status === 2 ? 'paid' :
+                order.status === 3 ? 'shipped' :
+                    order.status === 4 ? 'success' : 'unpaid'}`;
+
             return `
-                <div class="order-card" data-orderid="${order.id}">
-                    <div class="order-header">
-                        <span class="order-id">订单号: ${order.orderNo}</span>
-                        <span class="order-status">${getStatusText(order.status)}</span>
-                        <span class="order-time">下单时间: ${formatDate(order.createTime)}</span>
-                    </div>
-                    ${itemsHtml}
-                    <div class="order-footer">
-                        <span>实付款: <span class="price">¥${(order.amount || 0).toFixed(2)}</span></span>
-                        ${order.status === 1 || order.status === 5 ?
+        <div class="order-card" data-orderid="${order.id}">
+            <div class="order-header">
+                <span class="order-id">订单号: ${order.orderNo}</span>
+                <span class="order-status ${statusClass}">${statusText}</span>
+            </div>
+            ${itemsHtml}
+            <div class="order-footer">
+                <span>实付款: <span class="price">¥${(order.amount || 0).toFixed(2)}</span></span>
+                ${order.status === 1 || order.status === 5 || order.status === 6 ?
                 `<button class="delete-btn" data-orderid="${order.id}">删除订单</button>` :
                 ''}
-                    </div>
-                </div>
-            `;
+            </div>
+        </div>
+    `;
         }
-
         // 渲染订单列表
         function renderOrderList(orders) {
             const $orderList = $('#orderList');
